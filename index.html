@@ -191,12 +191,7 @@ h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2);
 #question { font-size: clamp(20px, 4vw, 22px); line-height: 1.4; font-weight: 600; margin: 14px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
 /* Boss/summary title — high emphasis text */
-.boss-title {font-weight: bold; letter-spacing: 1px;text-align: center;}
-
-/* Individual boss themes */
-.boss-title.forger {color: #fbbf24;text-shadow: 0 0 10px rgba(251,191,36,0.6);}
-.boss-title.engine {color: #f97316;text-shadow: 0 0 10px rgba(249,115,22,0.6);}
-.boss-title.tyrant {color: #ef4444;text-shadow: 0 0 12px rgba(239,68,68,0.7);}
+.boss-title { font-size: 28px; font-weight: bold; margin-bottom: 15px; display: block;color: #fbbf24;text-shadow:0 0 10px rgba(251,191,36,0.6),0 0 25px rgba(249,115,22,0.4);}}
 
 /* Area/zone label — subtle contextual info */
 .area-title { color: #9ca3af; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
@@ -2240,6 +2235,8 @@ function loadQuestion() {
     document.getElementById("srAnnouncements").innerText = `Entering ${getAreaName(room)}. Room ${room} of 30.`;
 
     // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
+
+       // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
     if (isBoss) {
         if (bossHealth === 3) {
         bossPool = [...questionBanks[diff]]; // ← NO SHUFFLE
@@ -2247,31 +2244,14 @@ function loadQuestion() {
 
         currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
         
-   const bossMsg = document.getElementById("bossMessage");
-
-   let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
-
-   let bossClass =
-    room === 10 ? "forger" :
-    room === 20 ? "engine" :
-    "tyrant";
-
-   let bossImg =
-    room === 10 ? "forger.png" :
-    room === 20 ? "engine.png" :
-    "tyrant.png";
-
-   bossMsg.innerHTML = `
-    <img src="${bossImg}" class="bossIcon ${bossClass}">
-    <div class="boss-title ${bossClass}">${bTitle}</div>
-`;
-       
+        let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
+        let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#f97316" : "#ef4444";
         document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
         bossMsg.style.color = bColor;
         gameBox.style.setProperty('--bossColor', bColor);
         let bossImage = "";
-
+        let bossClass = "";
 
 // =============================================
 // BOSS VISUAL CONFIGURATION — SAFE TO EDIT
