@@ -1166,29 +1166,46 @@ function weightedPick(pool){
 
 function getAdaptiveQuestion(poolName, targetTag = null){
     let pool = questionBanks[poolName];
+
     // --- 🎯 TARGET SPECIFIC TAG IF PROVIDED ---
     if(targetTag){
         let filtered = pool.filter(q => q.tag === targetTag);
 
-        // Only use filtered if it actually has questions
-        if(filtered.length > 0){
+        if(filtered.length >= Math.max(6, pool.length * 0.25)){
             pool = filtered;
         }
     }
 
     let recent = questionHistory[poolName].slice(-10);
+
+    // First pass — strict
     let available = pool.filter(q => !recent.includes(q.id));
+
+    // Second pass — relax slightly
+    if(available.length < 3){
+        available = pool.filter(q => !questionHistory[poolName].slice(-5).includes(q.id));
+    }
+
+    // Final fallback — still avoid immediate repeats
     if(available.length === 0){
-       available = pool.filter(q => !questionHistory[poolName].slice(-5).includes(q.id));
-      }
+        available = pool.filter(q => !questionHistory[poolName].slice(-3).includes(q.id));
+    }
+
+    // Absolute fallback
     if(available.length === 0){
-       available = pool;
-      }
+        available = pool;
+    }
+
+    console.log("AVAILABLE:", available.map(q => q.id));
+
     let picked = weightedPick(available);
+
+    console.log("PICKED:", picked.id);
+    console.log("RECENT:", questionHistory[poolName]);
 
     // Track history
     questionHistory[poolName].push(picked.id);
-    if(questionHistory[poolName].length > 10){
+    if(questionHistory[poolName].length > 15){
         questionHistory[poolName].shift();
     }
 
@@ -1199,8 +1216,9 @@ function getAdaptiveQuestion(poolName, targetTag = null){
             tagHistory.shift();
         }
     }
+
     return picked;
-} 
+}
 
 // =============================================
 // TIMING CONFIGURATION — SAFE TO TUNE
