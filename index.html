@@ -2247,17 +2247,24 @@ function loadQuestion() {
 
         currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
         
+   const bossMsg = document.getElementById("bossMessage");
+
    let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
 
    let bossClass =
-       room === 10 ? "forger" :
-       room === 20 ? "engine" :
-       "tyrant";
+    room === 10 ? "forger" :
+    room === 20 ? "engine" :
+    "tyrant";
 
-   const bossMsg = document.getElementById("bossMessage");
+   let bossImg =
+    room === 10 ? "forger.png" :
+    room === 20 ? "engine.png" :
+    "tyrant.png";
 
-   bossMsg.innerText = bTitle;
-   bossMsg.className = `boss-title ${bossClass}`;
+   bossMsg.innerHTML = `
+    <img src="${bossImg}" class="bossIcon ${bossClass}">
+    <div class="boss-title ${bossClass}">${bTitle}</div>
+`;
        
         document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
