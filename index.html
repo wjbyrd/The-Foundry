@@ -56,7 +56,7 @@ body {
     padding: 0;
    /* Use dvh to stay within Safari's changing UI */
     min-height: 100vh;
-    min-height: 100dvh;
+    max-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -75,7 +75,7 @@ body {
     gap: 10px; /* Reduced gap to save vertical space */
     max-width: 900px;
     width: 95%; /* Use 95% to leave a tiny bit of breathing room on the edges */
-    height: 90dvh; /* Force the shell to stay within the viewport */
+    height: auto; 
     margin: 0 auto;
 }
    
@@ -840,29 +840,33 @@ This controls responsiveness, not game logic.
 #wizardImage {width: 100px; max-width: 100%;}
 }
    
-/* Landscape (side-by-side, compact wizard) */   
 @media (max-width: 900px) and (orientation: landscape) {
-  /* 1. Limit the total game height to the screen height */
-  #gameShell {height: 95vh;display: flex; flex-direction: column;justify-content: space-between; padding: 5px;overflow: hidden; /* Prevents the 'bounce' scroll */}
+  /* 1. Shell adjustments - removed 'overflow: hidden' so you can scroll if needed */
+  #gameShell {height: auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-start; padding: 5px; gap: 5px;  }
 
-  /* 2. Shrink the 'The Foundry' header and top grid */
-  h1, .header-text { font-size: 1rem; margin: 2px 0; }
-  .grid-container { transform: scale(0.85); margin-top: -10px; }
+  /* 2. Shrink header and grid to save vertical space */
+  h1, .header-text { font-size: 0.9rem; margin: 2px 0; }
+  .grid-container {transform: scale(0.75); margin: -15px 0; /* Pulls the middle section up */ }
 
-  /* 3. Optimize the Middle Panel */
-  .main-panel {flex: 1; /* Takes up remaining middle space */
-    display: flex;align-items: center;}
-  #wizardBox {width: 25%; /* Fixed width for the side panel */
-    height: 100%;}
-  #wizardImage {height: 70%; /* Scale based on height, not width */
-    width: auto;max-height: 150px;}
+  /* 3. The CRITICAL FIX: Force side-by-side layout */
+  .main-panel {display: flex !important; /* Forces row layout */
+    flex-direction: row !important; align-items: center; justify-content: center; flex: 1; width: 100%; gap: 15px;}
 
-  /* 4. Flatten the Artifacts section */
-  #artifactsBox {padding: 5px;margin-top: 5px;}
-  .artifactSlot img {width: 30px; /* Smaller icons to save vertical room */}
-}
+  #wizardBox {width: 20%; /* Takes up less horizontal room */
+    display: flex;justify-content: center;}
 
-@media (max-width: 900px) and (orientation: landscape) {.fullscreenBtn {top: 5px;left: 5px; padding: 4px 8px; /* Slightly smaller to save space */ font-size: 10px;}}
+  #wizardImage {width: 120px; /* Big enough to see, small enough to fit */
+    height: auto; max-height: 40vh; /* Limits height so it doesn't push the screen down */  }
+
+  /* Ensure the question box takes the remaining width */
+  #questionBox {flex: 1; padding: 5px;}
+
+  /* 4. Inventory/Artifacts section */
+  #artifactsBox {padding: 4px;margin-top: 0;}
+  .artifactSlot img { width: 28px; }
+
+  /* Fullscreen button positioning */
+  .fullscreenBtn {top: 5px;left: 5px;padding: 4px 8px;font-size: 10px;}}
    
 </style>
 </head>
@@ -1056,15 +1060,26 @@ const hallwayImages = [
 function goFullscreen(){
 let el = document.documentElement;
 
-if (el.requestFullscreen) {
-    el.requestFullscreen();
-} 
-else if (el.webkitRequestFullscreen) { // Safari
-    el.webkitRequestFullscreen();
-} 
-else if (el.msRequestFullscreen) { // old Edge
-    el.msRequestFullscreen();
-}
+// Check if we are ALREADY in fullscreen
+let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+
+if (!isFullscreen) {
+        // ENTER Fullscreen
+        if (el.requestFullscreen) {
+            el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+        }
+    } else {
+        // EXIT Fullscreen (Crucial for iOS to reset the state)
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
 }
     
 // =============================================
