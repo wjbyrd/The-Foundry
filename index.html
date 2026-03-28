@@ -1098,7 +1098,6 @@ let usedQuestions = {
     easyBoss: [],
     mediumBoss: [],
     finalBoss: [],
-    finalBossPlus: []
 };
 let questionHistory = {
     easy: [],
@@ -1108,7 +1107,6 @@ let questionHistory = {
     easyBoss: [],
     mediumBoss: [],
     finalBoss: [],
-    finalBossPlus: []
 };
 
 // =============================================
@@ -1535,10 +1533,6 @@ finalBoss:[
 { id:4000, q:"The Market Tyrant rises: 'You think in parts. I demand the whole.' In a perfectly competitive market, what condition defines long-run equilibrium?",options:["Firms produce where marginal revenue equals marginal cost at all output levels","Price equals marginal cost ensuring efficient allocation of resources","Price equals average total cost with firms earning zero economic profit","Demand equals supply across all markets in the short run"],a:2,tag:"market",type:"definition",feedback:"Long-run equilibrium requires P = ATC (zero profit), not just MR = MC."},
 { id:4001, q:"The Tyrant tightens his grip: 'Now follow the chain.' A market begins in long-run equilibrium. Demand increases. What is the correct sequence of events?",options:["Price rises as firms incur losses and exit reduces supply further","Price rises as firms earn profit and entry expands supply over time","Price falls as firms earn profit and entry reduces market demand","Price remains constant as firms adjust output without entry"],a:1,tag:"market",type:"multi-step",feedback:"Demand ↑ → price ↑ → profit → entry → supply ↑ → price falls."},
 { id:4002, q:"The Tyrant delivers judgment: 'One final test.' In the new long-run equilibrium after demand increased, which statement is TRUE?",options:["Firms earn positive profit because demand remains elevated","Price equals marginal and average cost with higher total output","Price remains above cost as firms restrict entry into the market","Firms exit because increased competition lowers market price"],a:1,tag:"efficiency",type:"multi-step",feedback:"P = MC and P = ATC, with higher output due to more firms."}
-],
-finalBossPlus:[
-{ id:5000, q:"A competitive market is in long-run equilibrium. A technological improvement lowers costs for all firms. What is the most accurate outcome?",options:["Firms earn permanent profit","Price falls, output increases, and long-run profit returns to zero","Demand decreases","Firms exit immediately"],a:1,tag:"market",type:"ultimate",feedback:"Lower costs shift supply right. Entry/adjustment drives profit back to zero."},
-{ id:5001, q:"A market is in long-run equilibrium. A permanent increase in demand occurs. Which statement is TRUE in the long run?",options:["Price remains permanently higher","Firms earn ongoing profit","Output increases and price returns toward ATC","Supply decreases"],a:2,tag:"market",type:"ultimate",feedback:"Entry increases supply until profit returns to zero."}
 ],
 easy:[
 { id:1, q:"A production function shows the relationship between...",options:["Costs and profits","Inputs and output","Prices and demand","Revenue and cost"],a:1,tag:"production",type:"definition",feedback:"A production function maps inputs like labor and capital into output."},
@@ -1969,7 +1963,6 @@ if (room === 29) return getEfficiencyProfitCombo();
         ...usedQuestions.easyBoss,
         ...usedQuestions.mediumBoss,
         ...usedQuestions.finalBoss,
-        ...usedQuestions.finalBossPlus
     ];
 
     let available = pool.filter(q => !used.includes(q.id));
@@ -2506,37 +2499,13 @@ function answer(choice) {
         showArtifact(artifacts.crown.img, artifacts.crown.title, artifacts.crown.text);
         }
 
-         if(room === 30 && !finalBossCleared){
-
-       // --- MASTERY GATE ---
-          currentQuestion = shuffleOptions(randomQuestion("finalBossPlus"));
-
-          document.getElementById("question").innerHTML =
-          "👑 The Market Tyrant: Final Judgment<br>" + currentQuestion.q;
-
-          document.getElementById("formulaHint").innerText = "";
-          msgElement.innerHTML =
-          `<span class='fade-out-text'>You have proven strength… now prove mastery.</span>`;
-
-          finalBossCleared = true;
-
-       displayQuestion();
-    return;
-}
-
-    showKnowledgeRoom(room);
+   showKnowledgeRoom(room);
     bossHealth = 3;
     return;
             }
         
 msgElement.innerHTML = "";
-
-if(finalBossCleared && room === 30){
-    room = 31; // exit boss cleanly
-} else {
-    room++;
-}
-
+room++;
 localStorage.setItem("gauntletRoom", room);
 showHallwayTransition(currentQuestion.feedback);
 return;
