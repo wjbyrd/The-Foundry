@@ -209,7 +209,7 @@ h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2);
 #message {margin-top: 10px; font-style: italic; letter-spacing: 0.5px; text-align: center; color: #cbd5f5; opacity: 0.85;}
 
 /* Foundry override */
-.foundry #message {color: #fbbf24;font-size: 16px; font-style: italic; margin-top: 12px; margin-bottom: 6px; letter-spacing: 1px;text-shadow:0 0 6px rgba(251,191,36,0.6), 0 0 12px rgba(249,115,22,0.4);}
+.foundry #message {color: #fbbf24;font-size: 16px; font-style: italic; margin-top: 12px; margin-bottom: 6px; font-weight: 600; letter-spacing: 1px;text-shadow:0 0 6px rgba(251,191,36,0.6), 0 0 12px rgba(249,115,22,0.4);}
    
 /* =========================================
    4. BUTTONS & INTERACTION — SAFE TO CUSTOMIZE
@@ -2367,16 +2367,7 @@ else{
     bossMsg.style.color = "#ef4444";
 
     questionElement.innerHTML = `
-        <div>${currentQuestion.q}</div><div style="
-        margin-top:10px;
-        color:#fbbf24;
-        font-style:italic;
-        letter-spacing:1px;
-        text-align:center;
-        text-shadow:0 0 6px rgba(251,191,36,0.5);
-    ">
-        ${wizardText}
-    </div>
+        <div>${currentQuestion.q}</div>
     `;
 }
     
