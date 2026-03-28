@@ -1196,6 +1196,20 @@ function getAdaptiveQuestion(poolName, targetTag = null){
         available = pool;
     }
 
+    // =========================
+    // TAG ANTI-REPEAT FILTER
+    // =========================
+    let lastTags = tagHistory.slice(-2);
+
+    let tagFiltered = available.filter(q => {
+        return !(lastTags.length === 2 && lastTags.every(t => t === q.tag));
+    });
+
+    // Only apply if it doesn't collapse the pool
+    if(tagFiltered.length >= 3){
+        available = tagFiltered;
+    }
+
     console.log("AVAILABLE:", available.map(q => q.id));
 
     let picked = weightedPick(available);
