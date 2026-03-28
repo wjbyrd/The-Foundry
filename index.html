@@ -1128,23 +1128,40 @@ let questionHistory = {
 // Only advanced users should modify this.
 
 function weightedPick(pool){
-    let weightedPool = [];
-    pool.forEach(q => {
-        let weight = 1;
+    let totalWeight = 0;
+
+    let weights = pool.map(q => {
+        let w = 1;
+
         // Weakness boost
         if(q.tag && conceptMemory[q.tag]){
-            weight += Math.min(conceptMemory[q.tag], 2);
+            w += Math.min(conceptMemory[q.tag], 2);
         }
-        // Coverage boost (if tag not seen recently)
+
+        // Coverage boost
         let recentCount = tagHistory.filter(t => t === q.tag).length;
         if(recentCount === 0){
-            weight += 2;
+            w += 1;
         }
-        for(let i = 0; i < weight; i++){
-            weightedPool.push(q);
-        }
+
+        // Hard cap so one question does not dominate
+        w = Math.min(w, 3);
+
+        totalWeight += w;
+        return { q, w };
     });
-    return weightedPool[Math.floor(Math.random() * weightedPool.length)];
+
+    let r = Math.random() * totalWeight;
+
+    for(let item of weights){
+        r -= item.w;
+        if(r <= 0){
+            return item.q;
+        }
+    }
+
+    // Safety fallback
+    return weights[weights.length - 1].q;
 }
 
 function getAdaptiveQuestion(poolName, targetTag = null){
@@ -1159,11 +1176,14 @@ function getAdaptiveQuestion(poolName, targetTag = null){
         }
     }
 
-    let recent = questionHistory[poolName].slice(-5);
+    let recent = questionHistory[poolName].slice(-10);
     let available = pool.filter(q => !recent.includes(q.id));
     if(available.length === 0){
-        available = pool;
-    }
+       available = pool.filter(q => !questionHistory[poolName].slice(-5).includes(q.id));
+      }
+    if(available.length === 0){
+       available = pool;
+      }
     let picked = weightedPick(available);
 
     // Track history
