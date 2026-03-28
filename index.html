@@ -192,7 +192,7 @@ h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2);
 #questionContainer p:last-child {color: #f97316;opacity: 0.9;letter-spacing: 1px;}
 
 /* Boss/summary title — high emphasis text */
-.boss-title { font-size: 28px; font-weight: bold; margin-bottom: 15px; display: block; }
+.boss-title { color: #fbbf24; text-shadow: 0 0 10px rgba(251,191,36,0.7), 0 0 25px rgba(249,115,22,0.5); letter-spacing: 1px;font-size: 28px; font-weight: bold; margin-bottom: 15px; display: block; }
 
 /* Area/zone label — subtle contextual info */
 .area-title { color: #9ca3af; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
@@ -272,26 +272,15 @@ button:active {transform: scale(0.96);}
     text-transform: uppercase;
     color: #fef3c7;
     /* 🔥 forged metal look */
-    background: linear-gradient(
-        180deg,
-        #7c2d12,
-        #3f1a0d
-    );
-    border: 1px solid rgba(251,191,36,0.4);
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow:
-        0 0 10px rgba(249,115,22,0.4),
-        inset 0 0 6px rgba(0,0,0,0.6);
-    transition: all 0.15s ease;
-}
-   .fullscreenBtn:active {
-    transform: scale(0.95);
+    background: linear-gradient(180deg,#7c2d12,#3f1a0d);
+    border: 1px solid rgba(251,191,36,0.4); border-radius: 6px; cursor: pointer; box-shadow: 0 0 10px rgba(249,115,22,0.4), inset 0 0 6px rgba(0,0,0,0.6); transition: all 0.15s ease;}
+   .fullscreenBtn:active {transform: scale(0.95); box-shadow: 0 0 8px rgba(249,115,22,0.3),inset 0 0 10px rgba(0,0,0,0.8);}
 
-    box-shadow:
-        0 0 8px rgba(249,115,22,0.3),
-        inset 0 0 10px rgba(0,0,0,0.8);
-}
+.continue-btn {background: linear-gradient(180deg, #ea580c, #7c2d12);color: #fef3c7;font-weight: bold;padding: 14px 40px;font-size: 18px;border-radius: 8px;border: 1px solid rgba(251,191,36,0.4);cursor: pointer; box-shadow:
+        0 0 15px rgba(249,115,22,0.5),0 0 30px rgba(251,191,36,0.3);transition: all 0.15s ease;}
+.continue-btn:hover {background: linear-gradient(180deg, #f97316, #ea580c); box-shadow: 0 0 25px rgba(251,191,36,0.7), 0 0 40px rgba(249,115,22,0.5);transform: scale(1.03);}
+
+#continueBtn:active {transform: scale(0.97);box-shadow: 0 0 10px rgba(249,115,22,0.3),inset 0 0 10px rgba(0,0,0,0.6);}
 
 /* =========================================
    5. PROGRESS & MAZE TRACK — SAFE TO CUSTOMIZE (WITH RULES)
@@ -2879,11 +2868,10 @@ function showKnowledgeRoom(bossRoom) {
     let nextAction = bossRoom === 30 ? "handleVictory()" : "room++; loadQuestion();";
     let buttonLabel = bossRoom === 30 ? "FINALIZE THE ARCHIVE CONQUEST →" : `CONTINUE TO ROOM ${bossRoom + 1} →`;
 
-   aContainer.innerHTML = `
-    <button id="continueBtn"
-        style="background:#60a5fa; color:black; font-weight:bold; width:100%; padding:20px; font-size:18px;">
-        ${buttonLabel}
-    </button>`;
+aContainer.innerHTML = `
+<button id="continueBtn" class="continue-btn">
+    ${buttonLabel}
+</button>`;
 
 // =============================================
 // PROGRESSION HANDLER — DO NOT MODIFY
