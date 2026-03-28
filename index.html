@@ -191,7 +191,12 @@ h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2);
 #question { font-size: clamp(20px, 4vw, 22px); line-height: 1.4; font-weight: 600; margin: 14px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
 /* Boss/summary title — high emphasis text */
-.boss-title { color: #fbbf24; text-shadow: 0 0 10px rgba(251,191,36,0.7), 0 0 25px rgba(249,115,22,0.5); letter-spacing: 1px;font-size: 28px; font-weight: bold; margin-bottom: 15px; display: block; }
+.boss-title {font-weight: bold; letter-spacing: 1px;text-align: center;}
+
+/* Individual boss themes */
+.boss-title.forger {color: #fbbf24;text-shadow: 0 0 10px rgba(251,191,36,0.6);}
+.boss-title.engine {color: #f97316;text-shadow: 0 0 10px rgba(249,115,22,0.6);}
+.boss-title.tyrant {color: #ef4444;text-shadow: 0 0 12px rgba(239,68,68,0.7);}
 
 /* Area/zone label — subtle contextual info */
 .area-title { color: #9ca3af; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
@@ -2242,8 +2247,18 @@ function loadQuestion() {
 
         currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
         
-        let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
-        let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#06b6d4" : "#eab308";
+   let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
+
+   let bossClass =
+       room === 10 ? "forger" :
+       room === 20 ? "engine" :
+       "tyrant";
+
+   const bossMsg = document.getElementById("bossMessage");
+
+   bossMsg.innerText = bTitle;
+   bossMsg.className = `boss-title ${bossClass}`;
+       
         document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
         bossMsg.style.color = bColor;
@@ -2578,7 +2593,7 @@ console.log("DETOUR CHECK VALUE:", conceptMemory[currentQuestion.tag]);
         document.getElementById("question").innerText = "Concept Check: " + currentQuestion.q;
         document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
 
-        msgElement.innerHTML = `<span class='fade-out-text'>You falter… The labyrinth demands a concept check.</span>`;
+        msgElement.innerHTML = `<span class='fade-out-text'>You falter… The foundry demands a concept check.</span>`;
 
         displayQuestion();
         return;
