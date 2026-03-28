@@ -1,0 +1,3163 @@
+<!-- =====================================================
+GAUNTLET ENGINE — MASTER TEMPLATE
+
+READ BEFORE EDITING:
+
+This file is divided into TWO zones:
+
+1. SAFE TO EDIT (Customization)
+   - Question banks
+   - Boss names/images
+   - Text (wizard, areas, artifacts)
+   - Visual themes
+
+2. DO NOT TOUCH (Core Engine)
+   - Adaptive logic
+   - Question selection system
+   - Progression rules
+   - Boss mechanics
+
+If you modify the engine without understanding it,
+you WILL break the game.
+
+If something breaks, check:
+- Question IDs are unique
+- Each question has: q, options, a, tag, type, feedback
+- Tags/types are consistent
+
+===================================================== -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    
+<!-- Title can be changed to whatever the game needs -->
+<title>The Archives of Microeconomics</title>
+   
+<style>
+/* =========================================
+   1. VISUAL DESIGN — SAFE TO EDIT
+
+You can change:
+- Colors
+- Background images
+- Fonts
+- Glow effects
+
+Do NOT rename IDs (#gameBox, #mazeTrack, etc.)
+or you will break JavaScript connections.
+========================================= */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: scroll;
+}
+   
+#gameShell{
+    display:flex;
+    gap:20px;
+    max-width:900px;
+    width:100%;
+    margin:0 auto;
+}
+   
+.dungeon-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 20px;
+}
+
+/* =========================================
+   2. CORE GAME CONTAINER (#gameBox) — SAFE TO STYLE
+=========================================
+
+This is the main gameplay panel.
+
+Controls:
+- size and layout of the game area
+- background styling and effects
+- visual feedback (glow, boss mode, hit effects)
+- positioning of UI elements (autosave, etc.)
+
+-----------------------------------------
+SAFE TO EDIT:
+- colors, shadows, glow effects
+- padding, margins
+- background / blur effects
+- border styles
+- animation intensity
+
+-----------------------------------------
+USE CAUTION:
+- width / max-width / flex settings
+- position: relative (needed for overlays like autosave)
+- removing box-sizing may break layout
+
+-----------------------------------------
+DO NOT REMOVE:
+- #gameBox selector (used throughout JS)
+- .boss-mode class (boss visuals tied to logic)
+- .hit class (damage feedback)
+
+-----------------------------------------
+TIP:
+This controls how the game FEELS visually.
+You can restyle it completely—just keep structure intact.
+
+========================================= */
+#gameBox {
+    max-width: 750px;
+    flex:1;
+    min-width:0;
+    width:100%;
+    min-height: auto;
+    margin: 0;
+    padding: 18px 20px;
+    text-align: center;
+    background: rgba(15,23,42,0.98);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(212,175,55,0.6), 0 0 20px rgba(212,175,55,0.5), 0 0 40px rgba(212,175,55,0.3);
+    border: 1px solid rgba(255,255,255,0.05);
+    animation: torchFlicker 6s infinite;
+    transition: box-shadow .3s ease;
+    position: relative;
+}
+
+/* Boss state styling — triggered during boss fights (DO NOT REMOVE) */
+#gameBox.boss-mode {
+    border: 2px solid #60a5fa;
+    box-shadow: 0 0 40px rgba(96,165,250,0.4);
+}
+
+/* Damage effect when boss/player is hit (visual feedback) */
+.hit { box-shadow: 0 0 60px #ef4444, inset 0 0 40px #7f1d1d !important; animation: hitshake 0.4s ease; }
+
+/* Autosave indicator — positioned relative to gameBox */
+#autosave { position: absolute; top: 15px; right: 15px; font-size: 11px; opacity: 0.5; font-style: italic; }
+
+/* =========================================
+   3. TEXT & TYPOGRAPHY SYSTEM — SAFE TO CUSTOMIZE
+=========================================
+Controls all text styling in the game:
+- question readability
+- headers and titles
+- boss emphasis text
+- hints and feedback
+- visual hierarchy
+-----------------------------------------
+SAFE TO EDIT:
+- font sizes
+- colors
+- text shadows
+- spacing (margin, line-height)
+- stylistic effects (italic, uppercase, etc.)
+-----------------------------------------
+USE CAUTION:
+- extreme font sizes (may break layout)
+- removing margins (can cause overlap)
+- removing contrast (hurts readability)
+-----------------------------------------
+DO NOT REMOVE:
+- #question (core content display)
+- .boss-title (boss transitions)
+- .boss-q (boss summaries)
+- .fade-out-text (feedback animation)
+-----------------------------------------
+TIP:
+Prioritize readability over style.
+If students can’t read it quickly, the system fails.
+========================================= */
+h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2); margin-bottom: 5px; }
+
+/* Main question text — keep readable and centered */
+#question { font-size: clamp(20px, 4vw, 22px); line-height: 1.4; font-weight: 600; margin: 14px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+
+/* Boss/summary title — high emphasis text */
+.boss-title { font-size: 28px; font-weight: bold; margin-bottom: 15px; display: block; }
+
+/* Area/zone label — subtle contextual info */
+.area-title { color: #9ca3af; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
+
+/* Boss summary text — left-aligned for readability */
+.boss-q {font-style: italic; font-size: 24px; border-left: 4px solid var(--bossColor); padding-left: 15px; margin: 20px 0; text-align: left;}
+
+/* Optional hint display (calculation or guidance) */
+.hint-box { font-size: 13px; color: #fbbf24; margin-top: 15px; opacity: 0.8; height: 18px; }
+    
+/* Temporary feedback text (auto fades out) */
+.fade-out-text { animation: fadeOut 5s forwards; font-weight: bold; color: #4ade80; }
+
+/* =========================================
+   4. BUTTONS & INTERACTION — SAFE TO CUSTOMIZE
+=========================================
+Controls all interactive elements:
+- answer buttons
+- hover/active feedback
+- layout of answer choices
+- utility buttons (fullscreen, etc.)
+-----------------------------------------
+SAFE TO EDIT:
+- colors, backgrounds, borders
+- hover/active effects (scale, glow, etc.)
+- padding, spacing, font sizes
+- button shapes (border-radius)
+-----------------------------------------
+USE CAUTION:
+- removing hover/active effects (reduces feedback)
+- extreme sizing (can break layout or overlap)
+- flex settings in .answers (affects layout)
+-----------------------------------------
+DO NOT REMOVE:
+- button selector (used globally)
+- .answers layout (controls answer positioning)
+-----------------------------------------
+TIP:
+Buttons should feel responsive and clickable.
+Visual feedback = better engagement.
+========================================= */
+
+/* Base button styling — applies to all buttons */
+button {
+    padding: 12px 22px; margin: 6px; font-size: 16px; cursor: pointer;
+    background: #374151; color: white; border: none; border-radius: 8px; transition: all 0.2s ease;
+}
+
+/* Hover feedback — improves interactivity */
+button:hover { background: #4b5563; transform: translateY(-2px); }
+
+/* Click feedback — simulates button press */
+button:active {transform: scale(0.96);}
+
+/* Answer container — controls layout of choices */
+.answers { display: flex; flex-direction: column; justify-content: center; gap: 12px; width: 100%}
+
+/* Individual answer buttons — flexible sizing */
+.answers button { flex: 1 1 100%; min-height: 60px; max-width: 100%; padding: 15px; font-size: 18px; margin: 0; }
+
+/* Utility button (fullscreen toggle) — safe to restyle or move */
+.fullscreenBtn { position: absolute; top: 12px; left: 12px; background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+/* =========================================
+   5. PROGRESS & MAZE TRACK — SAFE TO CUSTOMIZE (WITH RULES)
+=========================================
+Controls visual progression feedback:
+- progress bar (top fill indicator)
+- maze track (30-room grid)
+- current position highlight
+- boss room visual cues
+-----------------------------------------
+SAFE TO EDIT:
+- colors, gradients, glow effects
+- sizes (maze-box, spacing, gap)
+- animation styles (pulse, transitions)
+- grid sizing (with care)
+-----------------------------------------
+USE CAUTION:
+- grid-template-columns (affects layout structure)
+- maze-box size vs spacing (can cause overflow)
+- removing animations (reduces feedback clarity)
+-----------------------------------------
+DO NOT MODIFY:
+- #mazeTrack structure (10 columns × 3 rows = 30 rooms)
+- nth-child(10, 20, 30) unless boss rooms are changed globally
+
+Changing boss room visuals here requires matching updates in:
+- game logic (boss triggers)
+- progression system
+-----------------------------------------
+TIP:
+This system gives players a sense of movement and progress.
+If it's unclear, motivation drops.
+========================================= */
+    
+/* Progress bar container — background track */
+#progressBar { width: 100%; height: 22px; background: #2d3748; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+    
+/* Progress fill — width controlled by JS */
+#progressFill { height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #ef4444); transition: width 0.4s ease; }
+
+/* Maze grid layout — 10 columns = 30 total rooms */
+#mazeTrack { display: grid; grid-template-columns: repeat(10, 36px); justify-content: center; gap: 10px; margin: 25px auto; }
+    
+/* Individual room cell — default state */
+.maze-box { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+
+/* Current room highlight — animated pulse */
+.maze-box.active { background: rgba(212,175,55,0.2); border: 2px solid #d4af37; z-index: 10; animation: activePulse 1s infinite alternate;}
+
+/* Boss room highlights (10, 20, 30) — visual only */
+.maze-box:nth-child(10) { text-shadow: 0 0 10px #60a5fa; }
+.maze-box:nth-child(20) { text-shadow: 0 0 12px #a855f7; }
+.maze-box:nth-child(30) { text-shadow: 0 0 15px #ef4444; }
+/* =========================================
+   6. ARTIFACT SYSTEM (REWARDS) — SAFE TO CUSTOMIZE
+=========================================
+Controls visual display of rewards:
+- artifact drop popup (after boss wins)
+- artifact vault (persistent collection)
+- locked vs unlocked states
+- reward animations and glow effects
+-----------------------------------------
+SAFE TO EDIT:
+- colors, backgrounds, borders
+- artifact sizes and spacing
+- glow effects and animations
+- text labels and styling
+-----------------------------------------
+USE CAUTION:
+- opacity (controls locked vs unlocked visibility)
+- transform/scale (can affect layout spacing)
+- animation timing (too fast = distracting)
+-----------------------------------------
+DO NOT MODIFY:
+- .artifactSlot.unlocked (linked to JS unlock logic)
+- element IDs (#artifactDrop, #artifactVault, etc.)
+- display behavior (used for showing/hiding rewards)
+
+Changing these may break:
+- artifact unlocking visuals
+- vault persistence feedback
+-----------------------------------------
+TIP:
+This is your reward system.
+If it doesn’t feel rewarding, engagement drops.
+========================================= */
+    
+/* Reward popup — appears after boss victory */
+#artifactDrop { margin-top: 20px; padding: 14px; background: rgba(15,23,42,.6); border-radius: 10px; border: 1px solid rgba(99,102,241,.35); text-align: center; }
+    
+/* Artifact image in popup */
+#artifactImage { width: 96px; margin-bottom: 8px; }
+#artifactDrop img { filter: drop-shadow(0 0 12px rgba(56,189,248,.8)); }
+
+/* Persistent artifact collection display (top panel) */
+#artifactVault { margin-top: -6px; width: 220px; padding: 18px; border-radius: 12px; background: linear-gradient(180deg,#020617,#020617 60%,#020617 100%); box-shadow: 0 0 25px rgba(56,189,248,.15); border: 1px solid rgba(56,189,248,.25); text-align: center; display:block !important; }
+#artifactVault h3 { color: #60a5fa; margin: 0 0 14px 0; }
+
+/* Layout container for artifact slots */
+.vaultRow { display: flex; justify-content: center; align-items:flex-end; gap: 15px; flex-wrap:wrap;}
+
+/* Individual artifact slot (default = locked state) */    
+.artifactSlot { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; text-align:center; opacity: .25; transition: all .4s ease;}
+
+/* Locked artifact image (grayscale effect) */    
+.artifactSlot img { width: 45px; margin-bottom:4px;filter: grayscale(1); transition: all .4s ease; }
+
+/* Unlocked artifact — triggered by JS (DO NOT REMOVE) */    
+.artifactSlot span { display: block; font-size: 13px; color: #94a3b8; margin-top: 8px; line-height: 1.2; }
+
+/* Glow + animation for unlocked artifacts */
+.artifactSlot.unlocked { opacity: 1; transform: scale(1.05); }
+.artifactSlot.unlocked img { filter: drop-shadow(0 0 14px rgba(56,189,248,.9)); animation: relicPulse 3s infinite; }
+.artifactSlot.unlocked span { color: #e2e8f0; font-weight: 600; }
+
+/* =========================================
+   7. BOSS EFFECTS & ATMOSPHERE — SAFE TO CUSTOMIZE
+=========================================
+Controls visual intensity and immersion:
+- boss animations (floating, shaking)
+- boss-specific glow effects
+- environmental effects (torches)
+-----------------------------------------
+SAFE TO EDIT:
+- glow colors (match your theme)
+- animation intensity and timing
+- boss icon size
+- torch placement and styling
+-----------------------------------------
+USE CAUTION:
+- removing animations (reduces feedback and immersion)
+- extreme sizing (can break layout)
+- opacity/filter changes (affects visibility)
+-----------------------------------------
+DO NOT REMOVE:
+- .boss-shake (triggered during boss hits)
+- .bossIcon (used for boss rendering)
+- .torch (environmental effect tied to game start)
+
+Removing these will:
+- eliminate combat feedback
+- reduce visual clarity during bosses
+-----------------------------------------
+TIP:
+This section controls how "intense" the game feels.
+Subtle changes here dramatically affect experience.
+========================================= */
+    
+/* Hit animation — triggered when boss takes damage */
+.boss-shake {animation: bossShake 0.5s cubic-bezier(.36,.07,.19,.97) both;}
+
+/* Boss image display — includes floating animation */
+.bossIcon { width: 96px; height: auto; display: block; margin: 0 auto 12px auto; animation: bossFloat 4s ease-in-out infinite; }
+
+/* Boss-specific glow effects (safe to recolor per theme, change name before glow to match your boss name) */
+.tyrantGlow { filter: drop-shadow(0 0 14px rgba(96,165,250,.8)); }
+.underwriterGlow { filter: drop-shadow(0 0 14px rgba(168,85,247,.8)); }
+.finalBoss { filter: drop-shadow(0 0 18px rgba(239,68,68,.9)); }
+
+/* Ambient torch effect — decorative, shown during gameplay */
+.torch { position: absolute; width: 70px; top: 30px; z-index: 10; animation: torchFlicker 3s infinite alternate; pointer-events: none; opacity: .95; filter: drop-shadow(0 0 12px rgba(255,180,80,.7)); display:none; }
+
+/* Torch positioning (left/right sides of screen) */
+.left-torch { left: 18px; }
+.right-torch { right: 18px; transform: scaleX(-1); }
+/* =========================================
+   8. FULLSCREEN SCREENS & TRANSITIONS — SAFE TO CUSTOMIZE
+=========================================
+Controls full-screen UI layers:
+- start screen (game entry)
+- hallway transition overlay (between rooms)
+- transition text display
+-----------------------------------------
+SAFE TO EDIT:
+- background images (start screen, hallway scenes)
+- text styling and layout
+- overlay colors and opacity
+- animation timing and effects
+-----------------------------------------
+USE CAUTION:
+- position: fixed (required for full-screen coverage)
+- z-index layering (controls what appears on top)
+- opacity / pointer-events (controls visibility + interaction)
+-----------------------------------------
+DO NOT REMOVE:
+- #startScreen (entry point to game)
+- #hallwayTransition + .active (transition system)
+- #hallwayText (text container)
+
+Removing these will break:
+- game start flow
+- transition animations
+- progression continuity
+-----------------------------------------
+TIP:
+This section controls immersion and pacing between actions.
+Good transitions = smoother experience.
+========================================= */
+
+/* Fullscreen start screen — shown before game begins */    
+#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('start_screen_image.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+/* Transition overlay — appears between rooms (controlled by JS) */
+#hallwayTransition { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)), url('hallway1.png'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; text-align: center; color: white; font-size: 26px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 1.2s ease; animation: hallwayZoom 3.2s ease-out forwards; }
+
+/* Activates transition visibility (DO NOT REMOVE) */    
+#hallwayTransition.active { opacity: 1; }
+
+/* Text container for transition messages */
+#hallwayText { max-width: 600px; background: rgba(0,0,0,0.55); padding: 30px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 0 25px rgba(0,0,0,0.6); }
+
+/* =========================================
+   9. ANIMATION SYSTEM — SAFE TO CUSTOMIZE (WITH CARE)
+=========================================
+Defines all animation keyframes used throughout the game:
+- environmental effects (torch flicker)
+- combat feedback (hit shake, boss shake)
+- progression feedback (active pulse, victory glow)
+- character motion (boss float, wizard float)
+- reward effects (relic pulse)
+- UI transitions (fade in/out)
+-----------------------------------------
+SAFE TO EDIT:
+- animation intensity (scale, movement distance)
+- timing (duration in CSS usage, not here)
+- visual effects (glow, brightness, shadows)
+-----------------------------------------
+USE CAUTION:
+- transform values (affects layout positioning)
+- extreme motion (can feel distracting or chaotic)
+- removing animations (reduces feedback clarity)
+-----------------------------------------
+DO NOT REMOVE:
+- keyframe names (used across CSS and JS)
+  e.g. torchFlicker, bossShake, activePulse, etc.
+
+Renaming or deleting these will break:
+- visual feedback
+- boss effects
+- UI transitions
+-----------------------------------------
+TIP:
+Animations should reinforce feedback, not distract.
+Subtle > excessive.
+========================================= */
+
+/* Ambient lighting effect (environmental immersion) */    
+@keyframes torchFlicker { 0%, 100% { filter: brightness(1); } 25% { filter: brightness(1.05); } 50% { filter: brightness(0.97); } 75% { filter: brightness(1.04); } }
+
+/* Damage feedback (quick impact effect) */    
+@keyframes hitshake { 0% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-6px); } 100% { transform: translateX(0); } }
+
+/* Boss-specific hit feedback (stronger shake) */    
+@keyframes bossShake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+/* Current room highlight animation (maze tracker) */   
+@keyframes activePulse { 0% { box-shadow: 0 0 6px rgba(212,175,55,0.7); transform: scale(1.1); } 100% { box-shadow:0 0 10px rgba(212,175,55,0.6), 0 0 20px rgba(212,175,55,0.5),0 0 40px rgba(212,175,55,0.3); ; transform: scale(1.2); } }
+
+/* Victory text animation (end screen emphasis) */    
+@keyframes victoryGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 10px gold; } 50% { transform: scale(1.1); text-shadow: 0 0 25px gold, 0 0 40px orange; } }
+
+/* Idle boss movement (subtle hovering effect) */    
+@keyframes bossFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* Artifact glow animation (reward emphasis) */    
+@keyframes relicPulse { 0%, 100% { filter: drop-shadow(0 0 8px #38bdf8); } 50% { filter: drop-shadow(0 0 18px #60a5fa); } }
+
+/* Temporary feedback text fade-out */   
+@keyframes fadeOut { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Wizard idle animation (subtle movement) */    
+@keyframes wizardFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); }}
+
+/* General UI entrance animation */    
+@keyframes fadeIn {from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+   
+   
+/* =========================================
+   10. PANEL LAYOUT SYSTEM — SAFE TO CUSTOMIZE (WITH LIMITS)
+=========================================
+
+Controls the structural layout of the game UI:
+
+- top panel (title, maze tracker, artifact vault)
+- main panel (wizard + game box)
+- spacing, alignment, and sizing
+
+-----------------------------------------
+SAFE TO EDIT:
+- spacing (gap, margin, padding)
+- colors, borders, shadows
+- font sizes and styling
+- max-width values (to adjust scale)
+
+-----------------------------------------
+USE CAUTION:
+- flexbox settings (display, flex, align-items)
+- width / max-width relationships
+
+-----------------------------------------
+DO NOT MODIFY:
+- element IDs (#gameShell, #gameBox, #wizardBox, etc.)
+- core layout structure (flex directions and hierarchy)
+
+Breaking structure may cause:
+- overlapping elements
+- misaligned panels
+- mobile layout issues
+
+-----------------------------------------
+TIP:
+If layout breaks, check:
+- flex direction
+- width vs max-width conflicts
+- container nesting
+
+This controls layout — not game logic.
+========================================= */
+    
+/* Maze Tracker & Artifact Boxes */
+/* Top panel: stacks title, maze tracker, and artifact vault */
+.top-panel{
+    display:flex;
+    flex-direction:column;   /* STACK */
+    align-items:center;      /* CENTER */
+    gap:8px;
+    width:100%;
+    max-width:700px;         /* SMALLER footprint */
+    margin:0 auto 10px auto;
+}
+   
+/* TITLE ABOVE MAZE */
+.top-title{
+    font-size:22px;
+    font-weight:bold;
+    color:#e5e7eb;
+    text-align:center;
+    margin-bottom:6px;
+    text-shadow:0 0 10px rgba(255,255,255,0.15);
+}
+   
+#mazeTrackContainer{
+    width:100%;
+    max-width:600px;
+    padding:8px 12px;
+}
+
+#artifactVault{
+    width:100%;
+    max-width:420px;
+    padding:10px 14px;
+}
+
+/* Main Game Row */
+/* Main horizontal layout: wizard + game area */
+.main-panel{
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    width:100%;
+    align-items: flex-start;
+}
+   
+/* Game Shell Wrapper*/
+/* Core game container — controls overall layout and spacing */
+   #gameShell{
+    display:flex;
+    gap:20px;
+    background:#0f172a;
+    padding:20px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 0 25px rgba(0,0,0,0.6);
+    max-width:900px;
+    width:100%;
+    margin:0 auto;
+}
+   
+/* Wizard Box */
+/* Wizard display panel — fixed width, do not remove flex settings */
+#wizardBox{
+    width:160px;
+    min-width:160px;
+    min-height:200px;
+    background:#0f172a;
+    border-radius:12px;
+    padding:10px;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    padding-top:14px;
+    align-items:center;          
+    flex:0 0 180px;
+    flex-shrink: 0;
+    gap:6px;
+    margin-bottom: 0px;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+/* Wizard Name */
+#wizardName {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #93c5fd; /* soft arcane blue */
+    margin-top: 4px;
+    margin-bottom: 6px;
+    opacity: 0.85;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+    padding-bottom: 2px;
+
+    /* subtle glow */
+    text-shadow: 0 0 6px rgba(147, 197, 253, 0.6);
+}
+
+/* Wizard Image */
+/* Wizard visual + floating animation (safe to replace image or effects) */
+#wizardImage{
+    width:115px;
+    filter: drop-shadow(0 0 12px rgba(96,165,250,.6));
+    animation: wizardFloat 4s ease-in-out infinite;
+}
+
+/* Game Box adjustment */
+/* Main gameplay area — expands to fill available space */
+#gameBox{
+    flex:1;
+    min-width:0;
+    max-width:720px;
+    width:100%;
+    padding:18px 20px;   /* slightly tighter */
+} 
+    
+/* =========================================
+   11. BOSS MODE (UI STATE OVERRIDES) — DO NOT MODIFY STRUCTURE
+=========================================
+Applies layout changes during boss encounters.
+Triggered by adding the "boss-mode" class via JavaScript.
+Effects:
+- hides wizard panel
+- centers game content
+- adjusts layout for focused boss interaction
+-----------------------------------------
+SAFE TO EDIT:
+- spacing (margin, alignment)
+- sizing (max-width adjustments)
+- visual styling
+-----------------------------------------
+DO NOT MODIFY:
+- .boss-mode selector
+- element targets (#wizardBox, #gameBox, #gameShell)
+
+Removing or changing these will break:
+- boss screen layout
+- UI transitions into boss mode
+-----------------------------------------
+TIP:
+Boss mode removes distractions and increases focus.
+Keep layout clean and centered.
+========================================= */
+
+/* Center layout when wizard is removed */
+.boss-mode #wizardBox{
+    display:none;
+}
+
+/* Center and slightly constrain game area for boss mode */
+.boss-mode #gameBox{
+    max-width:700px;
+    margin:0 auto;
+}
+
+/* Center layout when wizard is removed */
+.boss-mode #gameShell{
+    justify-content:center;
+}
+
+/* =========================================
+   12. RESPONSIVE DESIGN — MOBILE ADJUSTMENTS
+=========================================
+
+Applies layout changes for smaller screens (≤ 600px).
+
+Ensures:
+- maze tracker stays visible
+- game content fits without overflow
+- answer buttons stack vertically
+
+-----------------------------------------
+SAFE TO EDIT:
+- sizes (maze-box, scaling)
+- button layout (flex behavior)
+- scale amount for gameBox
+
+-----------------------------------------
+USE CAUTION:
+- removing transform scaling may cause overflow
+- changing button flex may break readability
+
+-----------------------------------------
+DO NOT REMOVE:
+This section is required for mobile usability.
+
+Without it:
+- layout will overflow screen
+- buttons may be cut off
+- UI becomes hard to use on phones
+
+-----------------------------------------
+TIP:
+Test changes on both:
+- desktop (full width)
+- mobile (narrow screen)
+
+This controls responsiveness, not game logic.
+========================================= */
+/* Base mobile rules */
+@media (max-width: 900px){
+#gameShell {padding: 8px;gap: 10px;}
+#question {font-size: 1.2rem; line-height: 1.3;}
+.artifactSlot img {width: 35px;}
+}
+   
+/* Portrait (stacked, bigger wizard) */
+@media (max-width: 600px) and (orientation: portrait){
+.main-panel {flex-direction: column; align-items: center;}
+#wizardBox{width: 100%; max-width: 280px;margin-bottom: 12px;}
+#wizardImage {width: 100px; max-width: 100%;}
+}
+   
+/* Landscape (side-by-side, compact wizard) */   
+@media (max-width: 900px) and (orientation: landscape){
+.main-panel{flex-direction: row;}
+#wizardBox{max-width: 180px;}
+#wizardImage{width: 80px;}
+}
+   
+</style>
+</head>
+
+<!-- =========================================
+HTML STRUCTURE — GAME UI FRAMEWORK
+=========================================
+
+This section defines the full layout of the game.
+
+It includes:
+- start screen (player entry)
+- accessibility elements (screen reader announcements)
+- transition overlays (hallway scenes)
+- top panel (progress + artifacts)
+- main panel (wizard + gameplay)
+- dynamic content containers (questions, answers, feedback)
+
+-----------------------------------------
+SAFE TO EDIT (CUSTOMIZATION):
+- text (titles, labels, instructions)
+- images (wizard, artifacts, backgrounds)
+- styling (colors, fonts, layout tweaks)
+- artifact names and visuals
+
+-----------------------------------------
+DO NOT MODIFY (STRUCTURE/IDS):
+The following IDs are REQUIRED by JavaScript:
+
+- usernameInput
+- gameBox
+- question
+- answers
+- message
+- mazeTrack
+- artifactVault / vault items
+- artifactDrop / artifactImage / artifactTitle / artifactText
+- hallwayTransition / hallwayText
+- srAnnouncements
+
+Renaming or removing these will break:
+- question loading
+- answer selection
+- progression tracking
+- artifact system
+- accessibility features
+
+-----------------------------------------
+NOTES:
+- This layout is tightly connected to the game engine
+- Most issues come from changing IDs, not styling
+
+Edit appearance freely.
+Respect structure strictly.
+
+========================================= -->
+<body>
+<!-- Screen reader announcements (accessibility — do not remove) -->    
+  <div id="srAnnouncements"
+     aria-live="assertive"
+     aria-atomic="true"
+     style="position:absolute; left:-9999px; height:1px; width:1px; overflow:hidden;">
+</div>
+<!-- Transition overlay between rooms (safe to style, keep IDs) -->    
+<div id="hallwayTransition">
+<div id="hallwayText"></div>
+</div>
+<!-- Start screen / player entry (safe to redesign completely) -->
+<div id="startScreen">
+    <h1 style="color:rgb(48, 187, 221); text-shadow:0 0 30px rgb(48, 187, 221); font-size:60px; margin-bottom:10px;">THE ARCHIVES OF MICROECONOMICS</h1>
+    <h2 style="color:rgb(51, 140, 178); text-shadow:0 0 20px rgb(51, 140, 178); font-size:40px; margin-bottom:50px;">THE LABYRINTH OF CHOICE</h2>
+    <p style="color:#c4cad3; letter-spacing:2px; margin-bottom:30px; font-style:italic;">Identify yourself, Adventurer</p>
+    <input type="text" id="usernameInput" placeholder="Enter Name..." style="padding:15px; border-radius:8px; border:1px solid #374151; background:#1f2937; color:white; font-size:20px; margin-bottom:20px; text-align:center; outline:none; width:300px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+    <button onclick="startGame()" style="background:#30bbdd; color:#000; font-weight:bold; padding:15px 50px; font-size:20px; cursor:pointer; border-radius:8px; border:none; transition: transform 0.2s;">ENTER THE ARCHIVES</button>
+</div>
+<div class="dungeon-container">
+    <button class="fullscreenBtn" onclick="goFullscreen()">Fullscreen</button>
+    <!-- TOP PANEL -CHANGE NAME IN TITLE -->
+    <!-- Top panel: progress track + artifact vault -->
+    <div class="top-panel">
+       <div class="top-title">The Labyrinth of Choice</div>
+        <div id="mazeTrackContainer">
+            <div id="mazeTrack"></div>
+        </div>
+        <!-- Artifact slots (IDs must match unlock system in JS - CHANGE NAMES) -->
+        <div id="artifactVault">
+            <h3>Relics Recovered</h3>
+            <div class="vaultRow">
+                <div id="vaultSeal" class="artifactSlot">
+                    <img src="seal_of_preferences.png">
+                    <span>Seal of Preferences</span>
+                </div>
+                <div id="vaultPrism" class="artifactSlot">
+                    <img src="prism_of_tradeoffs.png">
+                    <span>Prism of Tradeoffs</span>
+                </div>
+                <div id="vaultScepter" class="artifactSlot">
+                    <img src="scepter_of_elasticity.png">
+                    <span>Scepter of Elasticity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN PANEL -->
+    <!-- Main game area: wizard + question interface -->
+    <div class="main-panel">
+        <!-- WIZARD - CAN CHANGE WIZARD NAME-->
+      <div id="gameShell">
+       <div id="wizardBox">
+            <div id="wizardName">The Archivist</div>
+            <img src="wizard.png" id="wizardImage">
+        </div>
+        <!-- GAME -->
+        <!-- Dynamic question + answer rendering (DO NOT rename IDs) -->
+        <div id="gameBox">
+            <div id="autosave">💾 Progress Autosaved</div>
+
+            <p id="areaDisplay" class="area-title"></p>
+
+            <div id="progressBar">
+                <div id="progressFill"></div>
+            </div>
+            <div id="streakDisplay"></div>
+            <p id="bossMessage"></p>
+            <div id="questionContainer">
+                <p id="question"></p>
+                <div id="formulaHint" class="hint-box"></div>
+            </div>
+            <div id="answers"></div>
+            <p id="message"></p>
+            <!-- Artifact reward popup (triggered after boss victories) -->
+            <div id="artifactDrop" style="display:none;">
+                <img id="artifactImage" width="96">
+                <h3 id="artifactTitle"></h3>
+                <p id="artifactText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================
+   2. GAME ELEMENTS (CHANGE ELEMENTS WITH NEW GAME)
+========================================= -->
+ <script>
+
+// =============================================
+// AUDIO SYSTEM — OPTIONAL
+// =============================================
+// Replace audio files with your own if desired.
+// Safe to remove entirely if you don't want sound.
+// Does NOT affect game logic.
+     
+const bgMusic = new Audio('chamber.wav'); 
+bgMusic.loop = true; 
+bgMusic.volume = 0.1; 
+
+const bossMusic = new Audio('boss_battle_music.wav');
+bossMusic.loop = true;
+bossMusic.volume = 0.10;
+
+const finalBossMusic = new Audio('final_boss_music.wav');
+finalBossMusic.loop = true;
+finalBossMusic.volume = 0.12; // slightly louder, it's the final fight    
+    
+const sfxMilestone = new Audio('streak.wav');
+const sfxVictory = new Audio('victory.wav');
+const sfxBossHit = new Audio('boss_hit.wav');
+      sfxBossHit.volume = 0.5;
+const sfxCorrect = new Audio('ding.wav');
+      sfxCorrect.volume = 0.25;
+const sfxWrong = new Audio('mistake.wav');
+      sfxWrong.volume = 0.4;
+    
+const hallwayImages = [
+    "hallway1.png",
+    "hallway2.png",
+    "hallway3.png"
+];
+  
+function goFullscreen(){
+let el = document.documentElement;
+
+if (el.requestFullscreen) {
+    el.requestFullscreen();
+} 
+else if (el.webkitRequestFullscreen) { // Safari
+    el.webkitRequestFullscreen();
+} 
+else if (el.msRequestFullscreen) { // old Edge
+    el.msRequestFullscreen();
+}
+}
+    
+// =============================================
+// 1. Initial UI State: Hide game until startGame runs
+// =============================================
+document.getElementById("gameBox").style.display = "none";
+document.querySelectorAll(".torch").forEach(t => t.style.display = "none");
+
+// =============================================
+// 2. Global Variables (Declared only ONCE)
+// CORE GAME STATE — DO NOT MODIFY STRUCTURE
+// =============================================
+// These variables control:
+// - progression
+// - scoring
+// - adaptive difficulty
+//
+// You may RESET values (e.g., starting room),
+// but DO NOT rename or delete variables.
+     
+let totalAttempts = 0;
+let bossHealth = 3; 
+let bossPool = [];
+let correctAnswers = 0; 
+let maxStreak = 0; 
+let username = "";
+let streak = 0; 
+let startTime; // Will be set in startGame()
+let room = localStorage.getItem("gauntletRoom") ? parseInt(localStorage.getItem("gauntletRoom")) : 1;
+let currentQuestion = null;
+let detourActive = false;
+let detourReturnRoom = null;
+let conceptMemory = {};
+let tagHistory = [];
+let lastTypes = [];
+let easyCycle = 0 ;
+let mediumCycle = 0;
+let usedQuestions = {
+    easy: [],
+    medium: [],
+    hard: [],
+    easyBoss: [],
+    mediumBoss: [],
+    finalBoss: []
+};
+let questionHistory = {
+    easy: [],
+    medium: [],
+    hard: [],
+    calculation: [],
+    easyBoss: [],
+    mediumBoss: [],
+    finalBoss: []
+};
+
+// =============================================
+// ADAPTIVE ENGINE — DO NOT TOUCH
+// =============================================
+// This system controls:
+//
+// 1. Weakness tracking (conceptMemory)
+// 2. Question weighting (weightedPick)
+// 3. Topic rotation (tagHistory)
+// 4. Anti-repetition logic
+//
+// If you modify this without understanding it,
+// you will break:
+// - difficulty scaling
+// - learning reinforcement
+// - question balance
+//
+// Only advanced users should modify this.
+
+function weightedPick(pool){
+    let weightedPool = [];
+    pool.forEach(q => {
+        let weight = 1;
+        // Weakness boost
+        if(q.tag && conceptMemory[q.tag]){
+            weight += Math.min(conceptMemory[q.tag], 2);
+        }
+        // Coverage boost (if tag not seen recently)
+        let recentCount = tagHistory.filter(t => t === q.tag).length;
+        if(recentCount === 0){
+            weight += 2;
+        }
+        for(let i = 0; i < weight; i++){
+            weightedPool.push(q);
+        }
+    });
+    return weightedPool[Math.floor(Math.random() * weightedPool.length)];
+}
+
+function getAdaptiveQuestion(poolName, targetTag = null){
+    let pool = questionBanks[poolName];
+    // --- 🎯 TARGET SPECIFIC TAG IF PROVIDED ---
+    if(targetTag){
+        let filtered = pool.filter(q => q.tag === targetTag);
+
+        // Only use filtered if it actually has questions
+        if(filtered.length > 0){
+            pool = filtered;
+        }
+    }
+
+    let recent = questionHistory[poolName].slice(-5);
+    let available = pool.filter(q => !recent.includes(q.id));
+    if(available.length === 0){
+        available = pool;
+    }
+    let picked = weightedPick(available);
+
+    // Track history
+    questionHistory[poolName].push(picked.id);
+    if(questionHistory[poolName].length > 10){
+        questionHistory[poolName].shift();
+    }
+
+    // Track tag exposure
+    if(picked.tag){
+        tagHistory.push(picked.tag);
+        if(tagHistory.length > 10){
+            tagHistory.shift();
+        }
+    }
+    return picked;
+} 
+
+// =============================================
+// TIMING CONFIGURATION — SAFE TO TUNE
+// =============================================
+// Controls delay timing (in milliseconds) for game events.
+//
+// - normal  → standard transitions between questions
+// - boss    → faster pacing during boss encounters
+// - detour  → slightly longer for concept recovery moments
+//
+// SAFE TO EDIT:
+// - values (increase for slower pacing, decrease for faster)
+//
+// DO NOT REMOVE:
+// - keys (normal, boss, detour) — used elsewhere in game
+//
+// Changing timing affects:
+// - game speed
+// - perceived difficulty
+// - player experience (pressure vs. reflection)
+//
+// This is pacing control, not logic.
+// =============================================
+const TIMING = {
+    normal: 1200,
+    boss: 1000,
+    detour: 1400
+};
+
+// =============================================
+// BOSSES & REWARDS — SAFE TO CUSTOMIZE
+// =============================================
+// You can change:
+// - boss names
+// - images
+// - artifact rewards
+// - lore text
+//
+// Do NOT remove bossHealth logic.
+     
+const artifacts = {
+seal:{
+    img:"seal_of_preferences.png",
+    title:"Seal of Preferences",
+    text:"An ancient seal revealing the curves of desire. Where preferences meet the budget constraint, utility is maximized."
+    },
+
+prism:{
+    img:"prism_of_tradeoffs.png",
+    title:"Prism of Tradeoffs",
+    text:"A crystal that fractures a price change into its hidden forces: substitution toward cheaper goods and the pull of income on purchasing power."
+    },
+
+scepter:{
+    img:"scepter_of_elasticity.png",
+    title:"Scepter of Elasticity",
+    text:"The royal instrument of the Sovereign. It reveals how strongly quantity demanded responds when price changes."
+    }
+};
+  
+// =============================================
+// USERNAME RESTORE — SAFE TO MODIFY
+// =============================================
+// Loads previously saved username from localStorage
+// and pre-fills the input field.
+//
+// SAFE TO EDIT:
+// - key name ("gauntletUser")
+// - behavior (e.g., remove if you want fresh input every time)
+//
+// WARNING:
+// Requires input element with id="usernameInput"
+//
+// Removing this will NOT break the game,
+// but will remove convenience for returning users.
+// =============================================
+const savedUser = localStorage.getItem("gauntletUser");
+if(savedUser){
+    document.getElementById("usernameInput").value = savedUser;
+}
+
+// =============================================
+// GAME INITIALIZATION — PARTIAL CUSTOMIZATION
+// =============================================
+// Runs when player starts a new game.
+//
+// Handles:
+// - username setup
+// - full game state reset
+// - UI reveal (game, vault, torches)
+// - restoring unlocked artifacts
+// - starting music and timer
+//
+// ---------------------------------------------
+// SAFE TO EDIT:
+// - alert message text
+// - vault item IDs (Seal, Prism, Scepter)
+// - visual elements shown/hidden
+//
+// DO NOT MODIFY:
+// - state reset variables (room, streak, etc.)
+// - questionHistory structure
+// - loadQuestion() call
+//
+// Breaking this WILL cause:
+// - corrupted runs
+// - incorrect scoring
+// - progression bugs
+// =============================================
+function startGame() {
+    let inputName = document.getElementById("usernameInput").value.trim();
+    if (!inputName) {
+        alert("A name is required to bind your soul to the archives.");
+        return;
+    }
+    
+    username = inputName;
+    localStorage.setItem("gauntletUser", username);
+
+// =============================================
+// RESET CORE GAME STATE — DO NOT MODIFY STRUCTURE
+// =============================================
+// Resets all progression, scoring, and adaptive tracking
+    room = 1;
+    bossHealth = 3;
+    streak = 0;
+    maxStreak = 0;
+    totalAttempts = 0;
+    correctAnswers = 0;
+    bossPool = [];
+    calcBag = [];
+    localStorage.removeItem("gauntletRoom");
+    localStorage.removeItem("vaultSeal");
+    localStorage.removeItem("vaultPrism");
+    localStorage.removeItem("vaultScepter");
+
+    questionHistory = {
+    easy: [], medium: [], hard: [], calculation: [],
+    easyBoss: [], mediumBoss: [], finalBoss: []
+    };
+    
+// =============================================
+// UI INITIALIZATION — SAFE TO CUSTOMIZE
+// =============================================
+// Shows main game elements and restores vault visuals
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameBox").style.display = "block";
+    document.getElementById("artifactVault").style.display = "block";
+    document.querySelectorAll(".torch").forEach(t => t.style.display = "block");
+
+   // =============================================
+   // VAULT RESTORE SYSTEM — SAFE WITH MATCHING IDS
+   // =============================================
+   // Restores previously unlocked artifacts from storage.
+   //
+   // IMPORTANT:
+   // IDs must match exactly:
+   // - localStorage key ("vaultSeal")
+   // - HTML element id ("vaultSeal")
+   //
+   // Mismatches = artifacts won't display
+   // =============================================    
+        if(localStorage.getItem("vaultSeal")){
+        document.getElementById("vaultSeal").classList.add("unlocked");
+        }
+
+        if(localStorage.getItem("vaultPrism")){
+        document.getElementById("vaultPrism").classList.add("unlocked");
+        }    
+
+        if(localStorage.getItem("vaultScepter")){
+        document.getElementById("vaultScepter").classList.add("unlocked");
+        }
+  
+// Start game loop: music + timer + first question
+    bgMusic.play().catch(e => console.log("Audio started"));
+    startTime = Date.now(); 
+    loadQuestion();
+}
+
+// =============================================
+// INPUT SHORTCUT — SAFE TO KEEP OR REMOVE
+// =============================================
+// Allows pressing Enter to start the game
+// Improves usability, does not affect logic
+// =============================================
+document.getElementById("usernameInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        startGame();
+    }
+});
+
+// =============================================
+// AREA NAMING SYSTEM — SAFE TO CUSTOMIZE (WITH RULES)
+// =============================================
+// Maps room numbers → area names (display only)
+//
+// SAFE TO EDIT:
+// - area names (theme, tone, subject)
+// - text flavor
+//
+// DO NOT MODIFY:
+// - room number structure (<=9, ===10, etc.)
+// unless you also update:
+//   - boss rooms (10, 20, 30)
+//   - progression logic elsewhere
+//
+// This affects UI only, not game logic.
+// =============================================
+function getAreaName(r) {
+    if (r <= 9) return "The Dimly Lit Archives";
+    if (r === 10) return "The Warden's Gate";
+    if (r <= 19) return "The Hall of Substitutions";
+    if (r === 20) return "The Decomposer's Lair";
+    if (r <= 25) return "The Vault of Elasticity";
+    if (r <= 29) return "The Calculations Corridor";
+    return "The Sovereign's Throne";
+};
+
+// =============================================
+// WIZARD DIALOGUE SYSTEM — SAFE TO CUSTOMIZE
+// =============================================
+// Controls all in-game messaging tone:
+//
+// - wizardFeedback → correct/incorrect responses
+// - wizardLines → prompts based on question type
+//
+// SAFE TO EDIT:
+// - all text (tone, theme, personality)
+// - add/remove lines for variety
+//
+// DO NOT MODIFY:
+// - object structure (correct, wrong, definition, etc.)
+// - function calls that reference these keys
+//
+// Missing keys will cause undefined messages.
+//
+// This system controls immersion and feedback tone.
+// =============================================
+const wizardFeedback = {
+    correct: [
+        "The path reveals itself to those who think clearly.",
+        "You see it now… the logic unfolds.",
+        "Good. You’re beginning to understand.",
+        "The labyrinth yields to disciplined thought.",
+        "Yes… that was no accident. Press on."
+    ],
+    wrong: [
+        "No. That is not the way.",
+        "You moved too quickly.",
+        "The logic slipped from your grasp.",
+        "Careless. Try again.",
+        "The labyrinth punishes haste."
+    ]
+};
+    
+const wizardLines = {
+    definition: [
+        "Define it. No guessing.",
+        "State the concept clearly.",
+        "What does this mean?",
+        "Precision matters here."
+    ],
+    interpretation: [
+        "What is this telling you?",
+        "Look deeper.",
+        "Interpret the situation.",
+        "What insight do you see?"
+    ],
+    trap: [
+        "Careful. Many fall here.",
+        "This is where mistakes are made.",
+        "Do not answer too quickly.",
+        "Look closely before you choose.",
+        "This will test your attention.",
+        "One detail changes everything."
+    ],
+    calculation: [
+        "Work it out.",
+        "Numbers don’t lie.",
+        "Solve it carefully.",
+        "Precision wins here."
+    ],
+    default: [
+        "Choose wisely.",
+        "Focus.",
+        "Do not rush.",
+        "Your answer matters."
+    ]
+};
+     
+// Returns a random prompt based on question type
+// Falls back to "default" if type not found
+function getWizardLine(type){
+    const pool = wizardLines[type] || wizardLines.default;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Returns random feedback (correct or wrong)
+// Used during answer responses and transitions     
+function getWizardFeedback(type){
+    const pool = wizardFeedback[type];
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Updates on-screen message text
+// Requires element with id="message"     
+function wizardSpeak(text){
+    const msg = document.getElementById("message");
+    msg.innerText = text;
+}     
+    
+// =============================================
+// QUESTION BANKS — PRIMARY EDIT AREA
+// =============================================
+//
+// REQUIRED FORMAT:
+//
+// {
+//   id: UNIQUE NUMBER (DO NOT REUSE)
+//   q: "Question text",
+//   options: ["A","B","C","D"],
+//   a: INDEX OF CORRECT ANSWER (0–3),
+//   tag: "concept category",
+//   type: "definition | interpretation | calculation | trap",
+//   feedback: "Explanation shown after answer"
+// }
+//
+// RULES:
+// - IDs must be unique
+// - Always include 4 options
+// - Keep tags consistent (drives adaptive engine)
+// - Do NOT remove 'tag' or 'type'
+//
+// This is where instructors customize content.
+  
+const questionBanks = {
+easyBoss:[
+{q:"The Warden of Indifference challenges you. A consumer buys goods X and Y. Which condition must hold at the optimal consumption bundle?",options:["The consumer buys equal quantities of both goods","The marginal rate of substitution equals the price ratio","Income equals total utility","Prices of goods must be identical"],a:1,feedback:"Utility maximization occurs where the marginal rate of substitution equals the price ratio."},
+{q:"The Warden reveals the numbers. A consumer has MUx = 24 and MUy = 12. Prices are Px = $6 and Py = $3. Are they currently maximizing utility?",options:["Yes, MU per dollar is equal","No, they should buy more X","No, they should buy more Y","Not enough information"],a:0,feedback:"MUx/Px = 24/6 = 4 and MUy/Py = 12/3 = 4. Marginal utility per dollar is equal, so the consumer is maximizing utility."},
+{q:"The Warden disrupts the balance. Now MUx/Px = 6 and MUy/Py = 3. What should the consumer do to restore equilibrium?",options:["Reduce consumption of both goods","Buy more Y and less X","Buy equal amounts of both goods","Buy more X and less Y"],a:3,feedback:"Consumers increase consumption of the good with the higher marginal utility per dollar until the ratios equalize."}
+],
+mediumBoss:[
+{q:"The Decomposer smiles. A price falls and quantity demanded rises. A student claims this must be because both substitution and income effects are positive. What’s the problem?",options:["The substitution effect is always zero when price falls","The income effect could be negative even if total quantity rises","Both effects must always move in the same direction","A rise in quantity demanded implies the good is normal"],a:1,feedback:"Even if quantity rises, the good could be inferior—the substitution effect may outweigh a negative income effect."},
+{q:"The Decomposer twists the logic. The price of a good falls, and quantity demanded increases only slightly. What does this suggest?",options:["The substitution effect is small and the income effect is positive","The substitution effect is large but the income effect is negative","The income effect is negative and partially offsets the substitution effect","The good must be normal but weakly demanded"],a:2,feedback:"A small increase suggests the substitution effect is being partially offset by a negative income effect."},
+{q:"Final strike. A price falls, and quantity demanded falls. Which must be true?",options:["The income effect is negative and larger than the substitution effect","The substitution effect is weaker than the income effect but still negative","The good is normal but demand shifted inward","The substitution effect is zero while the income effect is negative"],a:0,feedback:"A decrease in quantity demanded when price falls implies a Giffen case: the income effect is negative and dominates the substitution effect."}
+],
+finalBoss:[
+{q:"The Sovereign whispers: 'A firm raises price and total revenue falls.' A student concludes demand must be elastic. What is the flaw in this reasoning?",options:["The conclusion assumes no other factors affecting demand changed","The conclusion ignores that quantity demanded may not have changed","The conclusion assumes demand is always downward sloping","The conclusion incorrectly assumes revenue and elasticity are unrelated"],a:0,feedback:"The elasticity–revenue relationship only holds ceteris paribus. If other factors changed, the conclusion may not be valid."},
+{q:"The Sovereign sets a snare. A firm lowers price and observes total revenue increase. A student claims this proves demand is inelastic. What’s the correct interpretation?",options:["Demand is elastic because quantity increased proportionally more than price fell","Demand is inelastic because total revenue changed","The result is consistent with unit elastic demand","The relationship between price and revenue cannot be used to infer elasticity"],a:0,feedback:"If price falls and revenue rises, demand is elastic—quantity increases proportionally more than price decreases."},
+{q:"Final deception. A firm increases price and observes quantity demanded falls slightly, while total revenue rises. Which statement MUST be true?",options:["Demand is inelastic because quantity falls proportionally less than price rises","Demand is elastic because quantity demanded decreased","The substitution effect dominates the income effect","Demand is unit elastic because total revenue changed"],a:0,feedback:"Revenue rising with a price increase implies inelastic demand—quantity falls proportionally less than price rises."}
+],
+easy: [
+{ id:1, q:"A theory of choice assumes individuals...",options:["Make random decisions","Choose the most preferred affordable bundle","Always maximize income","Always minimize work"],a:1,tag:"preferences",type:"definition",feedback:"Consumers choose the most preferred bundle they can afford given their budget constraint."},
+{ id:2, q:"Consumer preferences are typically represented using...",options:["Demand curves","Indifference curves","Supply curves","Cost curves"],a:1,tag:"indifference",type:"definition",feedback:"Indifference curves show combinations of goods that give the consumer the same level of satisfaction."},
+{ id:3, q:"Indifference curves represent...",options:["Bundles giving equal utility","Bundles giving equal price","Bundles giving equal income","Bundles giving equal production"],a:0,tag:"indifference",type:"definition",feedback:"Each point on an indifference curve provides the same level of utility."},
+{ id:4, q:"Marginal rate of substitution represents...",options:["Rate consumers trade one good for another","Price ratio","Income ratio","Demand elasticity"],a:0,tag:"indifference",type:"definition",feedback:"The MRS shows how much of one good a consumer is willing to give up for another."},
+{ id:5, q:"Utility refers to...",options:["Satisfaction a consumer receives","Total income","Market demand","Firm profit"],a:0,tag:"preferences",type:"definition",feedback:"Utility represents the satisfaction gained from consumption."},
+{ id:6, q:"The budget constraint shows...",options:["All affordable combinations of goods","Only preferred bundles","Production possibilities","Market equilibrium"],a:0,tag:"budget",type:"definition",feedback:"The budget constraint represents what a consumer can afford."},
+{ id:7, q:"A bundle of goods refers to...",options:["A set of goods a consumer may consume","A firm's production level","Total market demand","A supply schedule"],a:0,tag:"preferences",type:"definition",feedback:"A bundle is simply a combination of goods."},
+{ id:8, q:"Demand represents...",options:["Quantity consumers are willing and able to buy at different prices","Total production of firms","Government price controls","Consumer income levels"],a:0,tag:"demand",type:"definition",feedback:"Demand reflects willingness and ability to purchase."},
+{ id:9, q:"A demand curve typically slopes...",options:["Downward","Upward","Vertically","Perfectly flat"],a:0,tag:"demand",type:"definition",feedback:"Higher prices typically reduce quantity demanded."},
+{ id:10, q:"Price elasticity of demand measures...",options:["Responsiveness of quantity demanded to price change","Firm profit","Consumer income","Market supply"],a:0,tag:"demand",type:"definition",feedback:"Elasticity measures responsiveness to price changes."},
+{ id:11, q:"Consumer surplus measures...",options:["Difference between willingness to pay and price","Firm profits","Producer costs","Market revenue"],a:0,tag:"demand",type:"definition",feedback:"Consumer surplus is willingness to pay minus price."},
+{ id:12, q:"Market demand is obtained by...",options:["Summing individual demand curves horizontally","Summing vertically","Multiplying prices","Averaging costs"],a:0,tag:"demand",type:"definition",feedback:"Market demand adds quantities across individuals."},
+{ id:13, q:"If elasticity equals 1, demand is...",options:["Unit elastic","Perfectly elastic","Inelastic","Vertical"],a:0,tag:"elasticity",type:"definition",feedback:"Unit elasticity means proportional responses."},
+{ id:14, q:"If two bundles lie on the same indifference curve...",options:["They provide equal utility","They cost the same","They contain equal goods","They maximize income"],a:0,tag:"indifference",type:"definition",feedback:"Bundles on the same indifference curve provide equal utility."},
+{ id:15, q:"A complete preference ordering means...",options:["Consumers can compare any two bundles","Consumers always prefer cheaper goods","Consumers never change preferences","Consumers prefer equal bundles"],a:0,tag:"preferences",type:"definition",feedback:"Completeness means all bundles can be ranked."},
+{ id:16, q:"Transitive preferences imply...",options:["If A is preferred to B and B to C, then A is preferred to C","Consumers prefer cheaper goods","Income increases utility automatically","Demand curves shift"],a:0,tag:"preferences",type:"definition",feedback:"Transitivity ensures consistent ranking."},
+{ id:17, q:"A consumer receives a pay raise while prices stay the same. What happens to the budget constraint?",options:["Rotates inward","Shifts outward","Rotates around Y axis","Becomes vertical"],a:1,tag:"budget",type:"interpretation",feedback:"When income increases while prices stay constant, consumers can afford more of both goods. The budget constraint shifts outward in a parallel movement."},
+{ id:18, q:"The price of good X falls while income stays the same. What happens to the budget constraint?",options:["Rotates outward on the X-axis","Shifts outward parallel","Rotates inward","Does not change"],a:0,tag:"budget",type:"interpretation",feedback:"A fall in the price of X makes X relatively cheaper. The budget line rotates outward along the X-axis while the Y intercept stays the same."},
+{ id:19, q:"A consumer moves to a higher indifference curve after income rises. What does this indicate?",options:["Higher utility","Lower prices","Lower income","Demand collapse"],a:0,tag:"indifference",type:"interpretation",feedback:"Higher indifference curves represent higher levels of utility. More income allows the consumer to reach a more preferred bundle."},
+{ id:20, q:"If the price of a good rises and consumers buy less of it, this reflects...",options:["The law of demand","Perfect competition","Elastic supply","Producer surplus"],a:0,tag:"demand",type:"interpretation",feedback:"The law of demand states that as price increases, quantity demanded typically falls, all else equal."},
+{ id:21, q:"When the price of coffee rises, many consumers switch to tea. Coffee and tea are...",options:["Substitutes","Complements","Independent goods","Inferior goods"],a:0,tag:"demand",type:"interpretation",feedback:"Substitute goods replace each other. When the price of coffee rises, consumers switch to alternatives like tea."},
+{ id:22, q:"If the price of printers rises and fewer people buy ink cartridges, these goods are...",options:["Complements","Substitutes","Inferior goods","Luxury goods"],a:0,tag:"demand",type:"interpretation",feedback:"Complement goods are used together. When printers become more expensive, fewer are purchased, reducing demand for ink cartridges."},
+{ id:23, q:"If price falls and total revenue increases, demand must be...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"When demand is elastic, quantity demanded rises proportionally more than price falls, causing total revenue to increase."},
+{ id:24, q:"A consumer chooses a bundle where the indifference curve touches the budget line. This bundle...",options:["Maximizes utility","Minimizes spending","Maximizes income","Eliminates scarcity"],a:0,tag:"equilibrium",type:"interpretation",feedback:"Consumer equilibrium occurs where the highest attainable indifference curve is tangent to the budget line."},
+{ id:25, q:"If both goods become cheaper while income stays constant, what happens to purchasing power?",options:["It increases","It decreases","It stays the same","It disappears"],a:0,tag:"budget",type:"interpretation",feedback:"When prices fall while income stays constant, consumers can afford more goods. Purchasing power increases."},
+{ id:26, q:"If more consumers enter a market while prices stay the same, market demand will...",options:["Increase","Decrease","Stay constant","Become perfectly elastic"],a:0,tag:"demand",type:"interpretation",feedback:"Market demand is the horizontal sum of individual demands. More consumers increase total demand."},
+{ id:27, q:"A bundle lies inside the budget constraint but not on the highest indifference curve. This bundle is...",options:["Affordable but not optimal","Impossible","Utility maximizing","Profit maximizing"],a:0,tag:"budget",type:"interpretation",feedback:"Bundles inside the budget constraint are affordable but do not maximize utility because better bundles exist on higher indifference curves."},
+{ id:28, q:"If consumers are willing to trade fewer units of good Y for each additional unit of X, this reflects...",options:["Diminishing marginal rate of substitution","Increasing elasticity","Perfect substitutes","Budget rotation"],a:0,tag:"indifference",type:"interpretation",feedback:"Diminishing marginal rate of substitution means consumers give up fewer units of one good as they consume more of the other."},
+{ id:29, q:"A demand curve becomes steeper. What can we conclude about elasticity?",options:["It must be more elastic","It must be less elastic","Elasticity cannot be determined from slope alone","Demand becomes unit elastic"],a:2,tag:"elasticity",type:"trap",feedback:"Elasticity depends on both slope and position on the curve. A steeper curve does not automatically mean demand is less elastic."},
+{ id:30, q:"A bundle lies on the budget line. This means...",options:["It is affordable but not necessarily optimal","It always maximizes utility","It is outside the budget","It is inefficient"],a:0,tag:"budget",type:"trap",feedback:"Points on the budget line are affordable, but only the point tangent to the highest indifference curve maximizes utility."},
+{ id:31, q:"If income increases, demand for an inferior good will...",options:["Decrease","Increase","Stay constant","Become perfectly elastic"],a:0,tag:"demand",type:"trap",feedback:"Inferior goods are purchased less when income rises because consumers shift toward higher-quality alternatives."},
+{ id:32, q:"Two indifference curves intersect on a graph. What does this imply?",options:["Preferences are inconsistent","Utility is maximized","Prices changed","Demand increased"],a:0,tag:"indifference",type:"trap",feedback:"Indifference curves cannot intersect. If they did, it would violate the assumption of consistent (transitive) preferences."},
+{ id:33, q:"If the price of a good falls, demand has...",options:["Increased","Decreased","Not changed","Become elastic"],a:2,tag:"demand",type:"trap",feedback:"A price change causes a movement along the demand curve, not a shift of the curve. Demand itself has not changed."},
+{ id:34, q:"A point on a demand curve shows...",options:["The quantity demanded at a particular price","All possible prices consumers prefer","Consumer income","Producer costs"],a:0,tag:"demand",type:"trap",feedback:"Each point on a demand curve shows the quantity consumers are willing and able to buy at a specific price."},
+{ id:35, q:"If income increases and a consumer buys more of a good, that good must be...",options:["Normal","Inferior","Elastic","A complement"],a:0,tag:"demand",type:"trap",feedback:"Normal goods are purchased more when income rises. Inferior goods move in the opposite direction."},
+{ id:36, q:"If the price of good X changes and the budget line rotates, what stays constant?",options:["Income","Utility","Demand","Preferences"],a:0,tag:"budget",type:"trap",feedback:"When a price changes, the budget line rotates but income remains the same."},
+{ id:37, q:"A consumer chooses a bundle inside the budget constraint. What does this mean?",options:["They could afford more but chose not to","They spent all income","The bundle is impossible","Utility is maximized"],a:0,tag:"budget",type:"trap",feedback:"Bundles inside the budget constraint are affordable but do not use all available income."},
+{ id:38, q:"If the price of both goods doubles and income also doubles, the budget constraint...",options:["Does not change","Shifts outward","Rotates inward","Becomes vertical"],a:0,tag:"budget",type:"trap",feedback:"If both prices and income double, purchasing power stays the same and the budget constraint remains unchanged."}
+],
+medium: [
+{ id:39, q:"The substitution effect of a price decrease occurs because...",options:["Relative prices change while utility is held constant","The consumer’s real income increases, allowing more consumption","Preferences adjust in response to lower prices","The good becomes cheaper, increasing demand"],a:0,tag:"income_substitution",type:"definition",feedback:"The substitution effect isolates the impact of a change in relative prices while holding utility constant."},
+{ id:40, q:"A demand curve can be interpreted as...",options:["The consumer’s willingness to pay for additional units","A firm's marginal cost curve","Total utility over time","Market supply"],a:0,tag:"demand",type:"definition",feedback:"Each point on the demand curve reflects the consumer’s willingness to pay for one more unit."},
+{ id:41, q:"Consumer equilibrium requires that...",options:["Marginal utility per dollar is equal across goods","Income equals zero","Demand equals supply","Prices are identical"],a:0,tag:"consumer_equilibrium",type:"definition",feedback:"Consumers maximize utility when the marginal utility gained per dollar spent is equal across goods."},
+{ id:42, q:"Price elasticity of demand measures...",options:["The responsiveness of quantity demanded to price changes","The responsiveness of total revenue to price changes","The change in demand when income changes","The change in quantity supplied when price changes"],a:0,tag:"elasticity",type:"definition",feedback:"Elasticity measures how sensitive buyers are to price changes."},
+{ id:43, q:"If the price of a good falls and total revenue increases, what must be true about demand?",options:["Demand is elastic","Demand is inelastic","Demand is unit elastic","Demand is perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"When price falls and revenue rises, demand must be elastic because quantity increases proportionally more."},
+{ id:44, q:"A consumer allocates spending such that MUx/Px < MUy/Py. What should they do?",options:["Consume more of good X and less of good Y","Consume more of good Y and less of good X","Do nothing","Increase income"],a:1,tag:"consumer_equilibrium",type:"interpretation",feedback:"Consumers should shift spending toward the good with higher marginal utility per dollar."},
+{ id:45, q:"If two goods are perfect substitutes, what will indifference curves look like?",options:["Straight lines","Perfectly vertical","Perfectly horizontal","Circular"],a:0,tag:"consumer_equilibrium",type:"definition",feedback:"Perfect substitutes have constant MRS, leading to straight-line indifference curves."},
+{ id:46, q:"A normal good is defined as one where...",options:["Demand rises as income rises","Demand falls as income rises","Demand stays constant","Price always rises"],a:0,tag:"normal_inferior",type:"definition",feedback:"Normal goods experience increased demand as income increases."},
+{ id:47, q:"An inferior good is defined as one where...",options:["Demand falls as income rises","Demand rises as income rises","Demand is perfectly elastic","Demand disappears"],a:0,tag:"normal_inferior",type:"definition",feedback:"Inferior goods are consumed less when income increases."},
+{ id:48, q:"If demand is elastic, a price increase will most likely...",options:["Decrease total revenue","Increase total revenue","Leave total revenue unchanged","Increase quantity demanded"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity falls proportionally more than price rises, reducing total revenue."},
+{ id:49, q:"A price decrease causes quantity demanded to rise substantially. What does this suggest about elasticity?",options:["Demand is elastic","Demand is inelastic","Demand is perfectly inelastic","Demand is unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Large quantity responses indicate elastic demand."},
+{ id:50, q:"If the substitution effect increases consumption but the income effect decreases it, the good must be...",options:["Inferior","Normal","Perfect substitute","Perfect complement"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For inferior goods the income effect works opposite the substitution effect."},
+{ id:51, q:"If MRS is greater than the price ratio, what should the consumer do?",options:["Consume more of good X","Consume less of good X","Increase income","Reduce utility"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"If MRS exceeds the price ratio, the consumer gains more utility per dollar from X."},
+{ id:52, q:"If demand is elastic, a price increase will...",options:["Reduce total revenue","Increase total revenue","Leave revenue unchanged","Eliminate demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity falls proportionally more than price rises."},
+{ id:53, q:"If both substitution and income effects increase consumption after a price decrease, the good must be...",options:["Normal","Inferior","Giffen","Perfectly elastic"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For normal goods both effects reinforce each other."},
+{ id:54, q:"If the price of a good falls and quantity demanded rises substantially, demand is likely...",options:["Elastic","Inelastic","Perfectly inelastic","Unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Large quantity responses indicate elastic demand."},
+{ id:55, q:"If demand is inelastic, what happens to total revenue when price increases?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Quantity demanded increases"],a:0,tag:"elasticity",type:"interpretation",feedback:"With inelastic demand, quantity changes little, so price increases raise revenue."},
+{ id:56, q:"If the substitution effect increases consumption but the income effect reduces it, the good must be...",options:["Inferior","Normal","Perfect substitute","Complement"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Inferior goods have income effects that oppose substitution effects."},
+{ id:57, q:"If the price of coffee rises and consumers buy more tea, the goods are...",options:["Substitutes","Complements","Inferior","Giffen"],a:0,tag:"demand",type:"interpretation",feedback:"Substitutes replace each other when prices change."},
+{ id:58, q:"If the price of printers rises and demand for ink falls, the goods are...",options:["Complements","Substitutes","Inferior goods","Luxury goods"],a:0,tag:"demand",type:"interpretation",feedback:"Complementary goods are used together."},
+{ id:59, q:"If MRS exceeds the price ratio, the consumer should...",options:["Consume more of good X","Consume less of good X","Increase income","Consume less of both goods"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"If MRS exceeds the price ratio, X provides greater marginal utility per dollar."},
+{ id:60, q:"If the price of a good rises and total revenue falls, demand must be...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, price increases reduce revenue."},
+{ id:61, q:"If the price of a good rises and total revenue increases, demand must be...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means quantity responds weakly to price changes."},
+{ id:62, q:"If income rises and demand increases, the good is...",options:["Normal","Inferior","Perfect substitute","Perfect complement"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Normal goods experience increased demand when income rises."},
+{ id:63, q:"If income rises and demand decreases, the good is...",options:["Inferior","Normal","Elastic","Substitute"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Inferior goods see demand fall as income increases."},
+{ id:64, q:"A steeper budget constraint indicates...",options:["One good has become relatively more expensive","Income increased","Utility increased","Demand increased"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"The slope of the budget line reflects relative prices."},
+{ id:65, q:"A steeper indifference curve indicates...",options:["Greater willingness to trade Y for X","Greater willingness to trade X for Y","Higher prices","Lower demand"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Steeper curves indicate a higher marginal rate of substitution."},
+{ id:66, q:"If a consumer moves to a higher indifference curve after a price decrease, this indicates...",options:["Higher utility","Lower income","Lower prices overall","Demand collapse"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher indifference curves represent higher levels of satisfaction."},
+{ id:67, q:"If demand is elastic, lowering price will...",options:["Increase total revenue","Decrease revenue","Leave revenue unchanged","Eliminate demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity rises proportionally more than price falls."},
+{ id:68, q:"If quantity demanded barely responds to price changes, demand is...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means buyers respond weakly to price changes."},
+{ id:69, q:"If the price of X falls and the consumer buys more X and less Y, this reflects...",options:["The substitution effect","The income effect","Demand collapse","Consumer surplus"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Consumers substitute toward relatively cheaper goods."},
+{ id:70, q:"A demand curve becomes steeper. What happens to elasticity?",options:["Elasticity must increase","Elasticity must decrease","Elasticity cannot be determined from slope alone","Demand becomes unit elastic"],a:2,tag:"elasticity",type:"trap",feedback:"Elasticity depends on both slope and position on the curve."},
+{ id:71, q:"If income rises and quantity demanded does not change, the good must be...",options:["Normal","Inferior","Income neutral","Perfect substitute"],a:2,tag:"normal_inferior",type:"trap",feedback:"Some goods are income neutral, meaning demand does not respond to income changes."},
+{ id:72, q:"If MRS equals the price ratio but the bundle lies outside the budget constraint...",options:["It is impossible","It maximizes utility","Prices changed","Income increased"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Utility maximization requires the bundle to also be affordable."},
+{ id:73, q:"If demand is perfectly elastic and price rises slightly, quantity demanded will...",options:["Fall to zero","Decrease slightly","Remain constant","Increase"],a:0,tag:"elasticity",type:"trap",feedback:"Perfectly elastic demand means consumers will not buy at any higher price."},
+{ id:75, q:"If income rises but demand does not change, the good is...",options:["Normal","Inferior","Income neutral","Perfect substitute"],a:2,tag:"normal_inferior",type:"trap",feedback:"Some goods are income neutral and do not respond to income changes."},
+{ id:78, q:"A consumer moves along a demand curve after income rises. What happened?",options:["Nothing — demand curves do not move with income","Demand shifted","Supply changed","Prices disappeared"],a:0,tag:"demand",type:"trap",feedback:"Income changes shift demand curves, not movement along them."},
+{ id:79, q:"If the substitution effect dominates the income effect for an inferior good...",options:["Demand still rises when price falls","Demand falls when price falls","Demand disappears","Demand becomes perfectly elastic"],a:0,tag:"income_substitution",type:"trap",feedback:"For most inferior goods the substitution effect still dominates."},
+{ id:80, q:"Two indifference curves intersect. This implies...",options:["Preferences are inconsistent","Utility is maximized","Prices changed","Demand increased"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Indifference curves cannot cross if preferences are consistent."},
+{ id:81, q:"A bundle inside the budget constraint must...",options:["Be affordable but not necessarily optimal","Maximize utility","Be impossible","Increase income"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Bundles inside the budget line are affordable but may not maximize utility."},
+{ id:82, q:"If demand is unit elastic and price rises...",options:["Total revenue stays the same","Revenue rises","Revenue falls","Demand disappears"],a:0,tag:"elasticity",type:"trap",feedback:"With unit elasticity, revenue remains constant."},
+{ id:188, q:"A decrease in income leads to an increase in demand for a good. This good is...",options:["Inferior","Normal","Perfect substitute","Luxury"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Inferior goods see demand rise when income falls."},
+{ id:189, q:"If the price of good X rises and demand for good Y rises, what relationship exists between the goods?",options:["Substitutes","Complements","Inferior goods","Unrelated goods"],a:0,tag:"demand",type:"interpretation",feedback:"Substitutes are goods that replace each other when prices change."},
+{ id:190, q:"At the utility-maximizing bundle, what must be true about the slope of the indifference curve?",options:["It equals the slope of the budget constraint","It is zero","It is undefined","It is steeper than the budget constraint"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Utility maximization occurs where MRS equals the price ratio."},
+{ id:191, q:"If demand is perfectly inelastic, how does quantity demanded respond to price changes?",options:["It does not change","It changes proportionally","It becomes zero","It increases"],a:0,tag:"elasticity",type:"definition",feedback:"Perfectly inelastic demand means quantity demanded is completely unresponsive to price."},
+{ id:192, q:"If the substitution effect and income effect both reduce consumption after a price increase, the good is most likely...",options:["Normal","Inferior","Giffen","Perfect substitute"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For normal goods, both effects reinforce each other when price rises."},
+{ id:193, q:"A flatter demand curve generally indicates...",options:["More elastic demand","More inelastic demand","Unit elastic demand","Perfectly inelastic demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"Flatter curves indicate greater responsiveness to price changes."},
+{ id:83, q:"If both substitution and income effects reduce consumption after a price decrease...",options:["The good is Giffen","The good is normal","Demand is perfectly elastic","Supply increased"],a:0,tag:"income_substitution",type:"trap",feedback:"Giffen goods occur when the income effect dominates the substitution effect."}
+], 
+hard:[
+{ id:84, q:"A firm lowers its price and observes that total revenue falls. What must be true about demand at the original price?",options:["Demand was inelastic","Demand was elastic","Demand was unit elastic","Demand was perfectly elastic"],a:0,feedback:"If lowering price reduces revenue, quantity did not increase enough to offset the price drop. Demand must have been inelastic."},
+{ id:85, q:"A price increase causes total revenue to stay the same. What does this imply about demand at that price?",options:["Demand is unit elastic","Demand is elastic","Demand is inelastic","Demand is perfectly inelastic"],a:0,feedback:"When elasticity equals one, the percentage change in quantity exactly offsets the percentage change in price."},
+{ id:86, q:"A firm raises its price and observes that quantity demanded falls sharply and revenue decreases. What does this indicate?",options:["Demand is elastic","Demand is inelastic","Demand is unit elastic","Demand is perfectly inelastic"],a:0,feedback:"When price rises and revenue falls, demand must be elastic."},
+{ id:87, q:"A good has many close substitutes and consumers can easily switch between them. What is most likely true about demand?",options:["Demand is highly elastic","Demand is highly inelastic","Demand is perfectly inelastic","Demand is unrelated to price"],a:0,feedback:"More substitutes increase consumers' responsiveness to price changes."},
+{ id:88, q:"A price decrease causes consumers to buy more of good X even though X is an inferior good. Why?",options:["The substitution effect outweighs the income effect","The income effect outweighs the substitution effect","Preferences changed","Demand shifted outward"],a:0,feedback:"Even for inferior goods, the substitution effect usually dominates, increasing consumption when price falls."},
+{ id:89, q:"If a good takes a large share of consumer income and has many substitutes, demand will most likely be...",options:["Highly elastic","Highly inelastic","Perfectly inelastic","Unit elastic"],a:0,feedback:"Large budget share and many substitutes both increase elasticity."},
+{ id:90, q:"A demand curve becomes flatter. What does this imply about consumer responsiveness to price?",options:["Consumers are more responsive to price changes","Consumers are less responsive to price changes","Consumers ignore price changes","Consumers stop buying the good"],a:0,feedback:"Flatter demand curves indicate more elastic demand."},
+{ id:91, q:"A firm lowers price and sees quantity demanded increase substantially. What will most likely happen to total revenue?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Revenue becomes zero"],a:0,feedback:"A large increase in quantity indicates elastic demand, which raises revenue when price falls."},
+{ id:92, q:"If price falls and consumers buy more units while also gaining more surplus per unit, what happens to total consumer surplus?",options:["Consumer surplus increases","Consumer surplus decreases","Consumer surplus stays the same","Consumer surplus becomes zero"],a:0,feedback:"Lower prices increase the gap between willingness to pay and price and increase quantity purchased."},
+{ id:93, q:"If consumers become less sensitive to price changes, what happens to elasticity?",options:["Demand becomes more inelastic","Demand becomes more elastic","Demand becomes perfectly elastic","Demand becomes unit elastic"],a:0,feedback:"Less responsiveness to price changes means demand is more inelastic."},
+{ id:94, q:"A good has very few substitutes and is a small part of consumer income. Demand is most likely...",options:["Relatively inelastic","Highly elastic","Perfectly elastic","Unit elastic"],a:0,feedback:"Few substitutes and small budget share both reduce price sensitivity."},
+{ id:95, q:"A firm lowers price slightly and sees almost no change in quantity demanded. What does this imply about demand?",options:["Demand is inelastic","Demand is elastic","Demand is unit elastic","Demand is perfectly elastic"],a:0,feedback:"If quantity barely responds to price changes, demand is inelastic."},
+{ id:96, q:"At the optimal consumption bundle, what must be true about the marginal rate of substitution (MRS) and the price ratio?",options:["MRS equals the price ratio","MRS is greater than the price ratio","MRS is less than the price ratio","MRS must equal income"],a:0,feedback:"Utility maximization occurs where the marginal rate of substitution equals the relative price of the goods."},
+{ id:97, q:"If the marginal rate of substitution is greater than the price ratio, what should the consumer do?",options:["Consume more of good X and less of good Y","Consume more of good Y and less of good X","Stop consuming both goods","Increase income"],a:0,feedback:"If MRS exceeds the price ratio, the consumer values X more than the market trade-off, so they should consume more X."},
+{ id:98, q:"If two indifference curves intersect on a graph, what does this imply about consumer preferences?",options:["Preferences are inconsistent","Utility is maximized","Income increased","Demand increased"],a:0,feedback:"Indifference curves cannot cross because that would imply contradictory rankings of bundles."},
+{ id:99, q:"A consumer moves to a higher indifference curve after a price decrease. What must be true?",options:["The consumer is better off","The consumer is worse off","Income decreased","The budget line rotated inward"],a:0,feedback:"Higher indifference curves represent higher utility levels."},
+{ id:100, q:"If indifference curves become flatter as you move to the right along a curve, what does this indicate?",options:["Diminishing marginal rate of substitution","Increasing marginal utility","Perfect substitutes","Perfect complements"],a:0,feedback:"Consumers are willing to give up fewer units of Y for each additional unit of X, which reflects diminishing marginal rate of substitution."},
+{ id:101, q:"If the price of good X falls while income remains constant, what happens to the budget constraint?",options:["It rotates outward along the X-axis","It shifts outward parallel","It rotates inward","It becomes vertical"],a:0,feedback:"A lower price for X allows consumers to buy more X while the Y intercept stays the same."},
+{ id:102, q:"If the marginal rate of substitution is less than the price ratio at a bundle, what should the consumer do?",options:["Consume more of good Y and less of good X","Consume more of good X and less of good Y","Stop consuming both goods","Increase income"],a:0,feedback:"If MRS is less than the price ratio, the consumer values Y more relative to X than the market trade-off, so they should consume more Y."},
+{ id:103, q:"Which statement must be true for a bundle to maximize utility?",options:["An indifference curve is tangent to the budget line","The bundle lies on the highest indifference curve regardless of affordability","The consumer buys equal amounts of both goods","The budget line is horizontal"],a:0,feedback:"Utility maximization occurs where the highest attainable indifference curve is tangent to the budget constraint."},
+{ id:201, q:"A consumer has MUx = 30 and MUy = 20. Prices are Px = 5 and Py = 4. What should the consumer do?",options:["Buy more X and less Y","Buy more Y and less X","Do nothing","Increase income"],a:1,tag:"consumer_equilibrium",type:"calculation",feedback:"MUx/Px = 6 and MUy/Py = 5. Consumer should shift toward Y."},
+{ id:202, q:"A good has price elasticity of demand of 1.5. If price increases by 10%, what happens to total revenue?",options:["Total revenue decreases","Total revenue increases","Total revenue stays constant","Cannot be determined"],a:0,tag:"elasticity",type:"interpretation",feedback:"Elastic demand means price and revenue move in opposite directions."},
+{ id:203, q:"A consumer’s income increases and the demand for good X falls. Meanwhile, when price falls, quantity demanded rises. What type of good is X?",options:["Inferior","Normal","Giffen","Perfect substitute"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Inferior goods decrease in demand as income rises, but still follow the law of demand."},
+{ id:204, q:"If the price of a good decreases and total revenue decreases, what can you conclude about demand?",options:["Demand is inelastic","Demand is elastic","Demand is unit elastic","Demand is perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"If price and revenue move in the same direction, demand is inelastic."},
+{ id:205, q:"A consumer is at equilibrium. Income doubles, and prices remain constant. What happens to the optimal bundle?",options:["The consumer moves to a higher indifference curve","The consumer stays on the same bundle","The budget line rotates","The slope of the indifference curve changes"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher income shifts the budget constraint outward, allowing higher utility."},
+{ id:206, q:"If the substitution effect and income effect exactly offset each other after a price change, what happens to quantity demanded?",options:["It remains unchanged","It increases","It decreases","It becomes zero"],a:0,tag:"income_substitution",type:"trap",feedback:"If both effects cancel out, there is no net change in consumption."},
+{ id:207, q:"The price of a good rises from $8 to $10 and quantity demanded falls from 50 to 40. Using midpoint elasticity, what happens to total revenue?",options:["Total revenue decreases","Total revenue increases","Total revenue stays the same","Not enough information to determine"],a:2,tag:"elasticity",type:"calculation",feedback:"Elasticity = 1.00 (unit elastic), so the percentage change in quantity exactly offsets the price change. Total revenue remains unchanged."},
+{ id:208, q:"A consumer’s marginal rate of substitution is decreasing. What does this imply about preferences?",options:["They are convex","They are linear","They are inconsistent","They are perfect complements"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Diminishing MRS implies convex preferences."},
+{ id:209, q:"If the price of good X falls and consumption of good Y increases, what must be true?",options:["Goods are complements","Goods are substitutes","Y is inferior","X is inferior"],a:0,tag:"demand",type:"interpretation",feedback:"Complementary goods are consumed together."},
+{ id:210, q:"A demand curve is steep but not vertical. What can be said about elasticity?",options:["Demand is relatively inelastic","Demand is relatively elastic","Demand is perfectly elastic","Demand is unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Steeper curves indicate lower responsiveness to price changes."},
+{ id:211, q:"A consumer has MUx/Px = 8 and MUy/Py = 4. If they reallocate spending optimally, what will happen?",options:["They will buy more X and less Y","They will buy more Y and less X","They will not change consumption","They will increase income"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Consumers shift spending toward the good with higher marginal utility per dollar."},
+{ id:212, q:"If demand is elastic and price decreases by 5%, what must happen to quantity demanded for total revenue to increase?",options:["Quantity demanded increases by more than 5%","Quantity demanded increases by less than 5%","Quantity demanded decreases","Quantity demanded does not change"],a:0,tag:"elasticity",type:"interpretation",feedback:"Elastic demand requires quantity to change proportionally more than price."},
+{ id:213, q:"If a good is Giffen, what must be true about the income and substitution effects?",options:["Income effect outweighs substitution effect","Substitution effect outweighs income effect","Both effects reinforce each other","Neither effect exists"],a:0,tag:"income_substitution",type:"trap",feedback:"Giffen goods occur when the income effect dominates and reverses the usual demand relationship."}, 
+{ id:214, q:"A consumer faces Px = 2 and Py = 4. At their current bundle, MRS = 3. What should they do?",options:["Consume more X","Consume more Y","Stay at current bundle","Increase income"],a:0,tag:"consumer_equilibrium",type:"calculation",feedback:"Since MRS (3) > Px/Py (0.5), the consumer should consume more X."},    
+{ id:215, q:"If total revenue rises when price increases, what must be true about the percentage change in quantity demanded?",options:["It falls by less than the percentage increase in price","It falls by more than the percentage increase in price","It increases","It stays the same"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means quantity changes proportionally less than price."},
+{ id:216, q:"If both goods are normal and income rises, what happens to the budget constraint and optimal bundle?",options:["Budget shifts outward, higher indifference curve reached","Budget rotates, same indifference curve","Budget shifts inward, lower utility","No change occurs"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher income shifts the budget outward, allowing greater utility."},
+{ id:217, q:"If the price of X falls and demand for Y falls, what can you conclude?",options:["X and Y are complements","X and Y are substitutes","Y is inferior","X is inferior"],a:0,tag:"demand",type:"interpretation",feedback:"If consumption of Y falls when X becomes cheaper, the goods are complements."},
+{ id:218, q:"A demand curve is perfectly vertical. What happens to total revenue if price increases?",options:["Total revenue increases","Total revenue decreases","Total revenue stays constant","Cannot be determined"],a:0,tag:"elasticity",type:"interpretation",feedback:"With perfectly inelastic demand, quantity does not change, so higher price increases revenue."},
+{ id:219, q:"If MRS equals the price ratio but the consumer is not maximizing utility, what must be true?",options:["The bundle is not affordable","Preferences are inconsistent","Income is zero","Prices are changing"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Utility maximization requires both MRS = price ratio and that the bundle lies on the budget constraint."},
+{ id:220, q:"If demand is elastic at a given price, what happens to total revenue when price falls?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Revenue becomes zero"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, price and total revenue move in opposite directions."}
+]
+};
+
+easyConceptPools = {
+preferences:[
+{q:"Preferences are rational if they are...",options:["Complete and transitive","Based only on prices","Identical across consumers","Always maximize income"],a:0,feedback:"Rational preferences must be complete and transitive so consumers can rank bundles consistently."},
+{q:"If a consumer prefers bundle A to bundle B, this means...",options:["A provides greater satisfaction than B","A costs less than B","A contains more of every good","A lies inside the budget constraint"],a:0,feedback:"Preference means the consumer derives greater utility from A than from B."},
+{q:"Utility represents...",options:["A ranking of satisfaction across bundles","Total income a consumer earns","The price of goods","The quantity purchased"],a:0,feedback:"Utility measures the satisfaction a consumer receives from different bundles."},
+{q:"If preferences are complete, a consumer can...",options:["Compare any two bundles","Always afford their preferred bundle","Avoid trade-offs","Ignore prices"],a:0,feedback:"Completeness means consumers can rank any two bundles."},
+{q:"If preferences are transitive and A is preferred to B while B is preferred to C, then...",options:["A must be preferred to C","C must be preferred to A","All bundles are equal","Preferences change randomly"],a:0,feedback:"Transitivity ensures consistent rankings across choices."},
+{q:"If a consumer is indifferent between bundles A and B, this means...",options:["They provide the same level of utility","They cost the same","They contain identical goods","They are both affordable"],a:0,feedback:"Indifference means equal satisfaction, not equal cost or composition."},
+{q:"If preferences are not transitive, what problem arises?",options:["Choices become inconsistent","Prices change unpredictably","Income becomes irrelevant","Demand becomes perfectly elastic"],a:0,feedback:"Without transitivity, consumers can make contradictory choices."},
+{q:"A consumer prefers A to B and B to C. Which assumption ensures they prefer A to C?",options:["Transitivity","Completeness","Budget constraint","Diminishing returns"],a:0,feedback:"Transitivity ensures consistent rankings across bundles."},
+{q:"If preferences are incomplete, the consumer...",options:["Cannot rank some bundles","Always chooses the cheapest option","Ignores income","Prefers all bundles equally"],a:0,feedback:"Without completeness, some bundles cannot be compared."},
+{q:"A student says preferences depend only on prices. What is wrong?",options:["Preferences are independent of prices","Prices determine utility directly","Preferences only matter for firms","Prices eliminate trade-offs"],a:0,feedback:"Preferences describe tastes, not prices—prices affect constraints, not preferences."}
+],
+
+indifference:[
+{q:"Two bundles on the same indifference curve...",options:["Provide the same satisfaction","Cost the same amount","Contain the same quantities","Are always affordable"],a:0,feedback:"All points on an indifference curve yield the same utility."},
+{q:"The slope of an indifference curve represents the...",options:["Marginal rate of substitution","Price ratio","Income level","Demand elasticity"],a:0,feedback:"The slope equals the marginal rate of substitution between the goods."},
+{q:"Convex indifference curves imply...",options:["Diminishing marginal rate of substitution","Constant trade-offs","Perfect substitutes","Increasing marginal utility"],a:0,feedback:"As a consumer has more of one good, they are willing to give up less of the other."},
+{q:"A higher indifference curve represents...",options:["Greater satisfaction","Higher income","Higher prices","Greater demand"],a:0,feedback:"Curves farther from the origin represent higher levels of utility."},
+{q:"If a bundle lies above an indifference curve, it is...",options:["Preferred to bundles on that curve","Less preferred","Unaffordable","Equal in satisfaction"],a:0,feedback:"Bundles above the curve provide higher utility."},
+{q:"If indifference curves cross, what does that imply?",options:["Preferences are inconsistent","Utility is maximized","Prices are changing","Income is fixed"],a:0,feedback:"Crossing curves violate transitivity and consistency."},
+{q:"If indifference curves are straight lines, this implies...",options:["Perfect substitutes","Diminishing MRS","Perfect complements","No preferences"],a:0,feedback:"Straight lines indicate a constant trade-off between goods."},
+{q:"If indifference curves are L-shaped, this implies...",options:["Perfect complements","Perfect substitutes","Diminishing utility","No trade-offs"],a:0,feedback:"L-shapes indicate goods are consumed in fixed proportions."},
+{q:"As a consumer moves down an indifference curve, the MRS...",options:["Decreases","Increases","Remains constant","Becomes zero"],a:0,feedback:"Convexity implies diminishing willingness to substitute."},
+{q:"A flatter indifference curve means...",options:["Lower MRS","Higher income","Higher utility","Greater demand"],a:0,feedback:"A flatter slope means the consumer gives up less of Y for X."}
+],
+
+budget:[
+{q:"A budget constraint shows...",options:["All combinations of goods a consumer can afford","The bundles consumers most prefer","The firm's production choices","The market demand curve"],a:0,feedback:"The budget line shows all affordable combinations given income and prices."},
+{q:"If income rises and prices stay the same, the budget line...",options:["Shifts outward parallel","Rotates inward","Becomes steeper","Does not change"],a:0,feedback:"Higher income increases purchasing power for both goods."},
+{q:"If the price of good X increases while income stays constant, the budget line...",options:["Pivots inward along the X-axis intercept","Shifts outward parallel","Rotates outward","Becomes horizontal"],a:0,feedback:"A higher price reduces the maximum quantity of X that can be purchased."},
+{q:"The intercepts of a budget line represent...",options:["Maximum quantities of each good affordable if income is spent on only that good","The consumer's utility level","Market demand","Producer profits"],a:0,feedback:"Intercepts show the maximum amount of each good that could be purchased individually."},
+{q:"Bundles inside the budget constraint are...",options:["Affordable but not fully using income","Unaffordable","Preferred to all others","Impossible to purchase"],a:0,feedback:"Points inside the line are affordable but do not spend the entire budget."},
+{q:"If both prices double and income doubles, the budget line...",options:["Does not change","Shifts outward","Shifts inward","Rotates"],a:0,feedback:"Proportional changes leave the budget constraint unchanged."},
+{q:"If the price of good Y falls, the budget line...",options:["Rotates outward along the Y-axis","Shifts outward parallel","Rotates inward","Does not change"],a:0,feedback:"A lower price increases the Y-intercept."},
+{q:"A point outside the budget constraint is...",options:["Unaffordable","Efficient","Preferred","Optimal"],a:0,feedback:"Points outside exceed the consumer’s income."},
+{q:"The slope of the budget line represents...",options:["The price ratio","Income level","Utility","Demand"],a:0,feedback:"The slope equals -Px/Py."},
+{q:"If income decreases, the budget line...",options:["Shifts inward parallel","Rotates outward","Becomes flatter","Does not change"],a:0,feedback:"Lower income reduces purchasing power equally for both goods."}
+],
+
+equilibrium:[
+{q:"Consumer equilibrium occurs where...",options:["The highest attainable indifference curve touches the budget line","Demand equals supply","Income equals price","Utility equals zero"],a:0,feedback:"Consumers maximize utility at the tangency between the budget line and an indifference curve."},
+{q:"At the optimal bundle, the marginal rate of substitution equals...",options:["The price ratio","Income","Utility","Market demand"],a:0,feedback:"Utility maximization occurs when MRS equals Px/Py."},
+{q:"If MUx/Px is greater than MUy/Py, the consumer should...",options:["Consume more X and less Y","Consume more Y and less X","Reduce income","Consume equal quantities"],a:0,feedback:"Consumers shift spending toward the good with higher marginal utility per dollar."},
+{q:"If MUx/Px is less than MUy/Py, the consumer should...",options:["Consume more Y and less X","Consume more X","Stop consuming both goods","Increase income"],a:0,feedback:"Consumers increase consumption of the good providing greater utility per dollar."},
+{q:"At equilibrium the consumer...",options:["Cannot increase satisfaction without changing prices or income","Consumes equal amounts of both goods","Faces zero prices","Has no preferences"],a:0,feedback:"At the optimal bundle no affordable reallocation improves utility."},
+{q:"If MRS > Px/Py, the consumer should...",options:["Consume more X","Consume more Y","Do nothing","Increase income"],a:0,feedback:"The consumer values X more than the market does—buy more X."},
+{q:"If MRS < Px/Py, the consumer should...",options:["Consume more Y","Consume more X","Stop consuming","Increase prices"],a:0,feedback:"The consumer values Y more per dollar—shift toward Y."},
+{q:"At equilibrium, the slope of the indifference curve equals...",options:["The slope of the budget line","Income","Utility","Demand"],a:0,feedback:"Tangency condition defines optimal choice."},
+{q:"If a consumer is not at a tangency point, they...",options:["Can increase utility","Have maximized utility","Face no trade-offs","Have no preferences"],a:0,feedback:"Non-tangency means a better bundle exists."},
+{q:"Corner solutions occur when...",options:["Tangency is not feasible","Prices are equal","Income is zero","Utility is constant"],a:0,feedback:"Sometimes the best bundle is at an endpoint, not a tangency."}
+],
+
+demand:[
+{q:"The law of demand states that when price rises...",options:["Quantity demanded falls","Quantity demanded rises","Demand shifts outward","Elasticity becomes zero"],a:0,feedback:"Higher prices reduce the quantity consumers are willing to buy."},
+{q:"A demand curve shows...",options:["The relationship between price and quantity demanded","Income and utility","Costs and production","Market equilibrium"],a:0,feedback:"Demand curves show how quantity demanded changes as price changes."},
+{q:"Market demand is found by...",options:["Adding individual demand curves horizontally","Adding them vertically","Multiplying price by quantity","Averaging incomes"],a:0,feedback:"Market demand sums the quantities demanded by all consumers at each price."},
+{q:"A movement along a demand curve occurs when...",options:["The price of the good changes","Income changes","Preferences change","Population changes"],a:0,feedback:"Only price changes cause movement along the demand curve."},
+{q:"If income increases and a good is normal, demand will...",options:["Shift outward","Shift inward","Stay the same","Become perfectly elastic"],a:0,feedback:"Higher income increases demand for normal goods."},
+{q:"Which situation represents a shift in demand rather than a movement along the curve?",options:["A change in income","A change in the good’s price","A movement from one point to another on the curve","A change in quantity demanded"],a:0,feedback:"Changes in income shift demand, while price changes move along the curve."},
+{q:"If the price of a substitute good rises, what happens to demand?",options:["Demand increases","Demand decreases","Quantity demanded increases","Nothing changes"],a:0,feedback:"Substitutes becoming more expensive increase demand for the good."},
+{q:"If the price of a complement falls, demand for the related good will...",options:["Increase","Decrease","Stay the same","Become perfectly elastic"],a:0,feedback:"Cheaper complements increase demand for the good."},
+{q:"A student says: 'When price rises, demand falls.' What is wrong?",options:["They confused demand with quantity demanded","They are correct","Demand always falls with price","Demand and quantity demanded are identical"],a:0,feedback:"Price changes affect quantity demanded, not demand itself."},
+{q:"If population increases, the demand curve will...",options:["Shift outward","Shift inward","Rotate","Stay the same"],a:0,feedback:"More consumers increase demand."}
+]
+};
+
+const mediumConceptPools = {
+demand:[
+{q:"A movement along a demand curve occurs when...",options:["The price of the good changes","Income changes","Consumer tastes change","The number of buyers changes"],a:0,feedback:"A change in the good’s own price causes movement along the demand curve."},
+{q:"A demand curve shifts when...",options:["Income or preferences change","The good’s own price changes","Firms change production","Technology changes"],a:0,feedback:"Demand shifts occur when factors other than the good’s own price change."},
+{q:"If the price of coffee rises and demand for tea increases, coffee and tea are...",options:["Substitutes","Complements","Inferior goods","Unrelated goods"],a:0,feedback:"Substitutes are goods consumers switch between when relative prices change."},
+{q:"A student says: 'When price rises, demand falls.' What is the mistake?",options:["They confused demand with quantity demanded","They are correct","Demand always falls with price","Demand is unrelated to price"],a:0,feedback:"Price changes affect quantity demanded, not demand itself."},
+{q:"Which scenario causes a movement along the demand curve?",options:["A change in the good’s own price","A change in income","A change in preferences","An increase in population"],a:0,feedback:"Only a change in the good’s own price moves along the curve."},
+{q:"If both income and price increase, what happens to demand?",options:["Cannot be determined without more information","Demand always increases","Demand always decreases","Demand stays constant"],a:0,feedback:"Multiple factors shift demand differently—net effect is ambiguous."},
+{q:"Which would shift demand for a good inward?",options:["A decrease in income for a normal good","A decrease in price","An increase in substitutes' prices","An increase in population"],a:0,feedback:"Lower income reduces demand for normal goods."},
+{q:"If the price of a substitute falls, demand for the good will...",options:["Decrease","Increase","Stay the same","Become perfectly elastic"],a:0,feedback:"Cheaper substitutes reduce demand for the original good."}
+],
+
+income_substitution:[
+{q:"The substitution effect occurs because...",options:["Relative prices change","Income changes","Preferences change","Demand shifts randomly"],a:0,feedback:"The substitution effect occurs because one good becomes relatively cheaper or more expensive."},
+{q:"The income effect occurs because...",options:["A price change changes purchasing power","Consumers always buy less","Preferences suddenly change","Supply conditions shift"],a:0,feedback:"When price changes, the consumer’s real purchasing power changes too."},
+{q:"When the price of a good falls, the substitution effect causes consumers to...",options:["Buy more of the relatively cheaper good","Buy less of the good","Ignore the price change","Buy equal amounts of all goods"],a:0,feedback:"Consumers substitute toward the relatively cheaper good."},
+{q:"Which effect explains why a price change alters relative attractiveness between goods?",options:["Substitution effect","Income effect","Demand shift","Supply effect"],a:0,feedback:"Substitution effect comes from changes in relative prices."},
+{q:"Which effect reflects a change in real purchasing power?",options:["Income effect","Substitution effect","Elasticity","Opportunity cost"],a:0,feedback:"Income effect captures the change in real income after a price change."},
+{q:"When the price of a good falls, which effect always increases quantity demanded?",options:["Substitution effect","Income effect","Both always increase","Neither"],a:0,feedback:"Substitution effect always increases consumption of the cheaper good."},
+{q:"For an inferior good, the income effect is...",options:["Negative","Positive","Zero","Always dominant"],a:0,feedback:"Inferior goods see reduced consumption when income rises."},
+{q:"If the income effect opposes the substitution effect but is weaker, total demand will...",options:["Increase","Decrease","Stay the same","Become perfectly elastic"],a:0,feedback:"Substitution dominates, so quantity demanded still rises."}
+],
+
+normal_inferior:[
+{q:"A normal good is one where...",options:["Demand rises as income rises","Demand falls as income rises","Demand is unrelated to income","Price always rises with income"],a:0,feedback:"Normal goods are purchased more when income increases."},
+{q:"An inferior good is one where...",options:["Demand falls as income rises","Demand rises as income rises","Demand never changes","Price becomes lower as income rises"],a:0,feedback:"Inferior goods are purchased less when income increases."},
+{q:"If income rises and people buy more restaurant meals, restaurant meals are...",options:["Normal goods","Inferior goods","Giffen goods","Complements"],a:0,feedback:"If demand rises with income, the good is normal."},
+{q:"If income rises and demand falls, the good is...",options:["Inferior","Normal","Elastic","A substitute"],a:0,feedback:"Inferior goods are consumed less as income rises."},
+{q:"Which statement is always true about normal goods?",options:["Income and demand move in the same direction","They are always luxury goods","They are always expensive","They never have substitutes"],a:0,feedback:"Normal goods increase in demand as income increases."},
+{q:"A good could be inferior and still obey the law of demand if...",options:["The substitution effect dominates","Income effect dominates","Price never changes","Demand shifts"],a:0,feedback:"Substitution effect usually outweighs income effect."},
+{q:"If a good is inferior, the income effect works...",options:["Against the substitution effect","With the substitution effect","Independently of price","Only at equilibrium"],a:0,feedback:"Income effect is negative for inferior goods."},
+{q:"Which case would violate the law of demand?",options:["Income effect outweighs substitution effect","Substitution effect dominates","Demand shifts outward","Price decreases"],a:0,feedback:"This describes a Giffen good."}
+],
+
+consumer_equilibrium:[
+{q:"Consumer equilibrium occurs where...",options:["The highest attainable indifference curve is tangent to the budget line","Income equals spending on one good","Demand equals supply","Utility is zero"],a:0,feedback:"Consumers maximize utility at the point where the best affordable indifference curve touches the budget line."},
+{q:"At the optimal bundle, the marginal rate of substitution equals...",options:["The ratio of prices","Total income","The slope of the demand curve","Total utility"],a:0,feedback:"Consumer equilibrium occurs where MRS equals the price ratio."},
+{q:"If MUx/Px is greater than MUy/Py, the consumer should...",options:["Consume more X and less Y","Consume more Y and less X","Stop consuming both goods","Reduce income"],a:0,feedback:"The consumer should shift spending toward the good with higher marginal utility per dollar."},
+{q:"If MRS > Px/Py, the consumer is...",options:["Not maximizing utility","At equilibrium","Facing no trade-offs","Maximizing income"],a:0,feedback:"MRS must equal price ratio at equilibrium."},
+{q:"If a consumer moves along a budget line to a higher indifference curve, utility...",options:["Increases","Decreases","Stays the same","Becomes zero"],a:0,feedback:"Higher curves represent greater satisfaction."},
+{q:"A corner solution occurs when...",options:["Tangency is not possible","MRS equals price ratio","Income is zero","Prices are equal"],a:0,feedback:"Sometimes the best bundle is at an endpoint."},
+{q:"If MUx/Px ≠ MUy/Py, the consumer...",options:["Can increase utility","Is at equilibrium","Has no preferences","Must reduce consumption"],a:0,feedback:"Unequal MU per dollar means reallocation can improve utility."},
+{q:"At equilibrium, the consumer cannot...",options:["Improve utility without changing income or prices","Consume more goods","Face trade-offs","Change preferences"],a:0,feedback:"All beneficial reallocations are exhausted."}
+],
+
+elasticity:[
+{q:"Price elasticity of demand measures...",options:["How responsive quantity demanded is to price changes","How responsive supply is to price changes","How much income consumers earn","How much firms spend on production"],a:0,feedback:"Elasticity measures the responsiveness of quantity demanded to a change in price."},
+{q:"If elasticity is greater than 1, demand is...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,feedback:"Elastic demand means quantity demanded responds strongly to price changes."},
+{q:"If elasticity is less than 1, demand is...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,feedback:"Inelastic demand means quantity demanded responds weakly to price changes."},
+{q:"If demand is elastic, a price increase will...",options:["Decrease total revenue","Increase total revenue","Not affect revenue","Double revenue"],a:0,feedback:"Elastic demand means quantity drops significantly when price rises."},
+{q:"If demand is inelastic, a price increase will...",options:["Increase total revenue","Decrease total revenue","Have no effect","Eliminate demand"],a:0,feedback:"Inelastic demand means quantity changes little."},
+{q:"Perfectly inelastic demand means...",options:["Quantity demanded does not change with price","Demand is very responsive","Elasticity equals 1","Revenue is zero"],a:0,feedback:"Vertical demand curve—no response to price changes."},
+{q:"Unit elastic demand means...",options:["Total revenue stays constant when price changes","Quantity never changes","Demand shifts outward","Elasticity is zero"],a:0,feedback:"Price and quantity changes offset exactly."},
+{q:"A good with many substitutes is likely to have...",options:["Elastic demand","Inelastic demand","Perfectly inelastic demand","Unit elasticity"],a:0,feedback:"Substitutes increase responsiveness to price changes."}
+]
+};
+
+// =============================================
+// ANSWER SHUFFLING — DO NOT MODIFY CORE LOGIC
+// =============================================
+// Randomizes answer choices while preserving
+// the correct answer index.
+//
+// Steps:
+// 1. Copy original question (prevents mutation)
+// 2. Store correct answer value
+// 3. Shuffle options
+// 4. Recalculate correct index (q.a)
+//
+// ---------------------------------------------
+// DO NOT MODIFY:
+// - correct answer tracking logic
+// - q.a reassignment
+// - structure of returned object
+//
+// Breaking this WILL cause:
+// - incorrect answers being marked correct
+// - correct answers being marked wrong
+//
+// ---------------------------------------------
+// SAFE TO EDIT:
+// - adding extra fields (if needed)
+// - minor formatting changes
+//
+// This function ensures fairness in answer order.
+// =============================================   
+function shuffleOptions(question){
+    let q = {
+        q: question.q,
+        options: [...question.options],
+        a: question.a,
+        feedback: question.feedback,
+        hint: question.hint,
+        tag: question.tag,
+        type: question.type
+    };
+
+    let correct = q.options[q.a];
+
+    for(let i = q.options.length - 1; i > 0; i--){
+        let j = Math.floor(Math.random() * (i + 1));
+        [q.options[i], q.options[j]] = [q.options[j], q.options[i]];
+    }
+
+    q.a = q.options.indexOf(correct);
+
+    return q;
+}
+
+// =============================================
+// DYNAMIC CALCULATION QUESTIONS — SAFE TO EDIT
+// =============================================
+// These generate random numeric problems.
+//
+// You can:
+// - modify formulas
+// - add new generators
+//
+// Keep structure consistent (q, options, a, feedback)
+       
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function getMUPerDollar() {
+    const mu = Math.floor(Math.random() * 50) + 10;
+    const price = [2, 5, 10][Math.floor(Math.random() * 3)];
+    return {
+        q: `A consumer receives MUx = ${mu} from good X. The price of X is $${price}. What is the Marginal Utility per dollar?`,
+        options: [`${(mu/price).toFixed(1)}`, `${mu}`, `${price/mu}`, `${(mu*price)}`],
+        a: 0,  type: "calculation", feedback:`MU per dollar = MU / Price = ${mu} / ${price} = ${(mu/price).toFixed(1)}`
+    };
+}
+
+function getEquilibriumCheck() {
+    const muX = Math.floor(Math.random() * 20) + 10;
+    const pX = [2, 5][Math.floor(Math.random() * 2)];
+    const ratio = muX / pX;
+    // We want the student to find the MUy that satisfies MUx/Px = MUy/Py
+    const pY = 10;
+    const correctMUy = ratio * pY;
+    
+    return {
+        q: `A consumer is in equilibrium. MUx = ${muX} and Px = $${pX}. If the price of Good Y (Py) is $${pY}, what must be the Marginal Utility of Good Y (MUy)?`,
+        options: [`${correctMUy}`, `${correctMUy / 2}`, `${correctMUy + 10}`, `${muX}`],
+        a: 0,  type: "calculation", feedback:`Consumer equilibrium requires MUx/Px = MUy/Py. ${muX}/${pX} = ${ratio}. So MUy must equal ${correctMUy}.`
+    };
+}
+    
+function getElasticityCalc() {
+
+    const p1 = (Math.floor(Math.random() * 5) + 4) * 2;
+    const p2 = p1 + 2;
+
+    const q1 = (Math.floor(Math.random() * 5) + 8) * 10;
+    const q2 = q1 - 20;
+
+    const chgQ = q2 - q1;
+    const midQ = (q1 + q2) / 2;
+    const chgP = p2 - p1;
+    const midP = (p1 + p2) / 2;
+
+    const elasticityVal = Math.abs((chgQ / midQ) / (chgP / midP));
+    const elasticity = elasticityVal.toFixed(2);
+
+    // helper classifier
+    function classify(val){
+        if (val > 1) return "Elastic";
+        if (val < 1) return "Inelastic";
+        return "Unit Elastic";
+    }
+
+    const correct = `${elasticity} (${classify(elasticityVal)})`;
+
+    const d1Val = elasticityVal * 0.7;
+    const d2Val = elasticityVal * 1.3;
+    const d3Val = Math.abs((chgQ / q1) / (chgP / p1));
+
+    const d1 = `${d1Val.toFixed(2)} (${classify(d1Val)})`;
+    const d2 = `${d2Val.toFixed(2)} (${classify(d2Val)})`;
+    const d3 = `${d3Val.toFixed(2)} (${classify(d3Val)})`;
+
+    let options = new Set();
+    options.add(correct);
+    options.add(d1);
+    options.add(d2);
+    options.add(d3);
+
+    while (options.size < 4) {
+        const fillerVal = Math.random() * 2 + 0.5;
+        options.add(`${fillerVal.toFixed(2)} (${classify(fillerVal)})`);
+    }
+
+    options = Array.from(options);
+
+return {
+    q: `When the price of a good increases from $${p1} to $${p2}, the quantity demanded decreases from ${q1} to ${q2}. A firm raises price expecting to increase revenue. Based on the midpoint elasticity, what actually happens?`,
+    options: [
+        "Revenue increases because demand is inelastic",
+        "Revenue decreases because demand is elastic",
+        "Revenue stays the same because demand is unit elastic",
+        "Revenue cannot be determined from elasticity"
+    ],
+    a: elasticityVal > 1 ? 1 : (elasticityVal < 1 ? 0 : 2),
+    type: "calculation",
+    hint: "Calculate elasticity, then apply the revenue rule",
+    feedback: `Elasticity ≈ ${elasticity}. Demand is ${classify(elasticityVal)}, so ${elasticityVal > 1 ? "revenue falls when price rises." : elasticityVal < 1 ? "revenue rises when price rises." : "revenue stays the same."}`
+};
+}
+  
+function getConsumerSurplusCalc() {
+    const wtp = Math.floor(Math.random() * 20) + 40; // Higher WTP to ensure positive surplus
+    const initialPrice = Math.floor(Math.random() * 10) + 20; // e.g., $20 - $30
+    const priceDrop = Math.floor(Math.random() * 5) + 5; // e.g., $5 - $10 drop
+    const finalPrice = initialPrice - priceDrop;
+
+    // The increase in surplus is the difference between the price points
+    // New Surplus (wtp - finalPrice) - Old Surplus (wtp - initialPrice) = initialPrice - finalPrice
+    const surplusIncrease = initialPrice - finalPrice;
+
+return {
+    q: `A buyer is willing to pay $${wtp} for a product. The price falls from $${initialPrice} to $${finalPrice}. What happens to consumer surplus and why?`,
+    options: [
+        `It increases by $${surplusIncrease} because the buyer pays less for the same value`,
+        `It increases by $${wtp - finalPrice} because total value increases`,
+        `It does not change because willingness to pay is fixed`,
+        `It decreases because price falls`
+    ],
+    a: 0,
+    type: "calculation",
+    feedback: `Consumer surplus increases by the price drop since WTP stays constant while price falls.`
+};
+}
+
+const calculationGenerators = [
+    getMUPerDollar,
+    getEquilibriumCheck,
+    getElasticityCalc,
+    getConsumerSurplusCalc
+];
+    
+// =============================================
+// QUESTION SELECTION ENGINE — DO NOT MODIFY
+// =============================================
+// Handles:
+// - non-repetition
+// - difficulty filtering
+// - type balancing
+//
+// Breaking this = repeated questions or bad difficulty scaling
+     
+function randomQuestion(poolName) {
+    // --- SPECIAL CALCULATED ROOMS (26-29) ---
+    // These ensure the student practices specific math skills before the boss
+    if (room === 26) return getMUPerDollar();
+    if (room === 27) return getEquilibriumCheck();
+    if (room === 28) return getConsumerSurplusCalc();
+    if (room === 29) return getElasticityCalc();
+
+    let pool = questionBanks[poolName]
+
+    // Safety check in case poolName is invalid
+    if (!pool) return null;
+    
+    let used = [
+        ...usedQuestions.easy,
+        ...usedQuestions.medium,
+        ...usedQuestions.hard,
+        ...usedQuestions.easyBoss,
+        ...usedQuestions.mediumBoss,
+        ...usedQuestions.finalBoss
+    ];
+
+    let available = pool.filter(q => !used.includes(q.id));
+
+    if(available.length === 0){
+        usedQuestions[poolName] = []
+        available = pool
+    }
+
+    // Avoid three identical question types in a row
+    let filtered = available;
+    if (lastTypes.length >= 2) {
+        let last1 = lastTypes[lastTypes.length - 1];
+        let last2 = lastTypes[lastTypes.length - 2];
+
+        if (last1 === last2) {
+            filtered = available.filter(q => q.type !== last1);
+            if (filtered.length === 0) filtered = available;
+        }
+    }
+
+    let question = filtered[Math.floor(Math.random() * filtered.length)];
+
+usedQuestions[poolName].push(question.id)
+
+// Track types
+lastTypes.push(question.type)
+if(lastTypes.length > 3){
+lastTypes.shift()
+}
+
+    return question;
+}
+
+function pickConceptQuestion(pool){
+    if(!pool._remaining || pool._remaining.length === 0){
+        pool._remaining = shuffle([...pool]);
+    }
+    return pool._remaining.pop();
+}
+    
+// =============================================
+// MAZE TRACK VISUAL SYSTEM — SAFE TO EDIT (WITH RULES)
+// =============================================
+// This function renders the 30-room progression map.
+//
+// What you CAN change:
+// - Icons (🟩 🟦 ⬛ 🎲 🛡️ 👑)
+// - Colors / styles (opacity, glow, etc.)
+// - Visual themes (make it sci-fi, medieval, etc.)
+//
+// What you MUST NOT change:
+// - Loop range (1 → 30) → controls total rooms
+// - "room" variable usage → tracks player position
+// - Boss room numbers (10, 20, 30) unless you update ALL logic elsewhere
+//
+// If you change boss room numbers here but NOT in:
+// - loadQuestion()
+// - answer()
+// - boss logic
+// → the game WILL break.
+//
+// This is VISUAL ONLY.
+// It does NOT control game progression.
+// =============================================
+     
+function updateMazeTrack() {
+    const track = document.getElementById("mazeTrack");
+    track.innerHTML = ""; // Clear the old grid
+    
+    for (let i = 1; i <= 30; i++) {
+        const box = document.createElement("div");
+        box.setAttribute("role","img");
+        box.setAttribute("aria-label",`Room ${i} of 30`);
+        box.className = "maze-box";
+        
+        // Determine the icon and state
+        if (i < room) {
+            box.innerText = "🟩";
+            box.style.opacity = "0.6";
+        } else if (i === room) {
+            box.classList.add("active"); // Trigger the gold pulse
+            box.setAttribute("aria-label",`Current room ${i} of 30`);
+            box.innerText = "🟥";
+        } else {
+            // Boss icons for future rooms
+            if (i === 10){box.innerText = "🛡️";box.classList.add("boss10");}
+            else if (i === 20){box.innerText = "💀";box.classList.add("boss20");}
+            else if (i === 30){box.innerText = "👑";box.classList.add("boss30");}
+            else box.innerText = "⬛";
+        }
+        
+        track.appendChild(box);
+    }
+}
+
+// =============================================
+// RANDOMIZATION SYSTEM — DO NOT MODIFY CORE LOGIC
+// =============================================
+// Controls fair, non-repeating selection of:
+// - calculation generators
+// - question pools
+//
+// Uses "shuffle + bag" system to ensure:
+// - no immediate repeats
+// - full coverage before reuse
+//
+// ---------------------------------------------
+// SAFE TO EDIT:
+// - adding new generators (calculationGenerators)
+// - modifying pool content
+//
+// DO NOT MODIFY:
+// - shuffle logic
+// - bag system (calcBag, _remaining)
+// - pop() usage
+//
+// Breaking this WILL cause:
+// - repeated questions
+// - uneven distribution
+// - predictable patterns
+//
+// This ensures randomness WITHOUT repetition.
+// =============================================     
+
+// Fisher-Yates shuffle (uniform random order)
+// Do not modify — ensures unbiased randomness     
+function shuffle(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// Bag system for calculation generators
+// Ensures all generators are used before repeating
+let calcBag = [];
+
+// Pulls one calculation generator from the bag
+// Refills bag when empty (reshuffled)
+function pickCalcGenerator(){
+    if(calcBag.length === 0){
+        calcBag = shuffle([...calculationGenerators]);
+    }
+    return calcBag.pop();
+}
+
+// Generic bag-based random picker for any pool
+// Prevents repeats until pool is exhausted
+function pickRandom(pool){
+    if(!pool._remaining || pool._remaining.length === 0){
+        pool._remaining = shuffle([...pool]);
+    }
+    return pool._remaining.pop();
+}
+
+// =============================================
+// MUSIC CONTROL SYSTEM — SAFE TO CUSTOMIZE (WITH RULES)
+// =============================================
+// Controls background music states:
+//
+// - exploration (normal gameplay)
+// - boss (mid bosses)
+// - finalBoss (final encounter)
+//
+// Ensures ONLY ONE track plays at a time.
+//
+// ---------------------------------------------
+// SAFE TO EDIT:
+// - audio files (bgMusic, bossMusic, finalBossMusic)
+// - volumes
+// - adding new music states (advanced)
+//
+// ---------------------------------------------
+// DO NOT MODIFY:
+// - currentMusic tracking
+// - stopAllMusic() behavior
+// - conditional checks (prevents overlap)
+//
+// Breaking this WILL cause:
+// - multiple tracks playing at once
+// - music not switching correctly
+//
+// This system manages audio state transitions.
+// =============================================     
+let currentMusic = null;
+
+// Stops all music tracks (called before switching states)
+// Do not remove — prevents audio overlap     
+function stopAllMusic(){
+    if(bgMusic) bgMusic.pause();
+    if(bossMusic) bossMusic.pause();
+    if(finalBossMusic) finalBossMusic.pause();
+}
+
+// Plays exploration (default) music
+// Skips if already playing to prevent restart spam     
+function playExplorationMusic(){
+    if(currentMusic === "exploration") return;
+    stopAllMusic();
+    bgMusic.play();
+    currentMusic = "exploration";
+}
+
+// Plays boss encounter music
+// Automatically stops other tracks first     
+function playBossMusic(){
+    if(currentMusic === "boss") return;
+    stopAllMusic();
+    bossMusic.play();
+    currentMusic = "boss";
+}
+
+// Plays final boss music (highest priority state)
+// Overrides all other music     
+function playFinalBossMusic(){
+    if(currentMusic === "finalBoss") return;
+    stopAllMusic();
+    finalBossMusic.play();
+    currentMusic = "finalBoss";
+}
+
+// =============================================
+// MAIN GAME LOOP — DO NOT MODIFY
+// =============================================
+// Controls:
+// - what question appears
+// - boss encounters
+// - difficulty scaling
+// - UI updates
+//
+// This is the heart of the game.
+// Changing logic here will break progression.
+     
+function loadQuestion() {
+    updateMazeTrack();
+    const questionElement = document.getElementById("question");
+    const msgElement = document.getElementById("message");
+    const gameBox = document.getElementById("gameBox");
+    const bossMsg = document.getElementById("bossMessage");
+
+    document.getElementById("artifactDrop").style.display = "none";
+
+    // 1. Determine Difficulty and Boss Status
+    let diff = (room <= 9) ? "easy" : (room === 10) ? "easyBoss" : (room <= 19) ? "medium" : (room === 20) ? "mediumBoss" : (room <= 25) ? "hard" : (room <= 29) ? "calculation" : "finalBoss";
+    
+    // --- MUSIC CONTROL ---
+    if(diff === "finalBoss"){
+        playFinalBossMusic();
+        }
+    else if(diff.includes("Boss")){
+        playBossMusic();
+        }
+    else{
+        playExplorationMusic();
+        }
+
+    const isBoss = diff.includes("Boss");
+    const shell = document.getElementById("gameShell");
+
+    // SINGLE SOURCE OF TRUTH
+    shell.classList.toggle("boss-mode", isBoss);
+    gameBox.classList.toggle("boss-mode", isBoss);
+   
+    // 2. UI & Progress Updates
+    gameBox.classList.toggle("boss-mode", isBoss);
+    document.getElementById("progressFill").style.width = (room / 30 * 100) + "%";
+    document.getElementById("areaDisplay").innerText = `${getAreaName(room)} (${room}/30)`;
+    document.getElementById("srAnnouncements").innerText = `Entering ${getAreaName(room)}. Room ${room} of 30.`;
+
+    // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
+    if (isBoss) {
+        if (bossHealth === 3) {
+        bossPool = [...questionBanks[diff]]; // ← NO SHUFFLE
+        }
+
+        currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
+        
+        let bTitle = room === 10 ? "WARDEN OF INDIFFERENCE" : room === 20 ? "THE DECOMPOSER OF CHOICE" : "SOVEREIGN OF ELASTICITY";
+        let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#a855f7" : "#ef4444";
+        document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
+        bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
+        bossMsg.style.color = bColor;
+        gameBox.style.setProperty('--bossColor', bColor);
+        let bossImage = "";
+        let bossClass = "";
+
+// =============================================
+// BOSS VISUAL CONFIGURATION — SAFE TO EDIT
+// =============================================
+// Change:
+// - boss images
+// - boss class
+//
+// Keep room numbers (10, 20, 30) intact.
+// =============================================
+        
+    if(room === 10){
+    bossImage = "warden.png";
+    bossClass = "wardenGlow";
+    }
+    else if(room === 20){
+    bossImage = "decomposer.png";
+    bossClass = "decomposerGlow";
+    }
+    else{
+    bossImage = "sovereign.png";
+    bossClass = "finalBoss";
+    }
+
+    questionElement.innerHTML =
+    `<img src="${bossImage}" class="bossIcon ${bossClass}">
+    <span class="boss-title" style="color:${bColor}">${bTitle}</span>
+    <div class="boss-q" style="--bossColor:${bColor}">
+    ${currentQuestion.q}
+    </div>`;
+   } else {
+
+    // --- STREAK ADAPTIVE LOGIC ---
+    let adjustedDiff = diff;
+
+    // --- FIND STRONGEST AREA (lowest weakness) ---
+    let strongestTag = null;
+    let lowestValue = Infinity;
+
+    for(let tag in conceptMemory){
+        if(conceptMemory[tag] < lowestValue){
+            lowestValue = conceptMemory[tag];
+            strongestTag = tag;
+            }
+        }
+
+    // --- ADAPTIVE ESCALATION ---
+    if(streak >= 8 && lowestValue < 1.5 && room < 25){
+        adjustedDiff = "hard";
+        }
+    else if(streak >= 5 && lowestValue < 2.5 && room < 20){
+        adjustedDiff = "medium";
+        }
+
+// =============================
+// QUESTION SELECTION
+// =============================
+
+if(adjustedDiff === "calculation"){
+    const generator = pickCalcGenerator();
+    currentQuestion = shuffleOptions(generator());
+}
+else if(adjustedDiff === "hard" && strongestTag){
+    // 🔥 TARGET STRONGEST AREA FOR HARD QUESTIONS
+    currentQuestion = shuffleOptions(
+        getAdaptiveQuestion(adjustedDiff, strongestTag)
+    );
+}
+else{
+    // normal behavior
+    currentQuestion = shuffleOptions(
+        getAdaptiveQuestion(adjustedDiff)
+    );
+}
+
+// =============================
+// --- WIZARD LOGIC ---
+// =============================
+    if(!currentQuestion.type){
+        currentQuestion.type = "interpretation";
+    }
+
+    const wizardText = getWizardLine(currentQuestion.type);
+    wizardSpeak(wizardText);
+
+    // --- UI ---
+    bossMsg.innerText = (room === 9 || room === 19 || room === 29)
+        ? "⚠️ DANGER: BOSS DETECTED IN NEXT ROOM ⚠️"
+        : "";
+    bossMsg.style.color = "#ef4444";
+
+    questionElement.innerHTML = `
+        <div>${currentQuestion.q}</div>
+    `;
+}
+    
+    // 4. Update Hints and Draw Buttons
+    document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+    displayQuestion();
+    
+  // --- Final Boss Entrance Shake ---
+    if(diff === "finalBoss"){
+        setTimeout(()=>{
+        triggerBossShake();
+        setTimeout(triggerBossShake,450);
+        },200);
+    }
+}
+
+// =============================================
+// ANSWER RENDERING — DO NOT MODIFY CORE LOGIC
+// =============================================
+// This function displays answer choices as buttons.
+//
+// It connects each button to the answer() function,
+// which handles ALL game logic (correct/incorrect,
+// streaks, progression, etc.)
+//
+// ---------------------------------------------
+// SAFE TO EDIT:
+// - button styling (CSS)
+// - text formatting
+// - layout of answers
+//
+// DO NOT MODIFY:
+// - btn.onclick = () => answer(index)
+// - use of currentQuestion.options
+//
+// Changing these will break answer selection
+// and disconnect the game logic.
+//
+// This is the bridge between UI and engine.
+// =============================================     
+function displayQuestion() {
+    const optionsElement = document.getElementById("answers");
+    optionsElement.innerHTML = "";
+
+    currentQuestion.options.forEach((option, index) => { 
+        const btn = document.createElement("button");
+        btn.innerText = option;
+        btn.setAttribute("aria-label",`Answer option: ${option}`);
+        btn.onclick = () => answer(index);
+        optionsElement.appendChild(btn);
+    });
+}
+
+// =============================================
+// ANSWER HANDLER — CRITICAL SYSTEM
+// =============================================
+// Controls:
+// - correct/incorrect logic
+// - streaks
+// - setbacks
+// - boss damage
+// - adaptive memory updates
+//
+// DO NOT MODIFY unless you understand:
+// - conceptMemory
+// - detour system
+// - progression penalties
+//
+// Check for artifact names and CHANGE
+     
+function answer(choice) {
+    // --- GLOBAL MEMORY DECAY ---
+    for(let tag in conceptMemory){
+    conceptMemory[tag] *= 0.95;
+    }
+    totalAttempts++;
+    const isBossRoom = (room === 10 || room === 20 || room === 30);
+    const msgElement = document.getElementById("message");
+    const wizard = document.getElementById("wizardImage");
+    if (choice === currentQuestion.a) {
+        if(isBossRoom){
+        sfxCorrect.pause();
+        sfxCorrect.currentTime = 0;
+
+        sfxBossHit.pause();
+        sfxBossHit.currentTime = 0;
+        sfxBossHit.play().catch(()=>{});
+    } else {
+        sfxBossHit.pause();
+        sfxBossHit.currentTime = 0;
+
+        sfxCorrect.pause();
+        sfxCorrect.currentTime = 0;
+        sfxCorrect.play().catch(()=>{});
+    }
+        wizardSpeak(getWizardFeedback("correct"));
+        wizard.style.transform = "scale(1.1)";
+        setTimeout(()=>{
+        wizard.style.transform = "";
+        },200);
+        // If this was a concept detour question, return player to main path
+        if(detourActive){
+        detourActive = false;
+        msgElement.innerHTML = `<span class='fade-out-text'>Correct! Concept restored. Moving deeper...</span>`;
+        room = detourReturnRoom + 1;
+        localStorage.setItem("gauntletRoom", room);
+        setTimeout(loadQuestion, TIMING.normal);
+        return;
+    }
+        correctAnswers++;
+        streak++;
+        if (streak > maxStreak) maxStreak = streak;
+        handleStreakVisuals();
+
+        // --- LEARNING: reduce weakness ---
+        if(currentQuestion.tag){
+            conceptMemory[currentQuestion.tag] =
+            (conceptMemory[currentQuestion.tag] || 0) * 0.7;
+        }
+
+      // 🔍 DEBUG: Check tag + memory
+      console.log("TAG:", currentQuestion.tag);
+      console.log("MEMORY:", conceptMemory[currentQuestion.tag]);
+       
+       // --- BOSS HIT LOGIC ---
+        if(isBossRoom){
+        bossHealth--;
+
+        msgElement.innerHTML = `<span style='color:#f87171;font-weight:bold;'>⚔ HIT! Boss Health: ${bossHealth}/3</span>`;
+
+        triggerBossShake();
+
+        if (bossHealth > 0) {
+        setTimeout(loadQuestion, TIMING.boss);
+        return;
+        }
+
+        // Boss defeated (CHANGE ARTIFACT NAMES)
+        if(room === 10){
+        document.getElementById("vaultSeal").classList.add("unlocked");
+        localStorage.setItem("vaultSeal", "true");
+        showArtifact(artifacts.seal.img, artifacts.seal.title, artifacts.seal.text);
+        }
+
+        if(room === 20){
+        document.getElementById("vaultPrism").classList.add("unlocked");
+        localStorage.setItem("vaultPrism", "true");
+        showArtifact(artifacts.prism.img, artifacts.prism.title, artifacts.prism.text);
+        }
+
+        if(room === 30){
+        document.getElementById("vaultScepter").classList.add("unlocked");
+        localStorage.setItem("vaultScepter", "true");
+        showArtifact(artifacts.scepter.img, artifacts.scepter.title, artifacts.scepter.text);
+        }
+
+    showKnowledgeRoom(room);
+    bossHealth = 3;
+    return;
+            }
+        
+msgElement.innerHTML = "";
+
+room++;
+localStorage.setItem("gauntletRoom", room);
+showHallwayTransition(currentQuestion.feedback);
+return;
+
+// =============================================
+// ❌ WRONG ANSWER BLOCK — ALL FAILURE LOGIC
+// =============================================
+       
+    } else {
+        if(isBossRoom){
+        sfxWrong.volume = 0.7;
+        } else {
+        sfxWrong.volume = 0.5;
+        }    
+        sfxWrong.currentTime = 0;
+        sfxWrong.play().catch(()=>{});
+        wizardSpeak(getWizardFeedback("wrong"));
+        wizard.style.transform = "translateX(-6px)";
+        setTimeout(()=>{
+            wizard.style.transform = "translateX(6px)";
+            setTimeout(()=>{
+                wizard.style.transform = "";
+            },100);
+        },100);
+        streak = 0;
+
+// --- LEARNING: increase weakness (THIS DRIVES DETOURS) ---
+if(currentQuestion.tag){
+    conceptMemory[currentQuestion.tag] =
+    (conceptMemory[currentQuestion.tag] || 0) + 1;
+}
+
+// 🔍 DEBUG: verify detour trigger conditions
+console.log("WRONG TAG:", currentQuestion.tag);
+console.log("UPDATED MEMORY:", conceptMemory[currentQuestion.tag]);
+
+// =============================================
+// CONCEPT DETOUR SYSTEM — ADVANCED
+// =============================================
+// When a student repeatedly misses a concept,
+// they are forced into a focused "mini quiz"
+//
+// This is key to reinforcement learning.
+//
+// You can ADD questions to pools,
+// but do NOT change trigger logic unless advanced.
+
+console.log("DETOUR CHECK VALUE:", conceptMemory[currentQuestion.tag]);
+       
+   if(!detourActive &&currentQuestion.tag &&(conceptMemory[currentQuestion.tag] || 0) >= 1){
+
+    let conceptPool = null;
+
+    // Determine difficulty based on room
+    if(room <= 9 && easyConceptPools[currentQuestion.tag]){
+        conceptPool = easyConceptPools[currentQuestion.tag];
+    }
+
+    if(room >= 11 && room <= 19 && mediumConceptPools[currentQuestion.tag]){
+        conceptPool = mediumConceptPools[currentQuestion.tag];
+    }
+
+       if(conceptPool){
+
+        detourActive = true;
+        detourReturnRoom = room;
+
+        currentQuestion = shuffleOptions(pickConceptQuestion(conceptPool));
+
+        document.getElementById("question").innerText = "Concept Check: " + currentQuestion.q;
+        document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+
+        msgElement.innerHTML = `<span class='fade-out-text'>You falter… The labyrinth demands a concept check.</span>`;
+
+        displayQuestion();
+        return;
+        }
+       }
+
+    // Normal failure handling
+    document.getElementById("streakDisplay").innerText = "";
+    bossHealth = 3;
+
+    // =============================================
+    // SAFE FALLBACK LOGIC (NO BOSS REGRESSION)
+    // =============================================
+    const bossRooms = [10, 20, 30];
+
+    // Original fallback amount
+    let fallback = (room % 10 === 0 ? 3 : (room >= 21 ? 2 : 1));
+    let newRoom = room - fallback;
+
+    // Prevent falling into boss rooms
+    while (bossRooms.includes(newRoom)) {
+    newRoom++;
+    }
+
+    // Clamp to minimum
+    room = Math.max(1, newRoom);
+    localStorage.setItem("gauntletRoom", room);
+    alert(`Incorrect! You trip in the darkness and tumble back to Room ${room}.`);
+    loadQuestion();
+    }
+}
+
+// =============================================
+// UI FEEDBACK & REWARD SYSTEM — SAFE TO CUSTOMIZE
+// =============================================
+// These functions control:
+// - visual feedback (streaks, boss shake, transitions)
+// - reward display (artifacts)
+// - immersion elements (hallway transitions)
+//
+// SAFE TO EDIT:
+// - text, colors, messages
+// - images and styling
+// - timing (setTimeout delays)
+//
+// DO NOT MODIFY:
+// - function names (called elsewhere in engine)
+// - core triggers (when these are called)
+//
+// Breaking these won't destroy logic,
+// but WILL break user experience.
+//
+// This is presentation + feedback layer.
+// =============================================
+
+// Unlocks artifact in vault + saves progress
+// Requires matching ID format: "vault" + ArtifactName
+// Safe to customize artifact visuals/text only
+function unlockArtifact(key) {
+    const id = "vault" + key.charAt(0).toUpperCase() + key.slice(1);
+    document.getElementById(id).classList.add("unlocked");
+    localStorage.setItem(id, "true");
+    showArtifact(artifacts[key].img, artifacts[key].title, artifacts[key].text);
+}
+    
+// =============================================
+// STREAK FEEDBACK SYSTEM — SAFE TO CUSTOMIZE
+// =============================================
+// Controls milestone streak messages and colors.
+//
+// You can:
+// - change streak thresholds (5, 10, 20)
+// - change messages/themes
+// - change colors
+//
+// Keep variable "streak" intact.
+// =============================================
+function handleStreakVisuals() {
+    let streakMsg = "";
+    let streakColor = "#60a5fa";
+
+    if (streak === 5) { streakMsg = "🔥 STREAK: Economic Insight!"; streakColor = "#fbbf24"; }
+    else if (streak === 10) { streakMsg = "⚡ STREAK: Market Shock!"; streakColor = "#f87171"; }
+    else if (streak === 20) { streakMsg = "🌌 STREAK: Policy Reform!"; streakColor = "#a855f7"; }
+
+    if (streakMsg) {
+        sfxMilestone.currentTime = 0;
+        sfxMilestone.play();
+        document.getElementById("streakDisplay").innerText = streakMsg;
+        document.getElementById("streakDisplay").style.color = streakColor;
+    } else if (streak > 0) {
+        document.getElementById("streakDisplay").innerText = `Streak: ${streak}`;
+        document.getElementById("streakDisplay").style.color = "#60a5fa";
+    }
+}
+
+// =============================================
+// TRANSITION SCREEN — SAFE TO CUSTOMIZE
+// =============================================
+// Displays feedback + transition between rooms.
+//
+// You can:
+// - change text, tone, styling
+// - change images (hallwayImages array)
+// - adjust timing (setTimeout)
+//
+// DO NOT remove loadQuestion() call,
+// or the game will stall.
+// =============================================
+function showHallwayTransition(feedback){
+    const overlay = document.getElementById("hallwayTransition");
+    const text = document.getElementById("hallwayText");
+
+// pick a random hallway image
+    const randomHall = hallwayImages[Math.floor(Math.random()*hallwayImages.length)];
+
+    overlay.style.background =
+    `linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)), url('${randomHall}')`;
+
+    overlay.style.backgroundSize = "cover";
+    overlay.style.backgroundPosition = "center";
+
+    text.innerHTML = `
+    <div style="font-size:22px;margin-bottom:15px;color:#4ade80;">${getWizardFeedback("correct")}</div>
+    <div style="font-size:18px;opacity:.9;">${feedback}</div>
+    <div style="margin-top:25px;font-size:14px;opacity:.7;">You move deeper into the archives...</div>
+    `;
+
+    overlay.classList.add("active");
+
+    document.getElementById("srAnnouncements").innerText =`Correct. ${feedback}`;
+    
+    setTimeout(()=>{
+    overlay.classList.remove("active");
+    loadQuestion();
+    },3200);
+}
+
+// Displays artifact reward popup
+// Safe to customize layout, text, and images
+// Requires matching HTML element IDs     
+function showArtifact(img,title,text){
+
+    let drop = document.getElementById("artifactDrop");
+    let image = document.getElementById("artifactImage");
+    let t = document.getElementById("artifactTitle");
+    let p = document.getElementById("artifactText");
+
+    image.src = img;
+    t.innerText = title;
+    p.innerText = text;
+
+    drop.style.display = "block";
+}
+
+// =============================================
+// BOSS HIT ANIMATION — SAFE TO CUSTOMIZE
+// =============================================
+// Creates shake effect on boss + game box.
+//
+// You can:
+// - adjust animation timing
+// - change CSS effects
+//
+// Safe to remove if no animation desired.
+// =============================================     
+function triggerBossShake() {
+    const icon = document.querySelector(".bossIcon");
+    const box = document.getElementById("gameBox");
+
+    // Shake the world
+    box.classList.remove("boss-shake");
+    void box.offsetWidth;
+    box.classList.add("boss-shake");
+
+    // Shake the boss (if it exists)
+    if (icon) {
+        icon.classList.remove("boss-shake");
+        void icon.offsetWidth;
+        icon.classList.add("boss-shake");
+    }
+}
+  
+// =============================================
+// BOSS SUMMARY / TRANSITION ROOM — PARTIAL CUSTOMIZATION
+// =============================================
+// This function runs AFTER a boss is defeated.
+//
+// It serves THREE roles:
+// 1. Displays narrative payoff (title + summary)
+// 2. Pauses gameplay for reflection
+// 3. Routes player forward OR to final victory
+//
+// ---------------------------------------------
+// SAFE TO EDIT (CUSTOMIZATION):
+// - Boss titles ("DICE TYRANT DEFEATED", etc.)
+// - Summary text (lore, explanations, tone)
+// - Button text ("CONTINUE...", "FINALIZE...")
+// - Styling (colors, formatting)
+//
+// ---------------------------------------------
+// DO NOT MODIFY (CORE LOGIC):
+// - bossRoom checks (10, 20, 30)
+// - progression logic (room++, loadQuestion())
+// - handleVictory() trigger
+// - bossHealth reset
+//
+// If you change boss room numbers here,
+// you MUST also change them in:
+// - loadQuestion()
+// - answer()
+// - mazeTrack()
+//
+// ---------------------------------------------
+// WARNING:
+// This function controls the transition between levels.
+// Breaking this will cause:
+// - bosses to repeat
+// - game to freeze after boss
+// - victory screen not triggering
+//
+// This is BOTH UI + progression logic.
+// Edit carefully.
+// =============================================
+function showKnowledgeRoom(bossRoom) {
+    playExplorationMusic();  
+  
+    const qContainer = document.getElementById("question");
+    const aContainer = document.getElementById("answers");
+    const msgElement = document.getElementById("message");
+  
+  
+    // Clear the "Correct!" fade-out text so it doesn't stay on the summary screen
+    msgElement.innerText = "";
+    msgElement.className = "";
+    
+    let title = "";
+    let summary = "";
+
+// =============================================
+// BOSS NARRATIVE CONTENT — SAFE TO EDIT
+// =============================================
+// Each block corresponds to a boss room.
+// You can rewrite these freely to match your theme.
+//
+// Keep room numbers aligned with:
+// - actual boss encounters
+// =============================================    
+    if (bossRoom === 10) {
+        title = "WARDEN OF INDIFFERENCE DEFEATED (Archive 10.1)";
+        summary = "As the Warden fades you find the Seal of Preferences. Consumers have consistent preferences represented by indifference curves. They face trade-offs determined by their budget constraint. Optimal consumption occurs where the marginal rate of substitution equals the price ratio. The Labyrinth grows deeper...";
+    } else if (bossRoom === 20) {
+        title = "DECOMPOSER OF CHOICE DEFEATED (Archive 20.1)";
+        summary = "With the Decomposer's defeat you claim the Artifact of Price Effects. You have conquered the dual nature of price changes. You now distinguish between how price changes affect purchasing power (Income Effect) and relative attractiveness (Substitution Effect).";
+    } else if (bossRoom === 30) {
+        title = "SOVEREIGN OF ELASTICITY DEFEATED (Final Archive)";
+        summary = "With the Sovereign finally beaten, you claim the Scepter of Elasticity. You have proven your mastery over Market Responsiveness and the mathematical laws that govern Demand, Elasticity, and Total Revenue.";
+    }
+
+    // Update the UI
+    qContainer.innerHTML = `
+        <span class="boss-title" style="color:#60a5fa; text-shadow: 0 0 15px #60a5fa;">${title}</span>
+        <div class="boss-q" style="--bossColor:#60a5fa; font-style: normal; border-left-color: #60a5fa;">${summary}</div>
+    `;
+    
+    // logic to ensure Room 30 triggers the end game, while 10 and 20 trigger the next level
+    let nextAction = bossRoom === 30 ? "handleVictory()" : "room++; loadQuestion();";
+    let buttonLabel = bossRoom === 30 ? "FINALIZE THE ARCHIVE CONQUEST →" : `CONTINUE TO ROOM ${bossRoom + 1} →`;
+
+   aContainer.innerHTML = `
+    <button id="continueBtn"
+        style="background:#60a5fa; color:black; font-weight:bold; width:100%; padding:20px; font-size:18px;">
+        ${buttonLabel}
+    </button>`;
+
+// =============================================
+// PROGRESSION HANDLER — DO NOT MODIFY
+// =============================================
+// Controls what happens AFTER the summary screen:
+// - resets boss state
+// - advances room
+// - triggers next question or victory
+//
+// Breaking this = progression failure
+// =============================================    
+document.getElementById("continueBtn").onclick = () => {
+    // --- RESET BOSS STATE (THIS IS THE FIX) ---
+    document.getElementById("gameShell").classList.remove("boss-mode");
+    document.getElementById("gameBox").classList.remove("boss-mode");
+    bossHealth = 3;
+
+    if(bossRoom === 30){
+        handleVictory();
+    } else {
+        room++;
+        localStorage.setItem("gauntletRoom", room);
+        loadQuestion();
+    }
+};
+}
+
+// =============================================
+// COMPLETION CODE GENERATOR — DO NOT MODIFY
+// =============================================
+// This function creates a unique verification code
+// based on player performance:
+//
+// Inputs:
+// - name (player)
+// - accuracy (% correct)
+// - streak (max streak)
+// - total (questions answered)
+//
+// It generates a deterministic hash so that:
+// - codes are reproducible
+// - codes cannot be easily faked manually
+//
+// ---------------------------------------------
+// DO NOT CHANGE:
+// - string structure (name|acc|streak|total|ARCHIVE42)
+// - hashing logic
+// - return format ("ARCH-...")
+//
+// Changing this WILL:
+// - invalidate all existing completion codes
+// - break verification consistency
+//
+// ---------------------------------------------
+// SAFE TO EDIT (if absolutely necessary):
+// - "ARCHIVE42" → change only if rebranding ALL codes
+// - "ARCH-" prefix → cosmetic only
+//
+// This is NOT encryption.
+// It is a lightweight integrity check.
+// =============================================
+function generateCode(name, acc, streak, total){
+    let str = `${name}|${acc}|${streak}|${total}|ARCHIVE42`;
+    let hash = 0;
+
+    for(let i = 0; i < str.length; i++){
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+    }
+
+    return "ARCH-" + Math.abs(hash).toString(36).toUpperCase();
+} 
+
+// =============================================
+// VICTORY SCREEN — PARTIAL CUSTOMIZATION ZONE
+// =============================================
+// This function runs when the player completes the gauntlet.
+//
+// DO NOT MODIFY (CORE LOGIC):
+// - accuracy calculation
+// - time tracking
+// - verification code generation
+// - function structure
+//
+// SAFE TO EDIT (CUSTOMIZATION):
+// - victory title text ("CONQUEST COMPLETE")
+// - narrative/judgment text (archivistLine)
+// - colors and styling
+// - labels (Adventurer → Student, etc.)
+// - button text
+//
+// WARNING:
+// The HTML below is dynamically injected.
+// If you remove IDs like:
+// - vCode
+// - archivistLine
+// - shareBtn
+// you WILL break:
+// - copyResults()
+// - fade-in animation
+//
+// This is a PRESENTATION layer, not a logic layer.
+// =============================================     
+function handleVictory() {
+    bgMusic.pause();
+    bossMusic.pause();
+    if (typeof sfxVictory !== 'undefined') {
+        sfxVictory.currentTime = 0;
+        sfxVictory.play();
+    }
+    
+    const totalTimeMs = Date.now() - startTime;
+    const timeString = formatTime(totalTimeMs);
+    const accuracy = Math.round((correctAnswers / totalAttempts) * 100);
+    const verificationCode = generateCode(username, accuracy, maxStreak, totalAttempts);
+    
+// =============================================
+// PERFORMANCE FEEDBACK TEXT — SAFE TO EDIT
+// =============================================
+// Customize these lines to match your theme.
+// You can:
+// - rename "Archivist"
+// - change tone (serious, funny, brutal, etc.)
+// - adjust thresholds (90, 75)
+//
+// DO NOT remove the structure (if / else blocks)
+// unless you understand accuracy calculation.
+// =============================================
+    let archivistLine = "";
+    if(accuracy >= 90){
+        archivistLine = "You have mastered the Labyrinth. Few reach this level of clarity.";
+    }
+    else if(accuracy >= 75){
+        archivistLine = "You see much… but not all. The Labyrinth still holds power over you.";
+    }
+    else{
+        archivistLine = "You survived. Barely. The Labyrinth is not finished with you.";
+    }
+
+    let lineColor = "#93c5fd";
+
+    if(accuracy >= 90){
+        lineColor = "#4ade80"; // green
+    }
+    else if(accuracy < 75){
+    lineColor = "#f87171"; // red
+    }
+
+    const gameBox = document.getElementById("gameBox");
+
+// =============================================
+// VICTORY SCREEN HTML TEMPLATE
+// =============================================
+// You can fully redesign this layout.
+//
+// Just KEEP:
+// - id="vCode"
+// - id="archivistLine"
+// - onclick="copyResults()"
+//
+// Everything else is fair game.
+// =============================================
+    gameBox.innerHTML = `
+        <div style="text-align:center; padding:30px;">
+            <h1 class="victory" style="color:gold; text-shadow: 0 0 20px gold;">👑 CONQUEST COMPLETE 👑</h1>
+
+            <div style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid #374151;">
+                <p>👤 Adventurer: <strong>${username}</strong></p>
+                <p>🎯 Accuracy: <strong>${accuracy}%</strong> | 🔥 Best Streak: <strong>${maxStreak}</strong></p>
+                <p>⏱️ Time: <strong>${timeString}</strong> | 📝 Total Questions: <strong>${totalAttempts}</strong></p>
+                <p style="font-size: 0.8em; color: #9ca3af;">🔑 Verification Code: <span id="vCode">${verificationCode}</span></p>
+            </div>
+
+            <p id="archivistLine" style="margin-top:20px; font-style:italic; color:#93c5fd; font-size:1.1em; color:${lineColor}; text-shadow: 0 0 6px rgba(147,197,253,0.4); opacity:0;">
+                ${archivistLine}
+            </p>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button id="shareBtn" onclick="copyResults()" style="background:#4ade80; color:black; font-weight:bold; padding:12px 24px; border:none; border-radius:6px; cursor:pointer;">
+                    📋 Copy Results
+                </button>
+                <button onclick="location.reload()" style="background:transparent; color:white; border:1px solid white; padding:12px 24px; border-radius:6px; cursor:pointer;">
+                    Try Again
+                </button>
+            </div>
+        </div>
+    `;
+
+    // --- THEN RUN THE FADE-IN ---
+    setTimeout(() => {
+        const line = document.getElementById("archivistLine");
+        if(line){
+            line.style.transition = "opacity 1s ease";
+            line.style.opacity = 1;
+        }
+    }, 600);
+}     
+
+// =============================
+// UTILITIES
+// =============================
+     
+// =============================================
+// ARRAY SHUFFLE UTILITY — SAFE TO USE, DO NOT MODIFY
+// =============================================
+// Fisher-Yates shuffle algorithm.
+//
+// Used to randomize:
+// - question order
+// - calculation generators
+// - any randomized sequences
+//
+// DO NOT MODIFY unless you understand:
+// - uniform randomness
+// - bias in random selection
+//
+// Breaking this = predictable patterns in questions
+// =============================================     
+function shuffleArray(arr){
+    for(let i=arr.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    return arr;
+}     
+
+// =============================================
+// HIGH SCORE TRACKING — OPTIONAL FEATURE
+// =============================================
+// Stores top completion times in browser (localStorage)
+//
+// - Saves name, time, and date
+// - Sorts fastest → slowest
+// - Keeps top 5 results only
+//
+// SAFE TO EDIT:
+// - number of scores kept (slice)
+// - displayed fields (name/date)
+//
+// WARNING:
+// Clearing browser data will erase scores.
+// =============================================
+function updateHighScores(newTimeMs) {
+    let scores = JSON.parse(localStorage.getItem("gauntletHighScores")) || [];
+    scores.push({ name: username, time: newTimeMs, date: new Date().toLocaleDateString() });
+    
+    // Sort by time (lowest/fastest first) and keep top 5
+    scores.sort((a, b) => a.time - b.time);
+    scores = scores.slice(0, 5);
+    
+    localStorage.setItem("gauntletHighScores", JSON.stringify(scores));
+    return scores;
+}
+
+// =============================================
+// TIME FORMATTER — SAFE UTILITY
+// =============================================
+// Converts milliseconds → readable format (Xm Ys)
+//
+// Used for:
+// - victory screen
+// - performance tracking
+//
+// Safe to modify format if desired.
+// =============================================     
+function formatTime(ms) {
+    let mins = Math.floor(ms / 60000);
+    let secs = Math.floor((ms / 1000) % 60);
+    return `${mins}m ${secs}s`;
+}
+
+// =============================================
+// RESULT SHARING — SAFE TO CUSTOMIZE
+// =============================================
+// Copies player performance summary to clipboard.
+//
+// Includes:
+// - name
+// - time
+// - accuracy
+// - streak
+// - verification code
+//
+// SAFE TO EDIT:
+// - text format
+// - labels ("Adventurer", etc.)
+// - button feedback message
+//
+// WARNING:
+// Requires element IDs:
+// - "vCode"
+// - "shareBtn"
+//
+// Removing those will break this function.
+// =============================================     
+function copyResults() {
+    const totalTimeMs = Date.now() - startTime;
+    const timeString = formatTime(totalTimeMs);
+    const code = document.getElementById("vCode").innerText;
+    const accuracy = Math.round((correctAnswers / totalAttempts) * 100);
+
+    const shareText = `Adventurer: ${username}
+        Time: ${timeString}
+        Accuracy: ${accuracy}%
+        Best Streak: ${maxStreak}
+        Total Questions: ${totalAttempts}
+        Code: ${code}
+        Verified by The Archivist`;
+
+    navigator.clipboard.writeText(shareText).then(() => {
+        const btn = document.getElementById("shareBtn");
+        const originalText = btn.innerText;
+        const originalColor = btn.style.background;
+
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "#059669";
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = originalColor;
+        }, 2000);
+    });
+}
+    
+// =====================================================
+// IF SOMETHING BREAKS:
+//
+// 1. Check question IDs are unique
+// 2. Check each question has:
+//    - q, options, a
+// 3. Do NOT edit core engine sections
+// 4. Use browser console (F12) for errors
+//
+// Most issues come from bad question formatting.
+//
+// =====================================================
+
+</script>
+</body>
+</html>
