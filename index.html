@@ -30,7 +30,9 @@ If something breaks, check:
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
 <!-- Title can be changed to whatever the game needs -->
 <title>The Microeconomics Foundry</title>
@@ -52,7 +54,9 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+   /* Use dvh to stay within Safari's changing UI */
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -60,15 +64,19 @@ body {
     background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.png');
     background-size: cover;
     background-position: center;
-    background-attachment: scroll;
+    /* Use 'fixed' to prevent the background from jumping when the URL bar hides */
+    background-attachment: fixed; 
+    overflow: hidden; /* Prevents the body from scrolling */;
 }
    
 #gameShell{
-    display:flex;
-    gap:20px;
-    max-width:900px;
-    width:100%;
-    margin:0 auto;
+    display: flex;
+    flex-direction: column; /* Changed to column to allow better vertical stacking */
+    gap: 10px; /* Reduced gap to save vertical space */
+    max-width: 900px;
+    width: 95%; /* Use 95% to leave a tiny bit of breathing room on the edges */
+    height: 90dvh; /* Force the shell to stay within the viewport */
+    margin: 0 auto;
 }
    
 .dungeon-container {
@@ -77,10 +85,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 40px;
+    gap: 20px;
     width: 100%;
     max-width: 1100px;
-    margin-top: 20px;
 }
 
 /* =========================================
@@ -821,22 +828,41 @@ This controls responsiveness, not game logic.
 ========================================= */
 /* Base mobile rules */
 @media (max-width: 900px){
-#gameShell {padding: 8px;gap: 10px;width: 100%;max-width: 100%;}
-#question {font-size:clamp(18px, 4vw, 22px); line-height: 1.3; margin: 10px auto 14px auto;max-width: 600px;text-align: center;}
+#gameShell {padding: 8px;gap: 10px;}
+#question {font-size: 1.2rem; line-height: 1.3;}
 .artifactSlot img {width: 35px;}
-.answers{display: flex;flex-direction: column;gap: 14px;}
-.answers button{width: 100%;max-width: 100%;padding: 16px;font-size: 18px;}}
+}
    
 /* Portrait (stacked, bigger wizard) */
 @media (max-width: 600px) and (orientation: portrait){
 .main-panel {flex-direction: column; align-items: center;}
-#wizardBox{width: 100%;max-width: 300px;margin-bottom: 14px;padding: 10px;justify-content: flex-start;}
-#wizardImage{width: 120px; max-width: 90%; margin-top: 8px;}}
+#wizardBox{width: 100%; max-width: 280px;margin-bottom: 12px;}
+#wizardImage {width: 100px; max-width: 100%;}
+}
    
 /* Landscape (side-by-side, compact wizard) */   
-@media (max-width: 900px) and (orientation: landscape){.main-panel{flex-direction: row;align-items: flex-start;}
-#wizardBox{max-width: 180px;justify-content: center;}
-#wizardImage{width: 90px;}}
+@media (max-width: 900px) and (orientation: landscape) {
+  /* 1. Limit the total game height to the screen height */
+  #gameShell {height: 95vh;display: flex; flex-direction: column;justify-content: space-between; padding: 5px;overflow: hidden; /* Prevents the 'bounce' scroll */}
+
+  /* 2. Shrink the 'The Foundry' header and top grid */
+  h1, .header-text { font-size: 1rem; margin: 2px 0; }
+  .grid-container { transform: scale(0.85); margin-top: -10px; }
+
+  /* 3. Optimize the Middle Panel */
+  .main-panel {flex: 1; /* Takes up remaining middle space */
+    display: flex;align-items: center;}
+  #wizardBox {width: 25%; /* Fixed width for the side panel */
+    height: 100%;}
+  #wizardImage {height: 70%; /* Scale based on height, not width */
+    width: auto;max-height: 150px;}
+
+  /* 4. Flatten the Artifacts section */
+  #artifactsBox {padding: 5px;margin-top: 5px;}
+  .artifactSlot img {width: 30px; /* Smaller icons to save vertical room */}
+}
+
+@media (max-width: 900px) and (orientation: landscape) {.fullscreenBtn {top: 5px;left: 5px; padding: 4px 8px; /* Slightly smaller to save space */ font-size: 10px;}}
    
 </style>
 </head>
@@ -3201,6 +3227,33 @@ function copyResults() {
         }, 2000);
     });
 }
+
+// Target the button by its class name
+const fsButtons = document.querySelectorAll('.fullscreenBtn');
+
+fsButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // We target the root element to ensure the background and game stay together
+        const elem = document.documentElement; 
+
+        // Check if we are already in fullscreen to allow "toggling"
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                /* The critical fix for iOS Safari */
+                elem.webkitRequestFullscreen();
+            }
+        } else {
+            // Exit fullscreen if already active
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    });
+});
     
 // =====================================================
 // IF SOMETHING BREAKS:
