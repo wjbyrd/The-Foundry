@@ -198,7 +198,7 @@ h2 { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(251,191,36,0.2);
 .area-title { color: #9ca3af; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
 
 /* Boss summary text — left-aligned for readability */
-.boss-q {font-style: italic; font-size: 24px; border-left: 4px solid var(--bossColor); padding-left: 15px; margin: 20px 0; text-align: left;}
+.boss-q {font-style: normal; line-height: 1.5; font-size: 24px;border-left: 3px solid #f97316;padding-left: 15px;margin: 20px 0;text-align: left; color: #fef3c7; box-shadow: -4px 0 10px rgba(249,115,22,0.25);}
 
 /* Optional hint display (calculation or guidance) */
 .hint-box { font-size: 13px; color: #fbbf24; margin-top: 15px; opacity: 0.8; height: 18px; }
@@ -2859,10 +2859,10 @@ function showKnowledgeRoom(bossRoom) {
    }
 
     // Update the UI
-    qContainer.innerHTML = `
-        <span class="boss-title" style="color:#60a5fa; text-shadow: 0 0 15px #60a5fa;">${title}</span>
-        <div class="boss-q" style="--bossColor:#60a5fa; font-style: normal; border-left-color: #60a5fa;">${summary}</div>
-    `;
+   qContainer.innerHTML = `
+    <span class="boss-title">${title}</span>
+    <div class="boss-q">${summary}</div>
+   `;
     
     // logic to ensure Room 30 triggers the end game, while 10 and 20 trigger the next level
     let nextAction = bossRoom === 30 ? "handleVictory()" : "room++; loadQuestion();";
