@@ -1097,7 +1097,8 @@ let usedQuestions = {
     hard: [],
     easyBoss: [],
     mediumBoss: [],
-    finalBoss: []
+    finalBoss: [],
+    finalBossPlus: []
 };
 let questionHistory = {
     easy: [],
@@ -1106,7 +1107,8 @@ let questionHistory = {
     calculation: [],
     easyBoss: [],
     mediumBoss: [],
-    finalBoss: []
+    finalBoss: [],
+    finalBossPlus: []
 };
 
 // =============================================
@@ -1520,276 +1522,265 @@ function wizardSpeak(text){
   
 const questionBanks = {
 easyBoss:[
-{q:"The Warden of Indifference challenges you. A consumer buys goods X and Y. Which condition must hold at the optimal consumption bundle?",options:["The consumer buys equal quantities of both goods","The marginal rate of substitution equals the price ratio","Income equals total utility","Prices of goods must be identical"],a:1,feedback:"Utility maximization occurs where the marginal rate of substitution equals the price ratio."},
-{q:"The Warden reveals the numbers. A consumer has MUx = 24 and MUy = 12. Prices are Px = $6 and Py = $3. Are they currently maximizing utility?",options:["Yes, MU per dollar is equal","No, they should buy more X","No, they should buy more Y","Not enough information"],a:0,feedback:"MUx/Px = 24/6 = 4 and MUy/Py = 12/3 = 4. Marginal utility per dollar is equal, so the consumer is maximizing utility."},
-{q:"The Warden disrupts the balance. Now MUx/Px = 6 and MUy/Py = 3. What should the consumer do to restore equilibrium?",options:["Reduce consumption of both goods","Buy more Y and less X","Buy equal amounts of both goods","Buy more X and less Y"],a:3,feedback:"Consumers increase consumption of the good with the higher marginal utility per dollar until the ratios equalize."}
+{ id:2000, q:"The Cost Forger speaks: 'To shape output efficiently, a firm must balance its inputs.' Which condition defines cost minimization for a given level of output?",options:["The firm uses equal amounts of each input","The marginal product per dollar is equal across inputs","Total cost must be zero","Input prices must be identical"],a:1,tag:"production",type:"definition",feedback:"Cost minimization occurs when the marginal product per dollar is equal across inputs (MP_L / w = MP_K / r)."},
+{ id:2001, q:"The Forger strikes the anvil. 'Test your balance.' A firm has MP_L = 24 and MP_K = 12. The wage is $6 and the rental rate of capital is $3. Is the firm minimizing cost?",options:["Yes, marginal product per dollar is equal","No, the firm should use more labor","No, the firm should use more capital","Not enough information"],a:0,tag:"production",type:"calculation",feedback:"MP_L / w = 24/6 = 4 and MP_K / r = 12/3 = 4. The ratios are equal, so cost is minimized."},
+{ id:2002, q:"The forge destabilizes. 'The balance is broken.' Now MP_L / w = 8 and MP_K / r = 4. What must the firm do to restore efficiency?",options:["Use less labor and more capital","Use more labor and less capital","Use equal amounts of both inputs","Reduce output"],a:1,tag:"production",type:"interpretation",feedback:"The firm should use more of the input with the higher marginal product per dollar (labor) until the ratios equalize."}
 ],
 mediumBoss:[
-{q:"The Decomposer smiles. A price falls and quantity demanded rises. A student claims this must be because both substitution and income effects are positive. What’s the problem?",options:["The substitution effect is always zero when price falls","The income effect could be negative even if total quantity rises","Both effects must always move in the same direction","A rise in quantity demanded implies the good is normal"],a:1,feedback:"Even if quantity rises, the good could be inferior—the substitution effect may outweigh a negative income effect."},
-{q:"The Decomposer twists the logic. The price of a good falls, and quantity demanded increases only slightly. What does this suggest?",options:["The substitution effect is small and the income effect is positive","The substitution effect is large but the income effect is negative","The income effect is negative and partially offsets the substitution effect","The good must be normal but weakly demanded"],a:2,feedback:"A small increase suggests the substitution effect is being partially offset by a negative income effect."},
-{q:"Final strike. A price falls, and quantity demanded falls. Which must be true?",options:["The income effect is negative and larger than the substitution effect","The substitution effect is weaker than the income effect but still negative","The good is normal but demand shifted inward","The substitution effect is zero while the income effect is negative"],a:0,feedback:"A decrease in quantity demanded when price falls implies a Giffen case: the income effect is negative and dominates the substitution effect."}
+{ id:3000, q:"The Supply Engine hums: 'Output must be chosen precisely.' In a perfectly competitive market, what rule determines the profit-maximizing level of output?",options:["Produce where ATC is minimized","Produce where marginal revenue equals marginal cost","Produce where price equals average cost","Produce as much as possible"],a:1,tag:"profit",type:"definition",feedback:"A competitive firm maximizes profit where MR = MC. Since MR = P, this becomes P = MC."},
+{ id:3001, q:"The Engine flashes data. 'Evaluate the system.' A firm faces a market price of $10. At its current output, MC = $8 and AVC = $6. What should the firm do?",options:["Shut down because it is not maximizing profit","Continue operating and increase output","Continue operating and decrease output","Exit immediately"],a:1,tag:"profit",type:"calculation",feedback:"MR = P = 10 and MC = 8, so MR > MC → increase output. Also, P > AVC, so the firm should continue operating."},
+{ id:3002, q:"The Engine overloads: 'Multiple conditions detected.' A firm now faces P = $7, MC = $9, AVC = $6, and ATC = $10. What is the best decision?",options:["Shut down immediately because price is below ATC","Continue operating but reduce output","Increase output to reach equilibrium","Exit the market immediately"],a:1,tag:"profit",type:"multi-step",feedback:"Step 1: P > AVC → continue operating. Step 2: MC > MR → reduce output. Profit is negative (P < ATC), but shutdown is not optimal."}
 ],
 finalBoss:[
-{q:"The Sovereign whispers: 'A firm raises price and total revenue falls.' A student concludes demand must be elastic. What is the flaw in this reasoning?",options:["The conclusion assumes no other factors affecting demand changed","The conclusion ignores that quantity demanded may not have changed","The conclusion assumes demand is always downward sloping","The conclusion incorrectly assumes revenue and elasticity are unrelated"],a:0,feedback:"The elasticity–revenue relationship only holds ceteris paribus. If other factors changed, the conclusion may not be valid."},
-{q:"The Sovereign sets a snare. A firm lowers price and observes total revenue increase. A student claims this proves demand is inelastic. What’s the correct interpretation?",options:["Demand is elastic because quantity increased proportionally more than price fell","Demand is inelastic because total revenue changed","The result is consistent with unit elastic demand","The relationship between price and revenue cannot be used to infer elasticity"],a:0,feedback:"If price falls and revenue rises, demand is elastic—quantity increases proportionally more than price decreases."},
-{q:"Final deception. A firm increases price and observes quantity demanded falls slightly, while total revenue rises. Which statement MUST be true?",options:["Demand is inelastic because quantity falls proportionally less than price rises","Demand is elastic because quantity demanded decreased","The substitution effect dominates the income effect","Demand is unit elastic because total revenue changed"],a:0,feedback:"Revenue rising with a price increase implies inelastic demand—quantity falls proportionally less than price rises."}
+{ id:4000, q:"The Market Tyrant rises: 'You think in parts. I demand the whole.' In a perfectly competitive market, what condition defines long-run equilibrium?",options:["Firms maximize profit where MR = MC","Price equals marginal cost","Price equals average total cost and firms earn zero economic profit","Demand equals supply in the short run"],a:2,tag:"market",type:"definition",feedback:"Long-run equilibrium in perfect competition occurs where P = ATC, meaning zero economic profit. MR = MC still holds, but that alone is not enough."},
+{ id:4001, q:"The Tyrant tightens his grip: 'Now follow the chain.' A market begins in long-run equilibrium. Demand increases. What is the correct sequence of events?",options:["Price rises → firms incur losses → exit occurs → price rises further","Price rises → firms earn profit → entry occurs → price falls toward original level","Price falls → firms earn profit → entry occurs → price rises","Nothing changes because firms are price takers"],a:1,tag:"market",type:"multi-step",feedback:"Demand increase raises price in the short run. Firms earn profit, attracting entry. Entry increases supply and pushes price back down in the long run."},
+{ id:4002, q:"The Tyrant delivers judgment: 'One final test.' In the new long-run equilibrium after demand increased, which statement is TRUE?",options:["Firms earn positive profit because demand increased","Price equals marginal cost and average total cost, and output is higher than before","Price is higher than before and firms restrict output","Firms shut down because competition eliminates profit"],a:1,tag:"efficiency",type:"multi-step",feedback:"In the long run, P = MC (allocative efficiency) and P = ATC (zero profit). The key change is higher total output due to more firms in the market."}
 ],
+finalBossPlus:[
+{ id:5000, q:"A competitive market is in long-run equilibrium. A technological improvement lowers costs for all firms. What is the most accurate outcome?",options:["Firms earn permanent profit","Price falls, output increases, and long-run profit returns to zero","Demand decreases","Firms exit immediately"],a:1,tag:"market",type:"ultimate",feedback:"Lower costs shift supply right. Entry/adjustment drives profit back to zero."},
+{ id:5001, q:"A market is in long-run equilibrium. A permanent increase in demand occurs. Which statement is TRUE in the long run?",options:["Price remains permanently higher","Firms earn ongoing profit","Output increases and price returns toward ATC","Supply decreases"],a:2,tag:"market",type:"ultimate",feedback:"Entry increases supply until profit returns to zero."}
+]
 easy: [
-{ id:1, q:"A theory of choice assumes individuals...",options:["Make random decisions","Choose the most preferred affordable bundle","Always maximize income","Always minimize work"],a:1,tag:"preferences",type:"definition",feedback:"Consumers choose the most preferred bundle they can afford given their budget constraint."},
-{ id:2, q:"Consumer preferences are typically represented using...",options:["Demand curves","Indifference curves","Supply curves","Cost curves"],a:1,tag:"indifference",type:"definition",feedback:"Indifference curves show combinations of goods that give the consumer the same level of satisfaction."},
-{ id:3, q:"Indifference curves represent...",options:["Bundles giving equal utility","Bundles giving equal price","Bundles giving equal income","Bundles giving equal production"],a:0,tag:"indifference",type:"definition",feedback:"Each point on an indifference curve provides the same level of utility."},
-{ id:4, q:"Marginal rate of substitution represents...",options:["Rate consumers trade one good for another","Price ratio","Income ratio","Demand elasticity"],a:0,tag:"indifference",type:"definition",feedback:"The MRS shows how much of one good a consumer is willing to give up for another."},
-{ id:5, q:"Utility refers to...",options:["Satisfaction a consumer receives","Total income","Market demand","Firm profit"],a:0,tag:"preferences",type:"definition",feedback:"Utility represents the satisfaction gained from consumption."},
-{ id:6, q:"The budget constraint shows...",options:["All affordable combinations of goods","Only preferred bundles","Production possibilities","Market equilibrium"],a:0,tag:"budget",type:"definition",feedback:"The budget constraint represents what a consumer can afford."},
-{ id:7, q:"A bundle of goods refers to...",options:["A set of goods a consumer may consume","A firm's production level","Total market demand","A supply schedule"],a:0,tag:"preferences",type:"definition",feedback:"A bundle is simply a combination of goods."},
-{ id:8, q:"Demand represents...",options:["Quantity consumers are willing and able to buy at different prices","Total production of firms","Government price controls","Consumer income levels"],a:0,tag:"demand",type:"definition",feedback:"Demand reflects willingness and ability to purchase."},
-{ id:9, q:"A demand curve typically slopes...",options:["Downward","Upward","Vertically","Perfectly flat"],a:0,tag:"demand",type:"definition",feedback:"Higher prices typically reduce quantity demanded."},
-{ id:10, q:"Price elasticity of demand measures...",options:["Responsiveness of quantity demanded to price change","Firm profit","Consumer income","Market supply"],a:0,tag:"demand",type:"definition",feedback:"Elasticity measures responsiveness to price changes."},
-{ id:11, q:"Consumer surplus measures...",options:["Difference between willingness to pay and price","Firm profits","Producer costs","Market revenue"],a:0,tag:"demand",type:"definition",feedback:"Consumer surplus is willingness to pay minus price."},
-{ id:12, q:"Market demand is obtained by...",options:["Summing individual demand curves horizontally","Summing vertically","Multiplying prices","Averaging costs"],a:0,tag:"demand",type:"definition",feedback:"Market demand adds quantities across individuals."},
-{ id:13, q:"If elasticity equals 1, demand is...",options:["Unit elastic","Perfectly elastic","Inelastic","Vertical"],a:0,tag:"elasticity",type:"definition",feedback:"Unit elasticity means proportional responses."},
-{ id:14, q:"If two bundles lie on the same indifference curve...",options:["They provide equal utility","They cost the same","They contain equal goods","They maximize income"],a:0,tag:"indifference",type:"definition",feedback:"Bundles on the same indifference curve provide equal utility."},
-{ id:15, q:"A complete preference ordering means...",options:["Consumers can compare any two bundles","Consumers always prefer cheaper goods","Consumers never change preferences","Consumers prefer equal bundles"],a:0,tag:"preferences",type:"definition",feedback:"Completeness means all bundles can be ranked."},
-{ id:16, q:"Transitive preferences imply...",options:["If A is preferred to B and B to C, then A is preferred to C","Consumers prefer cheaper goods","Income increases utility automatically","Demand curves shift"],a:0,tag:"preferences",type:"definition",feedback:"Transitivity ensures consistent ranking."},
-{ id:17, q:"A consumer receives a pay raise while prices stay the same. What happens to the budget constraint?",options:["Rotates inward","Shifts outward","Rotates around Y axis","Becomes vertical"],a:1,tag:"budget",type:"interpretation",feedback:"When income increases while prices stay constant, consumers can afford more of both goods. The budget constraint shifts outward in a parallel movement."},
-{ id:18, q:"The price of good X falls while income stays the same. What happens to the budget constraint?",options:["Rotates outward on the X-axis","Shifts outward parallel","Rotates inward","Does not change"],a:0,tag:"budget",type:"interpretation",feedback:"A fall in the price of X makes X relatively cheaper. The budget line rotates outward along the X-axis while the Y intercept stays the same."},
-{ id:19, q:"A consumer moves to a higher indifference curve after income rises. What does this indicate?",options:["Higher utility","Lower prices","Lower income","Demand collapse"],a:0,tag:"indifference",type:"interpretation",feedback:"Higher indifference curves represent higher levels of utility. More income allows the consumer to reach a more preferred bundle."},
-{ id:20, q:"If the price of a good rises and consumers buy less of it, this reflects...",options:["The law of demand","Perfect competition","Elastic supply","Producer surplus"],a:0,tag:"demand",type:"interpretation",feedback:"The law of demand states that as price increases, quantity demanded typically falls, all else equal."},
-{ id:21, q:"When the price of coffee rises, many consumers switch to tea. Coffee and tea are...",options:["Substitutes","Complements","Independent goods","Inferior goods"],a:0,tag:"demand",type:"interpretation",feedback:"Substitute goods replace each other. When the price of coffee rises, consumers switch to alternatives like tea."},
-{ id:22, q:"If the price of printers rises and fewer people buy ink cartridges, these goods are...",options:["Complements","Substitutes","Inferior goods","Luxury goods"],a:0,tag:"demand",type:"interpretation",feedback:"Complement goods are used together. When printers become more expensive, fewer are purchased, reducing demand for ink cartridges."},
-{ id:23, q:"If price falls and total revenue increases, demand must be...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"When demand is elastic, quantity demanded rises proportionally more than price falls, causing total revenue to increase."},
-{ id:24, q:"A consumer chooses a bundle where the indifference curve touches the budget line. This bundle...",options:["Maximizes utility","Minimizes spending","Maximizes income","Eliminates scarcity"],a:0,tag:"equilibrium",type:"interpretation",feedback:"Consumer equilibrium occurs where the highest attainable indifference curve is tangent to the budget line."},
-{ id:25, q:"If both goods become cheaper while income stays constant, what happens to purchasing power?",options:["It increases","It decreases","It stays the same","It disappears"],a:0,tag:"budget",type:"interpretation",feedback:"When prices fall while income stays constant, consumers can afford more goods. Purchasing power increases."},
-{ id:26, q:"If more consumers enter a market while prices stay the same, market demand will...",options:["Increase","Decrease","Stay constant","Become perfectly elastic"],a:0,tag:"demand",type:"interpretation",feedback:"Market demand is the horizontal sum of individual demands. More consumers increase total demand."},
-{ id:27, q:"A bundle lies inside the budget constraint but not on the highest indifference curve. This bundle is...",options:["Affordable but not optimal","Impossible","Utility maximizing","Profit maximizing"],a:0,tag:"budget",type:"interpretation",feedback:"Bundles inside the budget constraint are affordable but do not maximize utility because better bundles exist on higher indifference curves."},
-{ id:28, q:"If consumers are willing to trade fewer units of good Y for each additional unit of X, this reflects...",options:["Diminishing marginal rate of substitution","Increasing elasticity","Perfect substitutes","Budget rotation"],a:0,tag:"indifference",type:"interpretation",feedback:"Diminishing marginal rate of substitution means consumers give up fewer units of one good as they consume more of the other."},
-{ id:29, q:"A demand curve becomes steeper. What can we conclude about elasticity?",options:["It must be more elastic","It must be less elastic","Elasticity cannot be determined from slope alone","Demand becomes unit elastic"],a:2,tag:"elasticity",type:"trap",feedback:"Elasticity depends on both slope and position on the curve. A steeper curve does not automatically mean demand is less elastic."},
-{ id:30, q:"A bundle lies on the budget line. This means...",options:["It is affordable but not necessarily optimal","It always maximizes utility","It is outside the budget","It is inefficient"],a:0,tag:"budget",type:"trap",feedback:"Points on the budget line are affordable, but only the point tangent to the highest indifference curve maximizes utility."},
-{ id:31, q:"If income increases, demand for an inferior good will...",options:["Decrease","Increase","Stay constant","Become perfectly elastic"],a:0,tag:"demand",type:"trap",feedback:"Inferior goods are purchased less when income rises because consumers shift toward higher-quality alternatives."},
-{ id:32, q:"Two indifference curves intersect on a graph. What does this imply?",options:["Preferences are inconsistent","Utility is maximized","Prices changed","Demand increased"],a:0,tag:"indifference",type:"trap",feedback:"Indifference curves cannot intersect. If they did, it would violate the assumption of consistent (transitive) preferences."},
-{ id:33, q:"If the price of a good falls, demand has...",options:["Increased","Decreased","Not changed","Become elastic"],a:2,tag:"demand",type:"trap",feedback:"A price change causes a movement along the demand curve, not a shift of the curve. Demand itself has not changed."},
-{ id:34, q:"A point on a demand curve shows...",options:["The quantity demanded at a particular price","All possible prices consumers prefer","Consumer income","Producer costs"],a:0,tag:"demand",type:"trap",feedback:"Each point on a demand curve shows the quantity consumers are willing and able to buy at a specific price."},
-{ id:35, q:"If income increases and a consumer buys more of a good, that good must be...",options:["Normal","Inferior","Elastic","A complement"],a:0,tag:"demand",type:"trap",feedback:"Normal goods are purchased more when income rises. Inferior goods move in the opposite direction."},
-{ id:36, q:"If the price of good X changes and the budget line rotates, what stays constant?",options:["Income","Utility","Demand","Preferences"],a:0,tag:"budget",type:"trap",feedback:"When a price changes, the budget line rotates but income remains the same."},
-{ id:37, q:"A consumer chooses a bundle inside the budget constraint. What does this mean?",options:["They could afford more but chose not to","They spent all income","The bundle is impossible","Utility is maximized"],a:0,tag:"budget",type:"trap",feedback:"Bundles inside the budget constraint are affordable but do not use all available income."},
-{ id:38, q:"If the price of both goods doubles and income also doubles, the budget constraint...",options:["Does not change","Shifts outward","Rotates inward","Becomes vertical"],a:0,tag:"budget",type:"trap",feedback:"If both prices and income double, purchasing power stays the same and the budget constraint remains unchanged."}
-],
+{ id:1, q:"A production function shows the relationship between...",options:["Costs and profits","Inputs and output","Prices and demand","Revenue and cost"],a:1,tag:"production",type:"definition",feedback:"A production function maps inputs like labor and capital into output."},
+{ id:2, q:"Marginal product of labor measures...",options:["Total output produced","Output per worker","Additional output from one more worker","Cost per worker"],a:2,tag:"production",type:"definition",feedback:"Marginal product captures the additional output from adding one more unit of labor."},
+{ id:3, q:"Diminishing marginal product occurs when...",options:["Total output falls","Additional workers produce less additional output","Costs increase","Prices fall"],a:1,tag:"production",type:"interpretation",feedback:"Each additional worker contributes less to output than the previous one."},
+{ id:4, q:"An isoquant represents...",options:["Equal cost combinations","Equal output combinations of inputs","Equal profit levels","Equal revenue levels"],a:1,tag:"production",type:"definition",feedback:"Isoquants show all input combinations that produce the same level of output."},
+{ id:5, q:"If a firm doubles all inputs and output also doubles, this is...",options:["Increasing returns to scale","Decreasing returns to scale","Constant returns to scale","Diminishing returns"],a:2,tag:"production",type:"definition",feedback:"Constant returns to scale means output increases proportionally with inputs."},
+{ id:6, q:"Economic cost differs from accounting cost because it includes...",options:["Fixed costs only","Variable costs only","Opportunity costs","Sunk costs"],a:2,tag:"costs",type:"definition",feedback:"Economic costs include both explicit and implicit (opportunity) costs."},
+{ id:7, q:"Fixed costs are costs that...",options:["Change with output","Do not change with output","Only occur in the long run","Always increase"],a:1,tag:"costs",type:"definition",feedback:"Fixed costs remain constant regardless of output level."},
+{ id:8, q:"Variable costs are costs that...",options:["Never change","Change with output","Are always fixed","Only occur in the long run"],a:1,tag:"costs",type:"definition",feedback:"Variable costs increase as output increases."},
+{ id:9, q:"Marginal cost measures...",options:["Total cost","Cost per unit","Additional cost of producing one more unit","Average cost"],a:2,tag:"costs",type:"definition",feedback:"Marginal cost is the cost of producing one additional unit."},
+{ id:10, q:"A firm maximizes profit when...",options:["Total revenue is highest","Marginal revenue equals marginal cost","Costs are minimized","Output is maximized"],a:1,tag:"profit",type:"definition",feedback:"Profit is maximized where MR = MC."},
+{ id:11, q:"For a price-taking firm, marginal revenue equals...",options:["Total revenue","Price","Average cost","Marginal cost"],a:1,tag:"competition",type:"definition",feedback:"In perfect competition, firms take price as given, so MR = P."},
+{ id:12, q:"A price-taking firm's supply curve is its...",options:["Demand curve","Marginal cost curve above AVC","Average cost curve","Total cost curve"],a:1,tag:"competition",type:"definition",feedback:"The MC curve above AVC represents the firm's supply decision."},
+{ id:13, q:"Firms exist primarily because they...",options:["Eliminate all costs","Reduce transaction costs","Control prices","Increase wages"],a:1,tag:"profit",type:"definition",feedback:"Firms reduce transaction costs compared to market exchanges."},
+{ id:14, q:"If price is below average variable cost, a firm should...",options:["Increase output","Shut down in the short run","Raise prices","Enter the market"],a:1,tag:"profit",type:"interpretation",feedback:"If P < AVC, the firm cannot cover variable costs and should shut down."},
+{ id:15, q:"In a perfectly competitive market, price is determined by...",options:["Individual firms","Government regulation","Market supply and demand","Marginal cost"],a:2,tag:"market",type:"definition",feedback:"Market price is set where supply equals demand."},
+{ id:16, q:"If total product is increasing at a decreasing rate, marginal product is...",options:["Increasing","Constant","Diminishing but positive","Negative"],a:2,tag:"production",type:"interpretation",feedback:"Total product rising at a decreasing rate means marginal product is falling but still positive."},
+{ id:17, q:"When marginal product becomes negative, total product will...",options:["Increase faster","Remain constant","Begin to fall","Reach maximum profit"],a:2,tag:"production",type:"interpretation",feedback:"Negative marginal product means additional input reduces total output."},
+{ id:18, q:"An isoquant that is bowed inward reflects...",options:["Constant returns","Perfect substitutes","Diminishing marginal rate of technical substitution","Fixed proportions"],a:2,tag:"production",type:"definition",feedback:"Convex isoquants reflect diminishing MRTS between inputs."},
+{ id:19, q:"Input substitution occurs when a firm...",options:["Uses fewer inputs overall","Switches between inputs based on relative prices","Increases output","Changes technology"],a:1,tag:"production",type:"definition",feedback:"Firms substitute toward relatively cheaper inputs."},
+{ id:20, q:"Technological progress means...",options:["Higher costs","Less output","More output from the same inputs","Fewer workers"],a:2,tag:"production",type:"definition",feedback:"Technology improves productivity."},
+{ id:21, q:"Average total cost equals...",options:["TC/Q","MC/Q","FC/Q","VC/Q"],a:0,tag:"costs",type:"definition",feedback:"ATC is total cost divided by output."},
+{ id:22, q:"Average fixed cost will...",options:["Increase with output","Stay constant","Decrease as output increases","Become negative"],a:2,tag:"costs",type:"interpretation",feedback:"AFC falls as output rises."},
+{ id:23, q:"When marginal cost is below average total cost, ATC will...",options:["Increase","Decrease","Stay constant","Become zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC down."},
+{ id:24, q:"When marginal cost equals average total cost, ATC is...",options:["Maximized","Minimized","Zero","Constant"],a:1,tag:"costs",type:"definition",feedback:"MC intersects ATC at its minimum."},
+{ id:25, q:"A firm’s profit equals...",options:["Revenue minus cost","Price times quantity","Cost minus revenue","Marginal cost minus marginal revenue"],a:0,tag:"profit",type:"definition",feedback:"Profit is TR - TC."},
+{ id:26, q:"If total revenue exceeds total cost, the firm earns...",options:["A loss","Zero profit","Positive economic profit","Negative revenue"],a:2,tag:"profit",type:"interpretation",feedback:"TR > TC implies profit."},
+{ id:27, q:"If total revenue equals total cost, the firm earns...",options:["Loss","Accounting profit only","Zero economic profit","Maximum profit"],a:2,tag:"profit",type:"definition",feedback:"All costs are covered."},
+{ id:28, q:"In perfect competition, firms are called price takers because...",options:["They set prices","They accept market price","They ignore demand","They control supply"],a:1,tag:"competition",type:"definition",feedback:"Firms cannot influence price."},
+{ id:29, q:"The demand curve faced by a perfectly competitive firm is...",options:["Downward sloping","Vertical","Perfectly elastic","Upward sloping"],a:2,tag:"competition",type:"definition",feedback:"Firm demand is perfectly elastic."},
+{ id:30, q:"If price rises for a price-taking firm, marginal revenue will...",options:["Fall","Stay the same","Rise","Become zero"],a:2,tag:"competition",type:"interpretation",feedback:"MR = P."},
+{ id:31, q:"Entry of new firms into a competitive market will...",options:["Raise prices","Reduce supply","Increase supply and lower price","Have no effect"],a:2,tag:"market",type:"definition",feedback:"Entry increases supply."},
+{ id:32, q:"Exit of firms from a competitive market will...",options:["Increase supply","Lower prices","Decrease supply and raise price","Eliminate demand"],a:2,tag:"market",type:"definition",feedback:"Exit reduces supply."},
+{ id:33, q:"In the long run, firms in perfect competition earn...",options:["Positive profit","Negative profit","Zero economic profit","Unlimited profit"],a:2,tag:"market",type:"definition",feedback:"Entry and exit eliminate profits."},
+{ id:34, q:"Allocative efficiency occurs when...",options:["MC = MR","MC = Price","Profit is maximized","ATC is minimized"],a:1,tag:"efficiency",type:"definition",feedback:"Efficiency occurs when P = MC."},
+{ id:35, q:"Productive efficiency occurs when...",options:["MC = P","Output is produced at lowest ATC","Profit is zero","Demand equals supply"],a:1,tag:"efficiency",type:"definition",feedback:"Minimum ATC defines productive efficiency."},
+{ id:36, q:"If marginal cost is rising, this is typically due to...",options:["Increasing returns","Diminishing marginal product","Falling prices","Lower wages"],a:1,tag:"production",type:"interpretation",feedback:"Diminishing marginal product raises marginal cost."},
+{ id:37, q:"Which cost exists even when output is zero?",options:["Marginal cost","Variable cost","Fixed cost","Average cost"],a:2,tag:"costs",type:"definition",feedback:"Fixed costs must be paid regardless of output."},
+{ id:38, q:"If price equals marginal cost, the firm is...",options:["Profit maximizing","Allocatively efficient","Shutting down","Losing money"],a:1,tag:"efficiency",type:"interpretation",feedback:"P = MC ensures allocative efficiency."},
+{ id:39, q:"A perfectly competitive firm increases output when...",options:["MC > MR","MR > MC","ATC rises","Demand falls"],a:1,tag:"profit",type:"interpretation",feedback:"Firms expand output when MR exceeds MC."},
+{ id:40, q:"If many firms exit a market, remaining firms will...",options:["Face lower prices","Produce less at higher prices","Shut down","Lose all profit"],a:1,tag:"market",type:"interpretation",feedback:"Reduced supply raises prices."},
+{ id:41, q:"Technological improvement will shift the production function...",options:["Downward","Leftward","Upward","Backward"],a:2,tag:"production",type:"interpretation",feedback:"Technology increases output for any input level."},
+{ id:42, q:"If marginal cost is above average total cost, ATC will...",options:["Fall","Rise","Stay constant","Become zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC upward when above it."}
+],   
 medium: [
-{ id:39, q:"The substitution effect of a price decrease occurs because...",options:["Relative prices change while utility is held constant","The consumer’s real income increases, allowing more consumption","Preferences adjust in response to lower prices","The good becomes cheaper, increasing demand"],a:0,tag:"income_substitution",type:"definition",feedback:"The substitution effect isolates the impact of a change in relative prices while holding utility constant."},
-{ id:40, q:"A demand curve can be interpreted as...",options:["The consumer’s willingness to pay for additional units","A firm's marginal cost curve","Total utility over time","Market supply"],a:0,tag:"demand",type:"definition",feedback:"Each point on the demand curve reflects the consumer’s willingness to pay for one more unit."},
-{ id:41, q:"Consumer equilibrium requires that...",options:["Marginal utility per dollar is equal across goods","Income equals zero","Demand equals supply","Prices are identical"],a:0,tag:"consumer_equilibrium",type:"definition",feedback:"Consumers maximize utility when the marginal utility gained per dollar spent is equal across goods."},
-{ id:42, q:"Price elasticity of demand measures...",options:["The responsiveness of quantity demanded to price changes","The responsiveness of total revenue to price changes","The change in demand when income changes","The change in quantity supplied when price changes"],a:0,tag:"elasticity",type:"definition",feedback:"Elasticity measures how sensitive buyers are to price changes."},
-{ id:43, q:"If the price of a good falls and total revenue increases, what must be true about demand?",options:["Demand is elastic","Demand is inelastic","Demand is unit elastic","Demand is perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"When price falls and revenue rises, demand must be elastic because quantity increases proportionally more."},
-{ id:44, q:"A consumer allocates spending such that MUx/Px < MUy/Py. What should they do?",options:["Consume more of good X and less of good Y","Consume more of good Y and less of good X","Do nothing","Increase income"],a:1,tag:"consumer_equilibrium",type:"interpretation",feedback:"Consumers should shift spending toward the good with higher marginal utility per dollar."},
-{ id:45, q:"If two goods are perfect substitutes, what will indifference curves look like?",options:["Straight lines","Perfectly vertical","Perfectly horizontal","Circular"],a:0,tag:"consumer_equilibrium",type:"definition",feedback:"Perfect substitutes have constant MRS, leading to straight-line indifference curves."},
-{ id:46, q:"A normal good is defined as one where...",options:["Demand rises as income rises","Demand falls as income rises","Demand stays constant","Price always rises"],a:0,tag:"normal_inferior",type:"definition",feedback:"Normal goods experience increased demand as income increases."},
-{ id:47, q:"An inferior good is defined as one where...",options:["Demand falls as income rises","Demand rises as income rises","Demand is perfectly elastic","Demand disappears"],a:0,tag:"normal_inferior",type:"definition",feedback:"Inferior goods are consumed less when income increases."},
-{ id:48, q:"If demand is elastic, a price increase will most likely...",options:["Decrease total revenue","Increase total revenue","Leave total revenue unchanged","Increase quantity demanded"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity falls proportionally more than price rises, reducing total revenue."},
-{ id:49, q:"A price decrease causes quantity demanded to rise substantially. What does this suggest about elasticity?",options:["Demand is elastic","Demand is inelastic","Demand is perfectly inelastic","Demand is unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Large quantity responses indicate elastic demand."},
-{ id:50, q:"If the substitution effect increases consumption but the income effect decreases it, the good must be...",options:["Inferior","Normal","Perfect substitute","Perfect complement"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For inferior goods the income effect works opposite the substitution effect."},
-{ id:51, q:"If MRS is greater than the price ratio, what should the consumer do?",options:["Consume more of good X","Consume less of good X","Increase income","Reduce utility"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"If MRS exceeds the price ratio, the consumer gains more utility per dollar from X."},
-{ id:52, q:"If demand is elastic, a price increase will...",options:["Reduce total revenue","Increase total revenue","Leave revenue unchanged","Eliminate demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity falls proportionally more than price rises."},
-{ id:53, q:"If both substitution and income effects increase consumption after a price decrease, the good must be...",options:["Normal","Inferior","Giffen","Perfectly elastic"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For normal goods both effects reinforce each other."},
-{ id:54, q:"If the price of a good falls and quantity demanded rises substantially, demand is likely...",options:["Elastic","Inelastic","Perfectly inelastic","Unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Large quantity responses indicate elastic demand."},
-{ id:55, q:"If demand is inelastic, what happens to total revenue when price increases?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Quantity demanded increases"],a:0,tag:"elasticity",type:"interpretation",feedback:"With inelastic demand, quantity changes little, so price increases raise revenue."},
-{ id:56, q:"If the substitution effect increases consumption but the income effect reduces it, the good must be...",options:["Inferior","Normal","Perfect substitute","Complement"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Inferior goods have income effects that oppose substitution effects."},
-{ id:57, q:"If the price of coffee rises and consumers buy more tea, the goods are...",options:["Substitutes","Complements","Inferior","Giffen"],a:0,tag:"demand",type:"interpretation",feedback:"Substitutes replace each other when prices change."},
-{ id:58, q:"If the price of printers rises and demand for ink falls, the goods are...",options:["Complements","Substitutes","Inferior goods","Luxury goods"],a:0,tag:"demand",type:"interpretation",feedback:"Complementary goods are used together."},
-{ id:59, q:"If MRS exceeds the price ratio, the consumer should...",options:["Consume more of good X","Consume less of good X","Increase income","Consume less of both goods"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"If MRS exceeds the price ratio, X provides greater marginal utility per dollar."},
-{ id:60, q:"If the price of a good rises and total revenue falls, demand must be...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, price increases reduce revenue."},
-{ id:61, q:"If the price of a good rises and total revenue increases, demand must be...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means quantity responds weakly to price changes."},
-{ id:62, q:"If income rises and demand increases, the good is...",options:["Normal","Inferior","Perfect substitute","Perfect complement"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Normal goods experience increased demand when income rises."},
-{ id:63, q:"If income rises and demand decreases, the good is...",options:["Inferior","Normal","Elastic","Substitute"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Inferior goods see demand fall as income increases."},
-{ id:64, q:"A steeper budget constraint indicates...",options:["One good has become relatively more expensive","Income increased","Utility increased","Demand increased"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"The slope of the budget line reflects relative prices."},
-{ id:65, q:"A steeper indifference curve indicates...",options:["Greater willingness to trade Y for X","Greater willingness to trade X for Y","Higher prices","Lower demand"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Steeper curves indicate a higher marginal rate of substitution."},
-{ id:66, q:"If a consumer moves to a higher indifference curve after a price decrease, this indicates...",options:["Higher utility","Lower income","Lower prices overall","Demand collapse"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher indifference curves represent higher levels of satisfaction."},
-{ id:67, q:"If demand is elastic, lowering price will...",options:["Increase total revenue","Decrease revenue","Leave revenue unchanged","Eliminate demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, quantity rises proportionally more than price falls."},
-{ id:68, q:"If quantity demanded barely responds to price changes, demand is...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means buyers respond weakly to price changes."},
-{ id:69, q:"If the price of X falls and the consumer buys more X and less Y, this reflects...",options:["The substitution effect","The income effect","Demand collapse","Consumer surplus"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Consumers substitute toward relatively cheaper goods."},
-{ id:70, q:"A demand curve becomes steeper. What happens to elasticity?",options:["Elasticity must increase","Elasticity must decrease","Elasticity cannot be determined from slope alone","Demand becomes unit elastic"],a:2,tag:"elasticity",type:"trap",feedback:"Elasticity depends on both slope and position on the curve."},
-{ id:71, q:"If income rises and quantity demanded does not change, the good must be...",options:["Normal","Inferior","Income neutral","Perfect substitute"],a:2,tag:"normal_inferior",type:"trap",feedback:"Some goods are income neutral, meaning demand does not respond to income changes."},
-{ id:72, q:"If MRS equals the price ratio but the bundle lies outside the budget constraint...",options:["It is impossible","It maximizes utility","Prices changed","Income increased"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Utility maximization requires the bundle to also be affordable."},
-{ id:73, q:"If demand is perfectly elastic and price rises slightly, quantity demanded will...",options:["Fall to zero","Decrease slightly","Remain constant","Increase"],a:0,tag:"elasticity",type:"trap",feedback:"Perfectly elastic demand means consumers will not buy at any higher price."},
-{ id:75, q:"If income rises but demand does not change, the good is...",options:["Normal","Inferior","Income neutral","Perfect substitute"],a:2,tag:"normal_inferior",type:"trap",feedback:"Some goods are income neutral and do not respond to income changes."},
-{ id:78, q:"A consumer moves along a demand curve after income rises. What happened?",options:["Nothing — demand curves do not move with income","Demand shifted","Supply changed","Prices disappeared"],a:0,tag:"demand",type:"trap",feedback:"Income changes shift demand curves, not movement along them."},
-{ id:79, q:"If the substitution effect dominates the income effect for an inferior good...",options:["Demand still rises when price falls","Demand falls when price falls","Demand disappears","Demand becomes perfectly elastic"],a:0,tag:"income_substitution",type:"trap",feedback:"For most inferior goods the substitution effect still dominates."},
-{ id:80, q:"Two indifference curves intersect. This implies...",options:["Preferences are inconsistent","Utility is maximized","Prices changed","Demand increased"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Indifference curves cannot cross if preferences are consistent."},
-{ id:81, q:"A bundle inside the budget constraint must...",options:["Be affordable but not necessarily optimal","Maximize utility","Be impossible","Increase income"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Bundles inside the budget line are affordable but may not maximize utility."},
-{ id:82, q:"If demand is unit elastic and price rises...",options:["Total revenue stays the same","Revenue rises","Revenue falls","Demand disappears"],a:0,tag:"elasticity",type:"trap",feedback:"With unit elasticity, revenue remains constant."},
-{ id:188, q:"A decrease in income leads to an increase in demand for a good. This good is...",options:["Inferior","Normal","Perfect substitute","Luxury"],a:0,tag:"normal_inferior",type:"interpretation",feedback:"Inferior goods see demand rise when income falls."},
-{ id:189, q:"If the price of good X rises and demand for good Y rises, what relationship exists between the goods?",options:["Substitutes","Complements","Inferior goods","Unrelated goods"],a:0,tag:"demand",type:"interpretation",feedback:"Substitutes are goods that replace each other when prices change."},
-{ id:190, q:"At the utility-maximizing bundle, what must be true about the slope of the indifference curve?",options:["It equals the slope of the budget constraint","It is zero","It is undefined","It is steeper than the budget constraint"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Utility maximization occurs where MRS equals the price ratio."},
-{ id:191, q:"If demand is perfectly inelastic, how does quantity demanded respond to price changes?",options:["It does not change","It changes proportionally","It becomes zero","It increases"],a:0,tag:"elasticity",type:"definition",feedback:"Perfectly inelastic demand means quantity demanded is completely unresponsive to price."},
-{ id:192, q:"If the substitution effect and income effect both reduce consumption after a price increase, the good is most likely...",options:["Normal","Inferior","Giffen","Perfect substitute"],a:0,tag:"income_substitution",type:"interpretation",feedback:"For normal goods, both effects reinforce each other when price rises."},
-{ id:193, q:"A flatter demand curve generally indicates...",options:["More elastic demand","More inelastic demand","Unit elastic demand","Perfectly inelastic demand"],a:0,tag:"elasticity",type:"interpretation",feedback:"Flatter curves indicate greater responsiveness to price changes."},
-{ id:83, q:"If both substitution and income effects reduce consumption after a price decrease...",options:["The good is Giffen","The good is normal","Demand is perfectly elastic","Supply increased"],a:0,tag:"income_substitution",type:"trap",feedback:"Giffen goods occur when the income effect dominates the substitution effect."}
+{ id:50, q:"A firm hires additional workers and notices output increases, but at a decreasing rate. What must be happening to marginal product and marginal cost?",options:["MP rising, MC falling","MP falling, MC rising","MP constant, MC constant","MP rising, MC rising"],a:1,tag:"production",type:"interpretation",feedback:"Diminishing marginal product causes marginal cost to rise."},
+{ id:51, q:"A firm experiences a decrease in wages. Holding everything else constant, what happens to its cost curves?",options:["MC and ATC shift up","MC and ATC shift down","Only MC shifts down","Only ATC shifts down"],a:1,tag:"costs",type:"interpretation",feedback:"Lower input costs reduce both marginal and average costs."},
+{ id:52, q:"A firm is producing where MR > MC. What should the firm do to maximize profit?",options:["Decrease output","Increase output","Shut down","Do nothing"],a:1,tag:"profit",type:"interpretation",feedback:"If MR exceeds MC, producing more increases profit."},
+{ id:53, q:"A perfectly competitive firm faces a market price of $10. If its marginal cost is $8, what is the best action?",options:["Reduce output","Increase output","Shut down","Exit market"],a:1,tag:"competition",type:"interpretation",feedback:"Profit increases when MR (price) exceeds MC."},
+{ id:54, q:"If new firms enter a competitive market, what happens in the long run to price and profit?",options:["Price rises, profit rises","Price falls, profit falls to zero","Price stays constant, profit rises","Price rises, profit falls"],a:1,tag:"market",type:"interpretation",feedback:"Entry increases supply, lowering price and eliminating profit."},
+{ id:55, q:"A firm is producing where MC < ATC. What must be happening to ATC as output increases?",options:["ATC is rising","ATC is falling","ATC is constant","ATC is zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC below ATC pulls average cost downward."},
+{ id:56, q:"If a firm’s marginal product of labor is falling, what happens to marginal cost?",options:["It falls","It rises","It stays constant","It becomes zero"],a:1,tag:"production",type:"interpretation",feedback:"Falling marginal product increases marginal cost."},
+{ id:57, q:"A firm earns positive economic profit. What must be true about price relative to ATC?",options:["P < ATC","P = ATC","P > ATC","P = MC"],a:2,tag:"profit",type:"interpretation",feedback:"Profit exists when price exceeds average total cost."},
+{ id:58, q:"If price equals marginal cost in a competitive market, what does this imply?",options:["Profit maximization","Allocative efficiency","Shutdown point","Zero output"],a:1,tag:"efficiency",type:"interpretation",feedback:"P = MC ensures resources are efficiently allocated."},
+{ id:59, q:"A firm continues operating even though it earns zero economic profit. Why?",options:["It is losing money","It covers all opportunity costs","It cannot shut down","Demand is falling"],a:1,tag:"profit",type:"interpretation",feedback:"Zero economic profit means all costs, including opportunity costs, are covered."},
+{ id:60, q:"If the price of output falls below AVC, what is the firm’s best short-run decision?",options:["Increase output","Reduce output","Shut down","Enter market"],a:2,tag:"profit",type:"interpretation",feedback:"Firms shut down when price cannot cover variable costs."},
+{ id:61, q:"A technological improvement occurs in production. What is the most direct effect on costs?",options:["Costs rise","Costs fall","Costs stay the same","Costs become fixed"],a:1,tag:"production",type:"interpretation",feedback:"Improved technology increases productivity and lowers costs."},
+{ id:62, q:"A firm’s marginal cost curve is rising. What is the most likely explanation?",options:["Increasing returns to scale","Diminishing marginal product","Falling wages","Improved technology"],a:1,tag:"production",type:"interpretation",feedback:"Diminishing marginal product causes marginal cost to rise."},
+{ id:63, q:"If a firm’s ATC is falling, what must be true about MC?",options:["MC > ATC","MC < ATC","MC = ATC","MC = 0"],a:1,tag:"costs",type:"interpretation",feedback:"MC below ATC pulls it downward."},
+{ id:64, q:"A firm is producing where MC = MR, but P < ATC. What is true?",options:["Firm is maximizing profit but earning a loss","Firm should shut down immediately","Firm is inefficient","Firm earns positive profit"],a:0,tag:"profit",type:"interpretation",feedback:"Profit is maximized even if it is negative."},
+{ id:65, q:"If a competitive firm increases output, what happens to price?",options:["It rises","It falls","It stays the same","It becomes zero"],a:2,tag:"competition",type:"interpretation",feedback:"Price is given in perfect competition."},
+{ id:66, q:"A firm shuts down in the short run when...",options:["P < ATC","P < AVC","P = MC","P > ATC"],a:1,tag:"profit",type:"definition",feedback:"Shutdown occurs when price is below AVC."},
+{ id:67, q:"If MC intersects ATC from below, what happens to ATC after the intersection?",options:["It falls","It rises","It stays constant","It becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC above ATC pushes ATC upward."},
+{ id:68, q:"If input prices fall, what happens to a firm’s supply curve?",options:["Shifts left","Shifts right","Does not change","Becomes vertical"],a:1,tag:"competition",type:"interpretation",feedback:"Lower costs increase supply."},
+{ id:69, q:"A firm is operating at P = MC but P > ATC. What does this imply?",options:["Losses","Break-even","Profit","Shutdown"],a:2,tag:"profit",type:"interpretation",feedback:"Price above ATC means profit."},
+{ id:70, q:"In long-run equilibrium, which condition must hold?",options:["P > ATC","P = ATC","P < MC","MC > ATC"],a:1,tag:"market",type:"definition",feedback:"Entry and exit drive P = ATC."},
+{ id:71, q:"If firms are earning losses, what happens in the long run?",options:["Entry increases","Exit occurs","Prices fall","Output rises"],a:1,tag:"market",type:"interpretation",feedback:"Losses drive firms out of the market."},
+{ id:72, q:"A firm’s MC decreases. What happens to its profit-maximizing output?",options:["Decreases","Increases","Stays the same","Becomes zero"],a:1,tag:"profit",type:"interpretation",feedback:"Lower MC increases optimal output."},
+{ id:73, q:"If MR is constant and MC is rising, the profit-maximizing output occurs where...",options:["MC < MR","MC = MR","MC > MR","ATC is minimized"],a:1,tag:"profit",type:"definition",feedback:"Profit maximization requires MC = MR."},
+{ id:74, q:"A firm is producing where MC > MR. What should it do?",options:["Increase output","Decrease output","Do nothing","Shut down"],a:1,tag:"profit",type:"interpretation",feedback:"Producing too much reduces profit."},
+{ id:75, q:"If technological progress occurs, what happens to isoquants?",options:["Shift inward","Shift outward","Do not change","Disappear"],a:1,tag:"production",type:"interpretation",feedback:"Less input needed for same output."},
+{ id:76, q:"If ATC is minimized, what must be true?",options:["MC = ATC","MC > ATC","MC < ATC","Profit is zero"],a:0,tag:"costs",type:"definition",feedback:"MC intersects ATC at its minimum."},
+{ id:77, q:"A firm with rising ATC but falling MC is experiencing...",options:["Efficiency","Cost reduction","Transitional phase before ATC minimum","Shutdown"],a:2,tag:"costs",type:"interpretation",feedback:"MC is still pulling ATC downward."},
+{ id:78, q:"If price increases in a competitive market, what happens to firm output?",options:["Falls","Rises","Stays constant","Becomes zero"],a:1,tag:"competition",type:"interpretation",feedback:"Higher price raises MR and output."},
+{ id:79, q:"If a firm earns zero economic profit, what is true?",options:["It should exit","It covers all costs","It is inefficient","It is losing money"],a:1,tag:"profit",type:"interpretation",feedback:"All opportunity costs are covered."},
+{ id:80, q:"If input substitution occurs, what drives the decision?",options:["Output level","Relative input prices","Demand curve","Marginal cost"],a:1,tag:"production",type:"definition",feedback:"Firms substitute based on relative prices."},
+{ id:81, q:"If MC rises sharply, what happens to supply?",options:["Increases","Decreases","Stays constant","Becomes vertical"],a:1,tag:"competition",type:"interpretation",feedback:"Higher costs reduce supply."},
+{ id:82, q:"A firm operates where P = AVC but P < ATC. What is true?",options:["Profit","Loss but continue operating","Shutdown","Zero cost"],a:1,tag:"profit",type:"interpretation",feedback:"Firm covers variable costs but not total costs."},
+{ id:83, q:"If demand increases in a competitive market, what happens in the short run?",options:["Price falls","Price rises","Supply falls","Firms exit"],a:1,tag:"market",type:"interpretation",feedback:"Higher demand raises price."},
+{ id:84, q:"If demand increases, what happens in the long run?",options:["Price rises permanently","Price returns to original level","Firms exit","Output falls"],a:1,tag:"market",type:"interpretation",feedback:"Entry restores equilibrium."},
+{ id:85, q:"If marginal product increases, what happens to marginal cost?",options:["Rises","Falls","Stays constant","Becomes zero"],a:1,tag:"production",type:"interpretation",feedback:"Higher productivity lowers marginal cost."},
+{ id:86, q:"A firm faces rising wages. What happens to MC?",options:["Falls","Rises","Stays constant","Becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"Higher input costs increase MC."},
+{ id:87, q:"If MC = MR but MC is rising, what does this indicate?",options:["Maximum profit","Minimum cost","Shutdown point","Inefficiency"],a:0,tag:"profit",type:"interpretation",feedback:"MC rising ensures maximum profit condition."},
+{ id:88, q:"If firms enter a market, what happens to existing firms’ profits?",options:["Increase","Decrease","Stay constant","Become negative immediately"],a:1,tag:"market",type:"interpretation",feedback:"Entry reduces profits."},
+{ id:89, q:"If MC is constant, what shape is the supply curve?",options:["Upward sloping","Downward sloping","Horizontal","Vertical"],a:2,tag:"competition",type:"interpretation",feedback:"Constant MC implies flat supply."},
+{ id:90, q:"If ATC is rising and MC is above it, what happens next?",options:["ATC falls","ATC rises","ATC stays constant","ATC disappears"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC upward."},
+{ id:91, q:"If a firm exits the market, what happens to industry supply?",options:["Increases","Decreases","Stays constant","Becomes zero"],a:1,tag:"market",type:"definition",feedback:"Exit reduces supply."},
+{ id:92, q:"If productivity improves, what happens to cost curves?",options:["Shift up","Shift down","Stay constant","Disappear"],a:1,tag:"production",type:"interpretation",feedback:"Higher productivity lowers costs."},
+{ id:93, q:"If MR > MC and firm does nothing, what happens to profit?",options:["Falls","Rises","Stays constant","Becomes zero"],a:0,tag:"profit",type:"trap",feedback:"Failure to increase output leaves profit unrealized."},
+{ id:94, q:"If firms earn profit, supply will...",options:["Decrease","Increase","Stay constant","Become zero"],a:1,tag:"market",type:"interpretation",feedback:"Profit attracts entry, increasing supply."},
+{ id:95, q:"If MC < AVC, what must be true about AVC?",options:["Rising","Falling","Constant","Zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC below AVC pulls it downward."}
 ], 
 hard:[
-{ id:84, q:"A firm lowers its price and observes that total revenue falls. What must be true about demand at the original price?",options:["Demand was inelastic","Demand was elastic","Demand was unit elastic","Demand was perfectly elastic"],a:0,feedback:"If lowering price reduces revenue, quantity did not increase enough to offset the price drop. Demand must have been inelastic."},
-{ id:85, q:"A price increase causes total revenue to stay the same. What does this imply about demand at that price?",options:["Demand is unit elastic","Demand is elastic","Demand is inelastic","Demand is perfectly inelastic"],a:0,feedback:"When elasticity equals one, the percentage change in quantity exactly offsets the percentage change in price."},
-{ id:86, q:"A firm raises its price and observes that quantity demanded falls sharply and revenue decreases. What does this indicate?",options:["Demand is elastic","Demand is inelastic","Demand is unit elastic","Demand is perfectly inelastic"],a:0,feedback:"When price rises and revenue falls, demand must be elastic."},
-{ id:87, q:"A good has many close substitutes and consumers can easily switch between them. What is most likely true about demand?",options:["Demand is highly elastic","Demand is highly inelastic","Demand is perfectly inelastic","Demand is unrelated to price"],a:0,feedback:"More substitutes increase consumers' responsiveness to price changes."},
-{ id:88, q:"A price decrease causes consumers to buy more of good X even though X is an inferior good. Why?",options:["The substitution effect outweighs the income effect","The income effect outweighs the substitution effect","Preferences changed","Demand shifted outward"],a:0,feedback:"Even for inferior goods, the substitution effect usually dominates, increasing consumption when price falls."},
-{ id:89, q:"If a good takes a large share of consumer income and has many substitutes, demand will most likely be...",options:["Highly elastic","Highly inelastic","Perfectly inelastic","Unit elastic"],a:0,feedback:"Large budget share and many substitutes both increase elasticity."},
-{ id:90, q:"A demand curve becomes flatter. What does this imply about consumer responsiveness to price?",options:["Consumers are more responsive to price changes","Consumers are less responsive to price changes","Consumers ignore price changes","Consumers stop buying the good"],a:0,feedback:"Flatter demand curves indicate more elastic demand."},
-{ id:91, q:"A firm lowers price and sees quantity demanded increase substantially. What will most likely happen to total revenue?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Revenue becomes zero"],a:0,feedback:"A large increase in quantity indicates elastic demand, which raises revenue when price falls."},
-{ id:92, q:"If price falls and consumers buy more units while also gaining more surplus per unit, what happens to total consumer surplus?",options:["Consumer surplus increases","Consumer surplus decreases","Consumer surplus stays the same","Consumer surplus becomes zero"],a:0,feedback:"Lower prices increase the gap between willingness to pay and price and increase quantity purchased."},
-{ id:93, q:"If consumers become less sensitive to price changes, what happens to elasticity?",options:["Demand becomes more inelastic","Demand becomes more elastic","Demand becomes perfectly elastic","Demand becomes unit elastic"],a:0,feedback:"Less responsiveness to price changes means demand is more inelastic."},
-{ id:94, q:"A good has very few substitutes and is a small part of consumer income. Demand is most likely...",options:["Relatively inelastic","Highly elastic","Perfectly elastic","Unit elastic"],a:0,feedback:"Few substitutes and small budget share both reduce price sensitivity."},
-{ id:95, q:"A firm lowers price slightly and sees almost no change in quantity demanded. What does this imply about demand?",options:["Demand is inelastic","Demand is elastic","Demand is unit elastic","Demand is perfectly elastic"],a:0,feedback:"If quantity barely responds to price changes, demand is inelastic."},
-{ id:96, q:"At the optimal consumption bundle, what must be true about the marginal rate of substitution (MRS) and the price ratio?",options:["MRS equals the price ratio","MRS is greater than the price ratio","MRS is less than the price ratio","MRS must equal income"],a:0,feedback:"Utility maximization occurs where the marginal rate of substitution equals the relative price of the goods."},
-{ id:97, q:"If the marginal rate of substitution is greater than the price ratio, what should the consumer do?",options:["Consume more of good X and less of good Y","Consume more of good Y and less of good X","Stop consuming both goods","Increase income"],a:0,feedback:"If MRS exceeds the price ratio, the consumer values X more than the market trade-off, so they should consume more X."},
-{ id:98, q:"If two indifference curves intersect on a graph, what does this imply about consumer preferences?",options:["Preferences are inconsistent","Utility is maximized","Income increased","Demand increased"],a:0,feedback:"Indifference curves cannot cross because that would imply contradictory rankings of bundles."},
-{ id:99, q:"A consumer moves to a higher indifference curve after a price decrease. What must be true?",options:["The consumer is better off","The consumer is worse off","Income decreased","The budget line rotated inward"],a:0,feedback:"Higher indifference curves represent higher utility levels."},
-{ id:100, q:"If indifference curves become flatter as you move to the right along a curve, what does this indicate?",options:["Diminishing marginal rate of substitution","Increasing marginal utility","Perfect substitutes","Perfect complements"],a:0,feedback:"Consumers are willing to give up fewer units of Y for each additional unit of X, which reflects diminishing marginal rate of substitution."},
-{ id:101, q:"If the price of good X falls while income remains constant, what happens to the budget constraint?",options:["It rotates outward along the X-axis","It shifts outward parallel","It rotates inward","It becomes vertical"],a:0,feedback:"A lower price for X allows consumers to buy more X while the Y intercept stays the same."},
-{ id:102, q:"If the marginal rate of substitution is less than the price ratio at a bundle, what should the consumer do?",options:["Consume more of good Y and less of good X","Consume more of good X and less of good Y","Stop consuming both goods","Increase income"],a:0,feedback:"If MRS is less than the price ratio, the consumer values Y more relative to X than the market trade-off, so they should consume more Y."},
-{ id:103, q:"Which statement must be true for a bundle to maximize utility?",options:["An indifference curve is tangent to the budget line","The bundle lies on the highest indifference curve regardless of affordability","The consumer buys equal amounts of both goods","The budget line is horizontal"],a:0,feedback:"Utility maximization occurs where the highest attainable indifference curve is tangent to the budget constraint."},
-{ id:201, q:"A consumer has MUx = 30 and MUy = 20. Prices are Px = 5 and Py = 4. What should the consumer do?",options:["Buy more X and less Y","Buy more Y and less X","Do nothing","Increase income"],a:1,tag:"consumer_equilibrium",type:"calculation",feedback:"MUx/Px = 6 and MUy/Py = 5. Consumer should shift toward Y."},
-{ id:202, q:"A good has price elasticity of demand of 1.5. If price increases by 10%, what happens to total revenue?",options:["Total revenue decreases","Total revenue increases","Total revenue stays constant","Cannot be determined"],a:0,tag:"elasticity",type:"interpretation",feedback:"Elastic demand means price and revenue move in opposite directions."},
-{ id:203, q:"A consumer’s income increases and the demand for good X falls. Meanwhile, when price falls, quantity demanded rises. What type of good is X?",options:["Inferior","Normal","Giffen","Perfect substitute"],a:0,tag:"income_substitution",type:"interpretation",feedback:"Inferior goods decrease in demand as income rises, but still follow the law of demand."},
-{ id:204, q:"If the price of a good decreases and total revenue decreases, what can you conclude about demand?",options:["Demand is inelastic","Demand is elastic","Demand is unit elastic","Demand is perfectly elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"If price and revenue move in the same direction, demand is inelastic."},
-{ id:205, q:"A consumer is at equilibrium. Income doubles, and prices remain constant. What happens to the optimal bundle?",options:["The consumer moves to a higher indifference curve","The consumer stays on the same bundle","The budget line rotates","The slope of the indifference curve changes"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher income shifts the budget constraint outward, allowing higher utility."},
-{ id:206, q:"If the substitution effect and income effect exactly offset each other after a price change, what happens to quantity demanded?",options:["It remains unchanged","It increases","It decreases","It becomes zero"],a:0,tag:"income_substitution",type:"trap",feedback:"If both effects cancel out, there is no net change in consumption."},
-{ id:207, q:"The price of a good rises from $8 to $10 and quantity demanded falls from 50 to 40. Using midpoint elasticity, what happens to total revenue?",options:["Total revenue decreases","Total revenue increases","Total revenue stays the same","Not enough information to determine"],a:2,tag:"elasticity",type:"calculation",feedback:"Elasticity = 1.00 (unit elastic), so the percentage change in quantity exactly offsets the price change. Total revenue remains unchanged."},
-{ id:208, q:"A consumer’s marginal rate of substitution is decreasing. What does this imply about preferences?",options:["They are convex","They are linear","They are inconsistent","They are perfect complements"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Diminishing MRS implies convex preferences."},
-{ id:209, q:"If the price of good X falls and consumption of good Y increases, what must be true?",options:["Goods are complements","Goods are substitutes","Y is inferior","X is inferior"],a:0,tag:"demand",type:"interpretation",feedback:"Complementary goods are consumed together."},
-{ id:210, q:"A demand curve is steep but not vertical. What can be said about elasticity?",options:["Demand is relatively inelastic","Demand is relatively elastic","Demand is perfectly elastic","Demand is unit elastic"],a:0,tag:"elasticity",type:"interpretation",feedback:"Steeper curves indicate lower responsiveness to price changes."},
-{ id:211, q:"A consumer has MUx/Px = 8 and MUy/Py = 4. If they reallocate spending optimally, what will happen?",options:["They will buy more X and less Y","They will buy more Y and less X","They will not change consumption","They will increase income"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Consumers shift spending toward the good with higher marginal utility per dollar."},
-{ id:212, q:"If demand is elastic and price decreases by 5%, what must happen to quantity demanded for total revenue to increase?",options:["Quantity demanded increases by more than 5%","Quantity demanded increases by less than 5%","Quantity demanded decreases","Quantity demanded does not change"],a:0,tag:"elasticity",type:"interpretation",feedback:"Elastic demand requires quantity to change proportionally more than price."},
-{ id:213, q:"If a good is Giffen, what must be true about the income and substitution effects?",options:["Income effect outweighs substitution effect","Substitution effect outweighs income effect","Both effects reinforce each other","Neither effect exists"],a:0,tag:"income_substitution",type:"trap",feedback:"Giffen goods occur when the income effect dominates and reverses the usual demand relationship."}, 
-{ id:214, q:"A consumer faces Px = 2 and Py = 4. At their current bundle, MRS = 3. What should they do?",options:["Consume more X","Consume more Y","Stay at current bundle","Increase income"],a:0,tag:"consumer_equilibrium",type:"calculation",feedback:"Since MRS (3) > Px/Py (0.5), the consumer should consume more X."},    
-{ id:215, q:"If total revenue rises when price increases, what must be true about the percentage change in quantity demanded?",options:["It falls by less than the percentage increase in price","It falls by more than the percentage increase in price","It increases","It stays the same"],a:0,tag:"elasticity",type:"interpretation",feedback:"Inelastic demand means quantity changes proportionally less than price."},
-{ id:216, q:"If both goods are normal and income rises, what happens to the budget constraint and optimal bundle?",options:["Budget shifts outward, higher indifference curve reached","Budget rotates, same indifference curve","Budget shifts inward, lower utility","No change occurs"],a:0,tag:"consumer_equilibrium",type:"interpretation",feedback:"Higher income shifts the budget outward, allowing greater utility."},
-{ id:217, q:"If the price of X falls and demand for Y falls, what can you conclude?",options:["X and Y are complements","X and Y are substitutes","Y is inferior","X is inferior"],a:0,tag:"demand",type:"interpretation",feedback:"If consumption of Y falls when X becomes cheaper, the goods are complements."},
-{ id:218, q:"A demand curve is perfectly vertical. What happens to total revenue if price increases?",options:["Total revenue increases","Total revenue decreases","Total revenue stays constant","Cannot be determined"],a:0,tag:"elasticity",type:"interpretation",feedback:"With perfectly inelastic demand, quantity does not change, so higher price increases revenue."},
-{ id:219, q:"If MRS equals the price ratio but the consumer is not maximizing utility, what must be true?",options:["The bundle is not affordable","Preferences are inconsistent","Income is zero","Prices are changing"],a:0,tag:"consumer_equilibrium",type:"trap",feedback:"Utility maximization requires both MRS = price ratio and that the bundle lies on the budget constraint."},
-{ id:220, q:"If demand is elastic at a given price, what happens to total revenue when price falls?",options:["Total revenue increases","Total revenue decreases","Total revenue stays the same","Revenue becomes zero"],a:0,tag:"elasticity",type:"interpretation",feedback:"With elastic demand, price and total revenue move in opposite directions."}
+{ id:150, q:"A firm in a perfectly competitive market finds that at its current output, price is above marginal cost but below average total cost. Which conclusion is best?",options:["The firm should shut down immediately because it is losing money","The firm should increase output because additional units add more to revenue than cost, even though overall profit is still negative","The firm should reduce output because price is below average total cost","The firm is already maximizing profit because losses mean it cannot improve its position"],a:1,tag:"profit",type:"trap",feedback:"If P = MR > MC, the firm should expand output even if it is still earning a loss overall because each additional unit improves profit."},
+{ id:151, q:"A wheat farmer faces a drop in market price after many new farms enter the industry. In the short run the farmer continues operating, but in the long run some farms leave. Which explanation best fits this sequence?",options:["The initial price drop pushes some firms below AVC immediately, so all firms shut down at once","Entry lowers price and profits; firms may continue if price covers AVC, but long-run exit occurs if losses persist","The price drop has no effect on output because competitive firms are price takers","Long-run exit occurs because marginal revenue becomes upward sloping"],a:1,tag:"market",type:"interpretation",feedback:"Short-run operation depends on AVC, while long-run exit depends on whether firms can cover total cost."},
+{ id:152, q:"A firm introduces a new machine that allows the same number of workers to produce more output per hour. Which chain of effects is most accurate?",options:["Marginal product rises, marginal cost falls, and the firm's cost curves shift downward","Marginal product rises, marginal cost rises, and the firm's cost curves shift upward","Marginal product falls, marginal cost falls, and supply decreases","Marginal product stays constant, marginal cost falls only in the long run"],a:0,tag:"production",type:"interpretation",feedback:"Higher productivity means each unit of input produces more, which lowers marginal cost and shifts cost curves downward."},
+{ id:153, q:"A manager says, 'We are producing where marginal cost equals marginal revenue, so we must be earning positive profit.' What is wrong with that statement?",options:["Nothing is wrong; MR = MC guarantees positive profit","MR = MC identifies the profit-maximizing output, but profit could still be zero or negative depending on average total cost","Positive profit depends only on whether price is above marginal cost","If MR = MC, the firm must be at allocative efficiency, not profit maximization"],a:1,tag:"profit",type:"trap",feedback:"MR = MC tells the firm where profit is maximized, not whether profit is positive."},
+{ id:154, q:"A competitive firm is producing where marginal cost is rising and exactly equal to price. Then wages increase. What happens first to the firm's profit-maximizing output?",options:["It rises because the firm needs to spread higher costs over more units","It falls because the marginal cost curve shifts upward, causing the MC = MR point to occur at a lower quantity","It stays the same because price has not changed","It falls only if average total cost also falls"],a:1,tag:"costs",type:"interpretation",feedback:"Higher wages shift marginal cost upward, so the firm reduces output at the new MC = MR point."},
+{ id:155, q:"Suppose a competitive market begins in long-run equilibrium. Demand then increases. Which outcome is most accurate?",options:["Price rises in the short run, firms earn profit, entry occurs, and long-run price returns toward the original level as output expands","Price rises in the short run and stays permanently higher because demand is higher","Output cannot change because firms are price takers","Firms immediately enter before any profit appears, so price never rises"],a:0,tag:"market",type:"trap",feedback:"In perfect competition, higher demand raises short-run price and profit, which attracts entry and pushes price back down in the long run."},
+{ id:156, q:"A firm observes that average total cost is falling while marginal cost is rising. Which conclusion is best?",options:["This is impossible because MC and ATC must always move in the same direction","ATC can still be falling as long as MC remains below ATC, even if MC itself is rising","MC must be above ATC because ATC is changing","The firm must be experiencing technological progress"],a:1,tag:"costs",type:"trap",feedback:"ATC keeps falling whenever MC is below it, even if MC is rising toward ATC."},
+{ id:157, q:"A perfectly competitive firm earns zero economic profit in long-run equilibrium. Which statement is best?",options:["The firm should leave the market because it is not making money","The firm covers explicit costs but not opportunity costs","The firm covers all explicit and implicit costs, so remaining in the market is consistent with equilibrium","The firm is at its shutdown point"],a:2,tag:"market",type:"trap",feedback:"Zero economic profit means the firm covers all opportunity costs and has no reason to exit."},
+{ id:158, q:"A factory can replace some labor with machinery when wages rise. Which concept is most directly involved in that adjustment?",options:["Shutdown decision","Input substitution based on relative input prices","Allocative efficiency","Long-run market exit"],a:1,tag:"production",type:"definition",feedback:"When relative input prices change, firms substitute toward the now relatively cheaper input if technology allows."},
+{ id:159, q:"An advisor claims that because a firm’s demand curve is perfectly elastic, the market demand curve must also be perfectly elastic. What is the flaw?",options:["The advisor confused the individual competitive firm's demand with the entire market demand, which is generally downward sloping","The market demand curve is vertical in perfect competition","The firm's demand curve is actually upward sloping","Perfect elasticity applies only in monopoly"],a:0,tag:"competition",type:"trap",feedback:"A competitive firm faces a perfectly elastic demand curve at the market price, but market demand is still downward sloping."},
+{ id:160, q:"A firm is producing at the output where average total cost is minimized. Which additional condition must hold there?",options:["Marginal cost equals average total cost","Price equals average variable cost","Marginal revenue equals average total cost","Profit is maximized"],a:0,tag:"costs",type:"definition",feedback:"ATC reaches its minimum where MC intersects ATC."},
+{ id:161, q:"A corn producer says, 'Because I cannot influence market price, my output decision does not matter for profit.' Which response is best?",options:["Correct, because price-taking means the firm has no meaningful choice","Incorrect, because even with a given price the firm must choose the quantity where MR equals MC","Correct, because only the market decides quantity","Incorrect, because profit depends only on fixed cost"],a:1,tag:"competition",type:"trap",feedback:"A price-taking firm cannot choose price, but it absolutely chooses output to maximize profit."},
+{ id:162, q:"If a firm's marginal product of labor falls while the wage rate remains constant, what happens to the marginal cost of output and why?",options:["Marginal cost falls because each worker is cheaper","Marginal cost rises because each additional unit of output requires more labor input","Marginal cost stays constant because wage is constant","Marginal cost becomes average fixed cost"],a:1,tag:"production",type:"interpretation",feedback:"When workers add less output, it takes more labor to produce another unit, so marginal cost rises."},
+{ id:163, q:"A firm is earning losses, but price still exceeds average variable cost. Which statement is most accurate?",options:["The firm should shut down immediately because losses are being incurred","The firm should continue operating in the short run because it covers variable costs and contributes something toward fixed costs","The firm should exit immediately because price is below ATC","The firm is in long-run equilibrium"],a:1,tag:"profit",type:"trap",feedback:"As long as price covers AVC, continuing to produce can reduce losses by covering some fixed costs."},
+{ id:164, q:"A competitive industry is allocatively efficient. Which condition describes that outcome?",options:["Price equals average total cost","Price equals marginal cost","Marginal revenue equals average variable cost","Average fixed cost is minimized"],a:1,tag:"efficiency",type:"definition",feedback:"Allocative efficiency occurs when the value consumers place on the last unit equals the cost of producing it, so P = MC."},
+{ id:165, q:"A bakery in perfect competition sees a temporary increase in demand for its product's market. In the short run, which outcome is most likely for the bakery itself?",options:["Its demand curve shifts right and becomes downward sloping","It sells more output at a higher market price, moving along its perfectly elastic demand curve","Its marginal revenue falls because more firms will eventually enter","Its average total cost must immediately fall"],a:1,tag:"competition",type:"trap",feedback:"A competitive firm still faces a perfectly elastic demand curve at the new higher market price and expands output accordingly."},
+{ id:166, q:"Which scenario best illustrates the difference between shutdown and exit?",options:["A firm shuts down when it earns zero profit and exits when it earns positive profit","A firm shuts down in the short run when price is below AVC, but exits in the long run when revenue cannot cover total cost","A firm exits whenever marginal cost rises","A firm shuts down only after all fixed costs disappear"],a:1,tag:"profit",type:"definition",feedback:"Shutdown is a short-run decision tied to AVC; exit is a long-run decision tied to whether the firm can cover total costs."},
+{ id:167, q:"A firm can produce 100 units with either 10 workers and 2 machines or 6 workers and 4 machines. If wages rise while machine costs stay constant, what is the best prediction?",options:["The firm will necessarily produce less output","The firm will substitute toward more machinery and fewer workers if technologically feasible","The firm will ignore the wage change because output is unchanged","The firm will shut down because input prices changed"],a:1,tag:"production",type:"interpretation",feedback:"When one input becomes relatively more expensive, cost minimization pushes the firm toward the relatively cheaper input."},
+{ id:168, q:"A student says, 'If firms in a competitive market are making profits, consumers must be worse off because price is too high forever.' Which response is best?",options:["Correct, because profit in competition is permanent","Incorrect, because profit attracts entry, which increases supply and tends to drive price back down over time","Correct, because firms can block entry in perfect competition","Incorrect, because consumer welfare never changes when price changes"],a:1,tag:"market",type:"trap",feedback:"Economic profit in competitive markets is usually temporary because entry erodes it."},
+{ id:169, q:"A firm’s average fixed cost is falling, but its average total cost is rising. Which explanation best fits?",options:["Marginal cost must be rising enough to push variable cost upward more than falling AFC pulls total average cost down","Average fixed cost and average total cost cannot move in opposite directions","The firm must be at productive efficiency","Marginal revenue must be falling"],a:0,tag:"costs",type:"interpretation",feedback:"AFC almost always falls with output, but rising variable costs can still cause ATC to rise overall."},
+{ id:170, q:"A market is in long-run competitive equilibrium. Then a permanent technological improvement lowers production costs for all firms. What is the best prediction?",options:["The market price rises because firms become more profitable","The market price falls in the long run as supply expands, while firms again end up earning zero economic profit","Output falls because lower cost reduces the need for production","Firms permanently earn positive economic profit because technology blocks entry"],a:1,tag:"market",type:"trap",feedback:"Lower costs shift supply right. Competition and entry/adjustment push the market toward a new long-run equilibrium with lower price and zero economic profit."},
+{ id:171, q:"Why can a firm be producing at the efficient scale yet still earn zero economic profit?",options:["Because productive efficiency means output is at minimum ATC, not that profit must be positive","Because productive efficiency guarantees losses","Because zero economic profit means the firm is not minimizing cost","Because efficient scale occurs only in the short run"],a:0,tag:"efficiency",type:"trap",feedback:"A firm at minimum ATC is productively efficient, and in long-run competitive equilibrium that is fully consistent with zero economic profit."},
+{ id:172, q:"A competitive firm notices that price is below average total cost but above marginal cost at its current output. Which conclusion is best?",options:["The firm should increase output because extra units add more to revenue than cost, even though it may still be losing money overall","The firm should shut down because price is below ATC","The firm should reduce output because ATC exceeds price","The firm is necessarily at the wrong side of its AVC curve"],a:0,tag:"profit",type:"trap",feedback:"The output decision depends on MR versus MC. Profit level depends on price versus ATC."},
+{ id:173, q:"Which statement best connects diminishing marginal product and the shape of the marginal cost curve?",options:["As marginal product falls, the marginal cost curve tends to rise because each extra unit of output requires more input","As marginal product falls, the marginal cost curve falls because labor is used more efficiently","Marginal product affects only average fixed cost","There is no systematic relationship between marginal product and marginal cost"],a:0,tag:"production",type:"definition",feedback:"When extra input adds less output, producing another unit becomes more costly at the margin."},
+{ id:174, q:"A firm in perfect competition sells where P = MC and P = ATC. Which statement is most accurate?",options:["The firm is in long-run equilibrium with zero economic profit","The firm is at its shutdown point","The firm is earning monopoly profit","The firm should reduce output because ATC equals price"],a:0,tag:"market",type:"interpretation",feedback:"P = MC gives allocative efficiency, and P = ATC indicates zero economic profit consistent with long-run equilibrium."},
+{ id:175, q:"A consultant argues that a firm should keep producing as long as total revenue exceeds total variable cost, regardless of whether MC exceeds MR at the current output. What is the flaw?",options:["None; covering variable cost always guarantees the current output is profit maximizing","Covering variable cost addresses the shutdown decision, but the profit-maximizing quantity still requires comparing MR and MC","The consultant should compare total revenue to total fixed cost only","The shutdown rule applies only in monopoly"],a:1,tag:"profit",type:"trap",feedback:"Staying open and choosing the best output are two different decisions. Shutdown uses AVC; output choice uses MR versus MC."},
+{ id:176, q:"If a market's price exceeds firms' average total cost, which long-run adjustment is most likely in perfect competition?",options:["Existing firms cut output and price rises further","New firms enter, supply increases, and price is pushed downward","Consumers leave the market so demand falls to zero","Firms shut down because profits are unsustainable"],a:1,tag:"market",type:"interpretation",feedback:"Positive economic profit attracts entry, which increases supply and reduces price."},
+{ id:177, q:"A firm uses labor and capital. The rental rate of capital falls substantially while wages stay unchanged. Assuming output is held constant and substitution is possible, what is the best prediction?",options:["The firm uses relatively more capital and less labor in its cost-minimizing input mix","The firm uses the same input mix because output is unchanged","The firm uses less capital because cheaper inputs are less productive","The firm must increase output immediately"],a:0,tag:"production",type:"interpretation",feedback:"Cost minimization responds to relative input prices, so the firm substitutes toward cheaper capital."},
+{ id:178, q:"Which statement best explains why the supply curve of a competitive firm is only the marginal cost curve above AVC, not the entire MC curve?",options:["Below AVC, the firm would not cover variable costs and would shut down in the short run","Below AVC, marginal revenue becomes negative","Above AVC, fixed costs disappear","Below AVC, the market demand curve becomes vertical"],a:0,tag:"competition",type:"definition",feedback:"The firm only supplies where producing is better than shutting down, which requires price at least as large as AVC."},
+{ id:179, q:"A firm is in a competitive market and currently produces at a quantity where MC is below MR, but the next unit would make MC exceed MR. What should it do?",options:["Reduce output because the current unit is too expensive","Increase output until the highest quantity where MC does not exceed MR","Shut down because MC is rising","Keep output unchanged because rising MC means profit is already maximized"],a:1,tag:"profit",type:"interpretation",feedback:"The firm should expand as long as additional units add more to revenue than cost, stopping when MC reaches MR."},
+{ id:180, q:"A market allocates resources efficiently, but an individual firm in that market is not producing at minimum ATC. Which statement is best?",options:["Allocative and productive efficiency are distinct, so one can hold without the other for a particular firm","That situation is impossible in any competitive market","The firm must be earning positive economic profit","The market demand curve must be perfectly elastic"],a:0,tag:"efficiency",type:"trap",feedback:"Allocative efficiency is P = MC. Productive efficiency is minimum ATC. They are related but conceptually distinct."},
+{ id:181, q:"Suppose firms in a competitive industry face identical costs and the market is in long-run equilibrium. A temporary surge in input prices raises ATC and MC for all firms. In the short run, what is most likely?",options:["Market price rises immediately, firms reduce output, and some may incur losses depending on how much price changes relative to cost","Nothing changes because firms are price takers","All firms exit immediately because ATC rose","Demand shifts right because costs increased"],a:0,tag:"market",type:"interpretation",feedback:"Higher costs shift supply left, raising price and reducing output, but short-run losses are still possible depending on the new price relative to cost."},
+{ id:182, q:"A student says, 'Because a competitive firm earns zero economic profit in the long run, it must be indifferent between producing and shutting down.' Which response is best?",options:["Correct, because zero profit means the firm covers none of its costs","Incorrect, because zero economic profit in the long run still means price covers total cost, while shutdown concerns whether price covers variable cost in the short run","Correct, because shutdown and exit mean the same thing","Incorrect, because long-run firms always earn positive accounting losses"],a:1,tag:"profit",type:"trap",feedback:"Zero economic profit is not the shutdown condition. A firm in long-run equilibrium covers all costs, including opportunity costs."},
+{ id:183, q:"A firm’s manager observes that output rose from 100 to 110 when labor increased from 10 to 11 workers, but later output rose from 110 to 117 when labor increased from 11 to 12 workers. What is the best conclusion?",options:["Marginal product rose between those additions, so marginal cost likely fell over that range if wage stayed constant","Marginal product fell, so marginal cost rose","Returns to scale must be decreasing","Average fixed cost increased"],a:0,tag:"production",type:"interpretation",feedback:"The extra output from the later worker was larger, so marginal product increased; with wage constant, marginal cost would tend to fall."}
 ]
 };
 
 easyConceptPools = {
-preferences:[
-{q:"Preferences are rational if they are...",options:["Complete and transitive","Based only on prices","Identical across consumers","Always maximize income"],a:0,feedback:"Rational preferences must be complete and transitive so consumers can rank bundles consistently."},
-{q:"If a consumer prefers bundle A to bundle B, this means...",options:["A provides greater satisfaction than B","A costs less than B","A contains more of every good","A lies inside the budget constraint"],a:0,feedback:"Preference means the consumer derives greater utility from A than from B."},
-{q:"Utility represents...",options:["A ranking of satisfaction across bundles","Total income a consumer earns","The price of goods","The quantity purchased"],a:0,feedback:"Utility measures the satisfaction a consumer receives from different bundles."},
-{q:"If preferences are complete, a consumer can...",options:["Compare any two bundles","Always afford their preferred bundle","Avoid trade-offs","Ignore prices"],a:0,feedback:"Completeness means consumers can rank any two bundles."},
-{q:"If preferences are transitive and A is preferred to B while B is preferred to C, then...",options:["A must be preferred to C","C must be preferred to A","All bundles are equal","Preferences change randomly"],a:0,feedback:"Transitivity ensures consistent rankings across choices."},
-{q:"If a consumer is indifferent between bundles A and B, this means...",options:["They provide the same level of utility","They cost the same","They contain identical goods","They are both affordable"],a:0,feedback:"Indifference means equal satisfaction, not equal cost or composition."},
-{q:"If preferences are not transitive, what problem arises?",options:["Choices become inconsistent","Prices change unpredictably","Income becomes irrelevant","Demand becomes perfectly elastic"],a:0,feedback:"Without transitivity, consumers can make contradictory choices."},
-{q:"A consumer prefers A to B and B to C. Which assumption ensures they prefer A to C?",options:["Transitivity","Completeness","Budget constraint","Diminishing returns"],a:0,feedback:"Transitivity ensures consistent rankings across bundles."},
-{q:"If preferences are incomplete, the consumer...",options:["Cannot rank some bundles","Always chooses the cheapest option","Ignores income","Prefers all bundles equally"],a:0,feedback:"Without completeness, some bundles cannot be compared."},
-{q:"A student says preferences depend only on prices. What is wrong?",options:["Preferences are independent of prices","Prices determine utility directly","Preferences only matter for firms","Prices eliminate trade-offs"],a:0,feedback:"Preferences describe tastes, not prices—prices affect constraints, not preferences."}
+production:[
+{ id:1, q:"Marginal product refers to...",options:["Total output","Output per worker","Additional output from one more unit of input","Total cost"],a:2,tag:"production",type:"definition",feedback:"Marginal product is the additional output from one more unit of input."},
+{ id:2, q:"Diminishing marginal product means...",options:["Output decreases","Each additional input adds less output","Costs fall","Technology improves"],a:1,tag:"production",type:"interpretation",feedback:"Each added input contributes less than the previous one."},
+{ id:3, q:"An isoquant shows...",options:["Equal cost combinations","Equal output combinations","Equal revenue","Equal profit"],a:1,tag:"production",type:"definition",feedback:"Isoquants show combinations that produce the same output."},
+{ id:4, q:"If inputs double and output more than doubles, this is...",options:["Constant returns","Decreasing returns","Increasing returns","Diminishing product"],a:2,tag:"production",type:"definition",feedback:"Output increasing more than inputs means increasing returns to scale."},
+{ id:5, q:"Technological progress will...",options:["Reduce output","Increase output for same inputs","Raise costs","Eliminate labor"],a:1,tag:"production",type:"interpretation",feedback:"Technology improves productivity."},
+{ id:6, q:"Input substitution occurs because...",options:["Costs are fixed","Relative input prices change","Output falls","Demand increases"],a:1,tag:"production",type:"interpretation",feedback:"Firms substitute toward cheaper inputs."}
 ],
 
-indifference:[
-{q:"Two bundles on the same indifference curve...",options:["Provide the same satisfaction","Cost the same amount","Contain the same quantities","Are always affordable"],a:0,feedback:"All points on an indifference curve yield the same utility."},
-{q:"The slope of an indifference curve represents the...",options:["Marginal rate of substitution","Price ratio","Income level","Demand elasticity"],a:0,feedback:"The slope equals the marginal rate of substitution between the goods."},
-{q:"Convex indifference curves imply...",options:["Diminishing marginal rate of substitution","Constant trade-offs","Perfect substitutes","Increasing marginal utility"],a:0,feedback:"As a consumer has more of one good, they are willing to give up less of the other."},
-{q:"A higher indifference curve represents...",options:["Greater satisfaction","Higher income","Higher prices","Greater demand"],a:0,feedback:"Curves farther from the origin represent higher levels of utility."},
-{q:"If a bundle lies above an indifference curve, it is...",options:["Preferred to bundles on that curve","Less preferred","Unaffordable","Equal in satisfaction"],a:0,feedback:"Bundles above the curve provide higher utility."},
-{q:"If indifference curves cross, what does that imply?",options:["Preferences are inconsistent","Utility is maximized","Prices are changing","Income is fixed"],a:0,feedback:"Crossing curves violate transitivity and consistency."},
-{q:"If indifference curves are straight lines, this implies...",options:["Perfect substitutes","Diminishing MRS","Perfect complements","No preferences"],a:0,feedback:"Straight lines indicate a constant trade-off between goods."},
-{q:"If indifference curves are L-shaped, this implies...",options:["Perfect complements","Perfect substitutes","Diminishing utility","No trade-offs"],a:0,feedback:"L-shapes indicate goods are consumed in fixed proportions."},
-{q:"As a consumer moves down an indifference curve, the MRS...",options:["Decreases","Increases","Remains constant","Becomes zero"],a:0,feedback:"Convexity implies diminishing willingness to substitute."},
-{q:"A flatter indifference curve means...",options:["Lower MRS","Higher income","Higher utility","Greater demand"],a:0,feedback:"A flatter slope means the consumer gives up less of Y for X."}
+costs:[
+{ id:7, q:"Fixed costs are...",options:["Costs that change with output","Costs that do not change with output","Marginal costs","Average costs"],a:1,tag:"costs",type:"definition",feedback:"Fixed costs remain constant regardless of output."},
+{ id:8, q:"Variable costs...",options:["Never change","Increase with output","Are always zero","Are fixed"],a:1,tag:"costs",type:"definition",feedback:"Variable costs rise as output increases."},
+{ id:9, q:"Marginal cost is...",options:["Total cost","Average cost","Cost of one more unit","Fixed cost"],a:2,tag:"costs",type:"definition",feedback:"Marginal cost is the cost of producing one more unit."},
+{ id:10, q:"Average total cost equals...",options:["TC/Q","MC/Q","FC/Q","VC/Q"],a:0,tag:"costs",type:"definition",feedback:"ATC is total cost divided by output."},
+{ id:11, q:"If MC is below ATC, ATC will...",options:["Rise","Fall","Stay constant","Disappear"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC downward."},
+{ id:12, q:"If MC is above ATC, ATC will...",options:["Fall","Rise","Stay constant","Become zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC upward."}
 ],
 
-budget:[
-{q:"A budget constraint shows...",options:["All combinations of goods a consumer can afford","The bundles consumers most prefer","The firm's production choices","The market demand curve"],a:0,feedback:"The budget line shows all affordable combinations given income and prices."},
-{q:"If income rises and prices stay the same, the budget line...",options:["Shifts outward parallel","Rotates inward","Becomes steeper","Does not change"],a:0,feedback:"Higher income increases purchasing power for both goods."},
-{q:"If the price of good X increases while income stays constant, the budget line...",options:["Pivots inward along the X-axis intercept","Shifts outward parallel","Rotates outward","Becomes horizontal"],a:0,feedback:"A higher price reduces the maximum quantity of X that can be purchased."},
-{q:"The intercepts of a budget line represent...",options:["Maximum quantities of each good affordable if income is spent on only that good","The consumer's utility level","Market demand","Producer profits"],a:0,feedback:"Intercepts show the maximum amount of each good that could be purchased individually."},
-{q:"Bundles inside the budget constraint are...",options:["Affordable but not fully using income","Unaffordable","Preferred to all others","Impossible to purchase"],a:0,feedback:"Points inside the line are affordable but do not spend the entire budget."},
-{q:"If both prices double and income doubles, the budget line...",options:["Does not change","Shifts outward","Shifts inward","Rotates"],a:0,feedback:"Proportional changes leave the budget constraint unchanged."},
-{q:"If the price of good Y falls, the budget line...",options:["Rotates outward along the Y-axis","Shifts outward parallel","Rotates inward","Does not change"],a:0,feedback:"A lower price increases the Y-intercept."},
-{q:"A point outside the budget constraint is...",options:["Unaffordable","Efficient","Preferred","Optimal"],a:0,feedback:"Points outside exceed the consumer’s income."},
-{q:"The slope of the budget line represents...",options:["The price ratio","Income level","Utility","Demand"],a:0,feedback:"The slope equals -Px/Py."},
-{q:"If income decreases, the budget line...",options:["Shifts inward parallel","Rotates outward","Becomes flatter","Does not change"],a:0,feedback:"Lower income reduces purchasing power equally for both goods."}
+profit:[
+{ id:13, q:"Profit equals...",options:["Revenue minus cost","Cost minus revenue","Price times cost","MC minus MR"],a:0,tag:"profit",type:"definition",feedback:"Profit is total revenue minus total cost."},
+{ id:14, q:"A firm maximizes profit when...",options:["TR is highest","MR = MC","Costs are lowest","Output is zero"],a:1,tag:"profit",type:"definition",feedback:"Profit maximization occurs where MR equals MC."},
+{ id:15, q:"If TR > TC, the firm has...",options:["Loss","Zero profit","Positive profit","Shutdown"],a:2,tag:"profit",type:"interpretation",feedback:"Revenue exceeding cost means profit."},
+{ id:16, q:"If TR = TC, the firm has...",options:["Loss","Positive profit","Zero economic profit","Shutdown"],a:2,tag:"profit",type:"definition",feedback:"All costs are covered."},
+{ id:17, q:"A firm should increase output when...",options:["MC > MR","MR > MC","ATC rises","Demand falls"],a:1,tag:"profit",type:"interpretation",feedback:"Firms expand when MR exceeds MC."},
+{ id:18, q:"A firm should reduce output when...",options:["MR > MC","MC > MR","ATC falls","Price rises"],a:1,tag:"profit",type:"interpretation",feedback:"Firms cut output when MC exceeds MR."}
 ],
 
-equilibrium:[
-{q:"Consumer equilibrium occurs where...",options:["The highest attainable indifference curve touches the budget line","Demand equals supply","Income equals price","Utility equals zero"],a:0,feedback:"Consumers maximize utility at the tangency between the budget line and an indifference curve."},
-{q:"At the optimal bundle, the marginal rate of substitution equals...",options:["The price ratio","Income","Utility","Market demand"],a:0,feedback:"Utility maximization occurs when MRS equals Px/Py."},
-{q:"If MUx/Px is greater than MUy/Py, the consumer should...",options:["Consume more X and less Y","Consume more Y and less X","Reduce income","Consume equal quantities"],a:0,feedback:"Consumers shift spending toward the good with higher marginal utility per dollar."},
-{q:"If MUx/Px is less than MUy/Py, the consumer should...",options:["Consume more Y and less X","Consume more X","Stop consuming both goods","Increase income"],a:0,feedback:"Consumers increase consumption of the good providing greater utility per dollar."},
-{q:"At equilibrium the consumer...",options:["Cannot increase satisfaction without changing prices or income","Consumes equal amounts of both goods","Faces zero prices","Has no preferences"],a:0,feedback:"At the optimal bundle no affordable reallocation improves utility."},
-{q:"If MRS > Px/Py, the consumer should...",options:["Consume more X","Consume more Y","Do nothing","Increase income"],a:0,feedback:"The consumer values X more than the market does—buy more X."},
-{q:"If MRS < Px/Py, the consumer should...",options:["Consume more Y","Consume more X","Stop consuming","Increase prices"],a:0,feedback:"The consumer values Y more per dollar—shift toward Y."},
-{q:"At equilibrium, the slope of the indifference curve equals...",options:["The slope of the budget line","Income","Utility","Demand"],a:0,feedback:"Tangency condition defines optimal choice."},
-{q:"If a consumer is not at a tangency point, they...",options:["Can increase utility","Have maximized utility","Face no trade-offs","Have no preferences"],a:0,feedback:"Non-tangency means a better bundle exists."},
-{q:"Corner solutions occur when...",options:["Tangency is not feasible","Prices are equal","Income is zero","Utility is constant"],a:0,feedback:"Sometimes the best bundle is at an endpoint, not a tangency."}
+competition:[
+{ id:19, q:"In perfect competition, firms are...",options:["Price makers","Price takers","Monopolists","Regulated"],a:1,tag:"competition",type:"definition",feedback:"Firms accept market price."},
+{ id:20, q:"Marginal revenue for a competitive firm equals...",options:["Cost","Price","Profit","Output"],a:1,tag:"competition",type:"definition",feedback:"MR = P in perfect competition."},
+{ id:21, q:"The firm's demand curve is...",options:["Downward sloping","Upward sloping","Perfectly elastic","Vertical"],a:2,tag:"competition",type:"definition",feedback:"Demand is perfectly elastic at market price."},
+{ id:22, q:"A firm's supply curve is...",options:["Demand curve","MC above AVC","ATC curve","Total cost"],a:1,tag:"competition",type:"definition",feedback:"MC above AVC defines supply."},
+{ id:23, q:"If price rises, MR will...",options:["Fall","Stay constant","Rise","Disappear"],a:2,tag:"competition",type:"interpretation",feedback:"MR moves with price."},
+{ id:24, q:"Price-taking firms cannot...",options:["Produce output","Change output","Influence market price","Earn profit"],a:2,tag:"competition",type:"definition",feedback:"They have no price control."}
 ],
 
-demand:[
-{q:"The law of demand states that when price rises...",options:["Quantity demanded falls","Quantity demanded rises","Demand shifts outward","Elasticity becomes zero"],a:0,feedback:"Higher prices reduce the quantity consumers are willing to buy."},
-{q:"A demand curve shows...",options:["The relationship between price and quantity demanded","Income and utility","Costs and production","Market equilibrium"],a:0,feedback:"Demand curves show how quantity demanded changes as price changes."},
-{q:"Market demand is found by...",options:["Adding individual demand curves horizontally","Adding them vertically","Multiplying price by quantity","Averaging incomes"],a:0,feedback:"Market demand sums the quantities demanded by all consumers at each price."},
-{q:"A movement along a demand curve occurs when...",options:["The price of the good changes","Income changes","Preferences change","Population changes"],a:0,feedback:"Only price changes cause movement along the demand curve."},
-{q:"If income increases and a good is normal, demand will...",options:["Shift outward","Shift inward","Stay the same","Become perfectly elastic"],a:0,feedback:"Higher income increases demand for normal goods."},
-{q:"Which situation represents a shift in demand rather than a movement along the curve?",options:["A change in income","A change in the good’s price","A movement from one point to another on the curve","A change in quantity demanded"],a:0,feedback:"Changes in income shift demand, while price changes move along the curve."},
-{q:"If the price of a substitute good rises, what happens to demand?",options:["Demand increases","Demand decreases","Quantity demanded increases","Nothing changes"],a:0,feedback:"Substitutes becoming more expensive increase demand for the good."},
-{q:"If the price of a complement falls, demand for the related good will...",options:["Increase","Decrease","Stay the same","Become perfectly elastic"],a:0,feedback:"Cheaper complements increase demand for the good."},
-{q:"A student says: 'When price rises, demand falls.' What is wrong?",options:["They confused demand with quantity demanded","They are correct","Demand always falls with price","Demand and quantity demanded are identical"],a:0,feedback:"Price changes affect quantity demanded, not demand itself."},
-{q:"If population increases, the demand curve will...",options:["Shift outward","Shift inward","Rotate","Stay the same"],a:0,feedback:"More consumers increase demand."}
+market:[
+{ id:25, q:"Market price is determined by...",options:["Firms","Government","Supply and demand","Costs"],a:2,tag:"market",type:"definition",feedback:"Equilibrium sets price."},
+{ id:26, q:"Entry into a market will...",options:["Reduce supply","Increase supply","Raise price","Reduce demand"],a:1,tag:"market",type:"definition",feedback:"Entry increases supply."},
+{ id:27, q:"Exit from a market will...",options:["Increase supply","Decrease supply","Lower price","Eliminate demand"],a:1,tag:"market",type:"definition",feedback:"Exit reduces supply."},
+{ id:28, q:"In the long run, profits tend toward...",options:["Positive","Negative","Zero","Infinite"],a:2,tag:"market",type:"definition",feedback:"Entry and exit eliminate profits."},
+{ id:29, q:"If firms are earning profits, new firms will...",options:["Exit","Enter","Shut down","Ignore market"],a:1,tag:"market",type:"interpretation",feedback:"Profit attracts entry."},
+{ id:30, q:"If firms are losing money, firms will...",options:["Enter","Exit","Raise price","Increase output"],a:1,tag:"market",type:"interpretation",feedback:"Loss drives exit."}
+],
+
+efficiency:[
+{ id:31, q:"Allocative efficiency occurs when...",options:["MC = MR","MC = Price","ATC is minimized","Profit is zero"],a:1,tag:"efficiency",type:"definition",feedback:"P = MC ensures efficient allocation."},
+{ id:32, q:"Productive efficiency occurs when...",options:["MC = P","ATC is minimized","Profit is maximized","Demand equals supply"],a:1,tag:"efficiency",type:"definition",feedback:"Minimum ATC defines productive efficiency."},
+{ id:33, q:"If P > MC, output is...",options:["Too high","Too low","Efficient","Zero"],a:1,tag:"efficiency",type:"interpretation",feedback:"Society values more output than it costs to produce."},
+{ id:34, q:"If P < MC, output is...",options:["Too high","Too low","Efficient","Optimal"],a:0,tag:"efficiency",type:"interpretation",feedback:"Production exceeds efficient level."},
+{ id:35, q:"Efficiency ensures...",options:["Maximum profit","Fair prices","Resources are allocated optimally","Costs are zero"],a:2,tag:"efficiency",type:"definition",feedback:"Efficiency maximizes total surplus."},
+{ id:36, q:"Productive efficiency focuses on...",options:["Price","Cost minimization","Demand","Profit"],a:1,tag:"efficiency",type:"definition",feedback:"Producing at lowest possible cost."}
 ]
 };
 
 const mediumConceptPools = {
-demand:[
-{q:"A movement along a demand curve occurs when...",options:["The price of the good changes","Income changes","Consumer tastes change","The number of buyers changes"],a:0,feedback:"A change in the good’s own price causes movement along the demand curve."},
-{q:"A demand curve shifts when...",options:["Income or preferences change","The good’s own price changes","Firms change production","Technology changes"],a:0,feedback:"Demand shifts occur when factors other than the good’s own price change."},
-{q:"If the price of coffee rises and demand for tea increases, coffee and tea are...",options:["Substitutes","Complements","Inferior goods","Unrelated goods"],a:0,feedback:"Substitutes are goods consumers switch between when relative prices change."},
-{q:"A student says: 'When price rises, demand falls.' What is the mistake?",options:["They confused demand with quantity demanded","They are correct","Demand always falls with price","Demand is unrelated to price"],a:0,feedback:"Price changes affect quantity demanded, not demand itself."},
-{q:"Which scenario causes a movement along the demand curve?",options:["A change in the good’s own price","A change in income","A change in preferences","An increase in population"],a:0,feedback:"Only a change in the good’s own price moves along the curve."},
-{q:"If both income and price increase, what happens to demand?",options:["Cannot be determined without more information","Demand always increases","Demand always decreases","Demand stays constant"],a:0,feedback:"Multiple factors shift demand differently—net effect is ambiguous."},
-{q:"Which would shift demand for a good inward?",options:["A decrease in income for a normal good","A decrease in price","An increase in substitutes' prices","An increase in population"],a:0,feedback:"Lower income reduces demand for normal goods."},
-{q:"If the price of a substitute falls, demand for the good will...",options:["Decrease","Increase","Stay the same","Become perfectly elastic"],a:0,feedback:"Cheaper substitutes reduce demand for the original good."}
+production:[
+{ id:100, q:"If marginal product is falling, what happens to marginal cost?",options:["Falls","Rises","Stays constant","Becomes zero"],a:1,tag:"production",type:"interpretation",feedback:"Falling marginal product increases marginal cost."},
+{ id:101, q:"A firm produces more output but each additional worker adds less than before. This is...",options:["Increasing returns","Diminishing marginal product","Technological progress","Input substitution"],a:1,tag:"production",type:"interpretation",feedback:"Each additional unit contributes less output."},
+{ id:102, q:"If productivity improves, what happens to marginal cost?",options:["Rises","Falls","Stays the same","Becomes fixed"],a:1,tag:"production",type:"interpretation",feedback:"Higher productivity lowers marginal cost."},
+{ id:103, q:"Isoquants that are bowed inward indicate...",options:["Constant output","Perfect substitutes","Diminishing MRTS","Rising costs"],a:2,tag:"production",type:"definition",feedback:"Convex isoquants reflect diminishing substitution between inputs."},
+{ id:104, q:"If a firm can produce the same output with fewer inputs, what has occurred?",options:["Higher costs","Technological progress","Diminishing returns","Shutdown"],a:1,tag:"production",type:"interpretation",feedback:"Technology allows more efficient production."},
+{ id:105, q:"If marginal product increases, what happens to marginal cost?",options:["Rises","Falls","Stays constant","Becomes zero"],a:1,tag:"production",type:"interpretation",feedback:"Higher productivity lowers cost per unit."}
 ],
 
-income_substitution:[
-{q:"The substitution effect occurs because...",options:["Relative prices change","Income changes","Preferences change","Demand shifts randomly"],a:0,feedback:"The substitution effect occurs because one good becomes relatively cheaper or more expensive."},
-{q:"The income effect occurs because...",options:["A price change changes purchasing power","Consumers always buy less","Preferences suddenly change","Supply conditions shift"],a:0,feedback:"When price changes, the consumer’s real purchasing power changes too."},
-{q:"When the price of a good falls, the substitution effect causes consumers to...",options:["Buy more of the relatively cheaper good","Buy less of the good","Ignore the price change","Buy equal amounts of all goods"],a:0,feedback:"Consumers substitute toward the relatively cheaper good."},
-{q:"Which effect explains why a price change alters relative attractiveness between goods?",options:["Substitution effect","Income effect","Demand shift","Supply effect"],a:0,feedback:"Substitution effect comes from changes in relative prices."},
-{q:"Which effect reflects a change in real purchasing power?",options:["Income effect","Substitution effect","Elasticity","Opportunity cost"],a:0,feedback:"Income effect captures the change in real income after a price change."},
-{q:"When the price of a good falls, which effect always increases quantity demanded?",options:["Substitution effect","Income effect","Both always increase","Neither"],a:0,feedback:"Substitution effect always increases consumption of the cheaper good."},
-{q:"For an inferior good, the income effect is...",options:["Negative","Positive","Zero","Always dominant"],a:0,feedback:"Inferior goods see reduced consumption when income rises."},
-{q:"If the income effect opposes the substitution effect but is weaker, total demand will...",options:["Increase","Decrease","Stay the same","Become perfectly elastic"],a:0,feedback:"Substitution dominates, so quantity demanded still rises."}
+costs:[
+{ id:106, q:"If MC is below ATC, what happens to ATC?",options:["Rises","Falls","Stays constant","Becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC downward."},
+{ id:107, q:"If MC is above ATC, what happens to ATC?",options:["Falls","Rises","Stays constant","Becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"MC pulls ATC upward."},
+{ id:108, q:"If ATC is at its minimum, what must be true?",options:["MC = ATC","MC > ATC","MC < ATC","MC = 0"],a:0,tag:"costs",type:"definition",feedback:"MC intersects ATC at its minimum."},
+{ id:109, q:"Which cost exists even if output is zero?",options:["Marginal cost","Variable cost","Fixed cost","Average cost"],a:2,tag:"costs",type:"definition",feedback:"Fixed costs must always be paid."},
+{ id:110, q:"If input prices rise, what happens to cost curves?",options:["Shift down","Shift up","Stay the same","Disappear"],a:1,tag:"costs",type:"interpretation",feedback:"Higher input prices increase costs."},
+{ id:111, q:"If MC falls, what happens to profit-maximizing output?",options:["Falls","Rises","Stays the same","Becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"Lower MC increases optimal output."}
 ],
 
-normal_inferior:[
-{q:"A normal good is one where...",options:["Demand rises as income rises","Demand falls as income rises","Demand is unrelated to income","Price always rises with income"],a:0,feedback:"Normal goods are purchased more when income increases."},
-{q:"An inferior good is one where...",options:["Demand falls as income rises","Demand rises as income rises","Demand never changes","Price becomes lower as income rises"],a:0,feedback:"Inferior goods are purchased less when income increases."},
-{q:"If income rises and people buy more restaurant meals, restaurant meals are...",options:["Normal goods","Inferior goods","Giffen goods","Complements"],a:0,feedback:"If demand rises with income, the good is normal."},
-{q:"If income rises and demand falls, the good is...",options:["Inferior","Normal","Elastic","A substitute"],a:0,feedback:"Inferior goods are consumed less as income rises."},
-{q:"Which statement is always true about normal goods?",options:["Income and demand move in the same direction","They are always luxury goods","They are always expensive","They never have substitutes"],a:0,feedback:"Normal goods increase in demand as income increases."},
-{q:"A good could be inferior and still obey the law of demand if...",options:["The substitution effect dominates","Income effect dominates","Price never changes","Demand shifts"],a:0,feedback:"Substitution effect usually outweighs income effect."},
-{q:"If a good is inferior, the income effect works...",options:["Against the substitution effect","With the substitution effect","Independently of price","Only at equilibrium"],a:0,feedback:"Income effect is negative for inferior goods."},
-{q:"Which case would violate the law of demand?",options:["Income effect outweighs substitution effect","Substitution effect dominates","Demand shifts outward","Price decreases"],a:0,feedback:"This describes a Giffen good."}
+profit:[
+{ id:112, q:"If MR > MC, what should the firm do?",options:["Decrease output","Increase output","Shut down","Do nothing"],a:1,tag:"profit",type:"interpretation",feedback:"Producing more increases profit."},
+{ id:113, q:"If MR < MC, what should the firm do?",options:["Increase output","Decrease output","Shut down","Raise price"],a:1,tag:"profit",type:"interpretation",feedback:"Producing less increases profit."},
+{ id:114, q:"If P > ATC, the firm is earning...",options:["Loss","Zero profit","Positive profit","Shutdown"],a:2,tag:"profit",type:"interpretation",feedback:"Price above ATC means profit."},
+{ id:115, q:"If P < ATC but P > AVC, the firm should...",options:["Shut down","Continue operating","Exit immediately","Raise price"],a:1,tag:"profit",type:"interpretation",feedback:"Firm covers variable costs but not total costs."},
+{ id:116, q:"If P < AVC, the firm should...",options:["Increase output","Continue operating","Shut down","Raise price"],a:2,tag:"profit",type:"definition",feedback:"Firm cannot cover variable costs."},
+{ id:117, q:"If a firm earns zero economic profit, what is true?",options:["It should exit","It covers all costs","It is inefficient","It is losing money"],a:1,tag:"profit",type:"interpretation",feedback:"All opportunity costs are covered."}
 ],
 
-consumer_equilibrium:[
-{q:"Consumer equilibrium occurs where...",options:["The highest attainable indifference curve is tangent to the budget line","Income equals spending on one good","Demand equals supply","Utility is zero"],a:0,feedback:"Consumers maximize utility at the point where the best affordable indifference curve touches the budget line."},
-{q:"At the optimal bundle, the marginal rate of substitution equals...",options:["The ratio of prices","Total income","The slope of the demand curve","Total utility"],a:0,feedback:"Consumer equilibrium occurs where MRS equals the price ratio."},
-{q:"If MUx/Px is greater than MUy/Py, the consumer should...",options:["Consume more X and less Y","Consume more Y and less X","Stop consuming both goods","Reduce income"],a:0,feedback:"The consumer should shift spending toward the good with higher marginal utility per dollar."},
-{q:"If MRS > Px/Py, the consumer is...",options:["Not maximizing utility","At equilibrium","Facing no trade-offs","Maximizing income"],a:0,feedback:"MRS must equal price ratio at equilibrium."},
-{q:"If a consumer moves along a budget line to a higher indifference curve, utility...",options:["Increases","Decreases","Stays the same","Becomes zero"],a:0,feedback:"Higher curves represent greater satisfaction."},
-{q:"A corner solution occurs when...",options:["Tangency is not possible","MRS equals price ratio","Income is zero","Prices are equal"],a:0,feedback:"Sometimes the best bundle is at an endpoint."},
-{q:"If MUx/Px ≠ MUy/Py, the consumer...",options:["Can increase utility","Is at equilibrium","Has no preferences","Must reduce consumption"],a:0,feedback:"Unequal MU per dollar means reallocation can improve utility."},
-{q:"At equilibrium, the consumer cannot...",options:["Improve utility without changing income or prices","Consume more goods","Face trade-offs","Change preferences"],a:0,feedback:"All beneficial reallocations are exhausted."}
+competition:[
+{ id:118, q:"For a competitive firm, marginal revenue equals...",options:["Cost","Price","Profit","Output"],a:1,tag:"competition",type:"definition",feedback:"MR = P in perfect competition."},
+{ id:119, q:"If a firm increases output, what happens to price?",options:["Rises","Falls","Stays the same","Becomes zero"],a:2,tag:"competition",type:"interpretation",feedback:"Firms are price takers."},
+{ id:120, q:"A competitive firm's demand curve is...",options:["Downward sloping","Upward sloping","Perfectly elastic","Vertical"],a:2,tag:"competition",type:"definition",feedback:"Demand is perfectly elastic."},
+{ id:121, q:"A firm's supply curve is its...",options:["Demand curve","MC above AVC","ATC curve","Revenue curve"],a:1,tag:"competition",type:"definition",feedback:"MC above AVC defines supply."},
+{ id:122, q:"If price rises, what happens to firm output?",options:["Falls","Rises","Stays constant","Becomes zero"],a:1,tag:"competition",type:"interpretation",feedback:"Higher price increases output."},
+{ id:123, q:"Competitive firms cannot...",options:["Produce output","Change output","Influence price","Earn profit"],a:2,tag:"competition",type:"definition",feedback:"They take price as given."}
 ],
 
-elasticity:[
-{q:"Price elasticity of demand measures...",options:["How responsive quantity demanded is to price changes","How responsive supply is to price changes","How much income consumers earn","How much firms spend on production"],a:0,feedback:"Elasticity measures the responsiveness of quantity demanded to a change in price."},
-{q:"If elasticity is greater than 1, demand is...",options:["Elastic","Inelastic","Unit elastic","Perfectly inelastic"],a:0,feedback:"Elastic demand means quantity demanded responds strongly to price changes."},
-{q:"If elasticity is less than 1, demand is...",options:["Inelastic","Elastic","Unit elastic","Perfectly elastic"],a:0,feedback:"Inelastic demand means quantity demanded responds weakly to price changes."},
-{q:"If demand is elastic, a price increase will...",options:["Decrease total revenue","Increase total revenue","Not affect revenue","Double revenue"],a:0,feedback:"Elastic demand means quantity drops significantly when price rises."},
-{q:"If demand is inelastic, a price increase will...",options:["Increase total revenue","Decrease total revenue","Have no effect","Eliminate demand"],a:0,feedback:"Inelastic demand means quantity changes little."},
-{q:"Perfectly inelastic demand means...",options:["Quantity demanded does not change with price","Demand is very responsive","Elasticity equals 1","Revenue is zero"],a:0,feedback:"Vertical demand curve—no response to price changes."},
-{q:"Unit elastic demand means...",options:["Total revenue stays constant when price changes","Quantity never changes","Demand shifts outward","Elasticity is zero"],a:0,feedback:"Price and quantity changes offset exactly."},
-{q:"A good with many substitutes is likely to have...",options:["Elastic demand","Inelastic demand","Perfectly inelastic demand","Unit elasticity"],a:0,feedback:"Substitutes increase responsiveness to price changes."}
-]
+market:[
+{ id:124, q:"If firms are earning profit, what happens?",options:["Exit","Entry","Shutdown","No change"],a:1,tag:"market",type:"interpretation",feedback:"Profit attracts new firms."},
+{ id:125, q:"If firms are losing money, what happens?",options:["Entry","Exit","Price rises immediately","Demand falls"],a:1,tag:"market",type:"interpretation",feedback:"Losses drive firms out."},
+{ id:126, q:"Entry into a market causes price to...",options:["Rise","Fall","Stay constant","Become zero"],a:1,tag:"market",type:"interpretation",feedback:"Supply increases, lowering price."},
+{ id:127, q:"Exit from a market causes price to...",options:["Rise","Fall","Stay constant","Disappear"],a:0,tag:"market",type:"interpretation",feedback:"Supply decreases, raising price."},
+{ id:128, q:"In the long run, profits tend to...",options:["Increase","Decrease to zero","Stay constant","Become negative"],a:1,tag:"market",type:"definition",feedback:"Entry and exit eliminate profit."},
+{ id:129, q:"If demand rises, what happens in the short run?",options:["Price falls","Price rises","Firms exit","Supply falls"],a:1,tag:"market",type:"interpretation",feedback:"Higher demand increases price."}
+],
+
+efficiency:[
+{ id:130, q:"Allocative efficiency occurs when...",options:["MC = MR","MC = Price","ATC minimized","Profit maximized"],a:1,tag:"efficiency",type:"definition",feedback:"P = MC ensures efficient allocation."},
+{ id:131, q:"Productive efficiency occurs when...",options:["MC = P","ATC minimized","Profit maximized","Demand equals supply"],a:1,tag:"efficiency",type:"definition",feedback:"Lowest ATC defines productive efficiency."},
+{ id:132, q:"If P > MC, output is...",options:["Too high","Too low","Efficient","Zero"],a:1,tag:"efficiency",type:"interpretation",feedback:"More output would increase total surplus."},
+{ id:133, q:"If P < MC, output is...",options:["Too high","Too low","Efficient","Optimal"],a:0,tag:"efficiency",type:"interpretation",feedback:"Production exceeds efficient level."},
+{ id:134, q:"Efficiency ensures...",options:["Maximum profit","Optimal allocation of resources","Zero cost","Equal income"],a:1,tag:"efficiency",type:"definition",feedback:"Efficiency maximizes total surplus."},
+{ id:135, q:"If output is produced at minimum ATC, this is...",options:["Allocative efficiency","Productive efficiency","Profit maximization","Market equilibrium"],a:1,tag:"efficiency",type:"definition",feedback:"Minimum cost production defines productive efficiency."}
+
+}
 };
 
 // =============================================
@@ -1857,121 +1848,96 @@ function shuffleOptions(question){
        
 function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-function getMUPerDollar() {
-    const mu = Math.floor(Math.random() * 50) + 10;
-    const price = [2, 5, 10][Math.floor(Math.random() * 3)];
+function getProfitShutdownCombo(){
+    let price = [6,8,10][Math.floor(Math.random()*3)];
+    let mc = price - [2,1,-1][Math.floor(Math.random()*3)];
+    let avc = price + [-2,1][Math.floor(Math.random()*2)];
+    let atc = avc + 2;
+
     return {
-        q: `A consumer receives MUx = ${mu} from good X. The price of X is $${price}. What is the Marginal Utility per dollar?`,
-        options: [`${(mu/price).toFixed(1)}`, `${mu}`, `${price/mu}`, `${(mu*price)}`],
-        a: 0,  type: "calculation", feedback:`MU per dollar = MU / Price = ${mu} / ${price} = ${(mu/price).toFixed(1)}`
+        q:`A firm has P = $${price}, MC = $${mc}, AVC = $${avc}, and ATC = $${atc}.
+What is the BEST decision?`,
+        options:[
+            "Shut down because it is making a loss",
+            "Continue operating and increase output",
+            "Continue operating but decrease output",
+            "Exit immediately because ATC exceeds price"
+        ],
+        a: (price < avc) ? 0 : (mc < price ? 1 : 2),
+        tag:"profit",
+        type:"multi-step",
+        feedback:"Step 1: Shutdown depends on AVC. Step 2: Output depends on MR vs MC. Most people miss one of these."
     };
 }
 
-function getEquilibriumCheck() {
-    const muX = Math.floor(Math.random() * 20) + 10;
-    const pX = [2, 5][Math.floor(Math.random() * 2)];
-    const ratio = muX / pX;
-    // We want the student to find the MUy that satisfies MUx/Px = MUy/Py
-    const pY = 10;
-    const correctMUy = ratio * pY;
-    
+function getCostOutputCombo(){
+    let direction = Math.random() < 0.5 ? "increase" : "decrease";
+
     return {
-        q: `A consumer is in equilibrium. MUx = ${muX} and Px = $${pX}. If the price of Good Y (Py) is $${pY}, what must be the Marginal Utility of Good Y (MUy)?`,
-        options: [`${correctMUy}`, `${correctMUy / 2}`, `${correctMUy + 10}`, `${muX}`],
-        a: 0,  type: "calculation", feedback:`Consumer equilibrium requires MUx/Px = MUy/Py. ${muX}/${pX} = ${ratio}. So MUy must equal ${correctMUy}.`
+        q:`A firm experiences a ${direction} in marginal product of labor.
+What happens to cost and output?`,
+        options:[
+            "MC rises and output rises",
+            "MC falls and output falls",
+            direction === "increase"
+                ? "MC falls and output increases"
+                : "MC rises and output decreases",
+            "ATC determines output directly"
+        ],
+        a:2,
+        tag:"production",
+        type:"multi-step",
+        feedback:"Productivity affects MC → MC determines output via MR = MC."
     };
 }
     
-function getElasticityCalc() {
+function getMarketChainCombo(){
+    let scenario = Math.random() < 0.5 ? "profit" : "loss";
 
-    const p1 = (Math.floor(Math.random() * 5) + 4) * 2;
-    const p2 = p1 + 2;
-
-    const q1 = (Math.floor(Math.random() * 5) + 8) * 10;
-    const q2 = q1 - 20;
-
-    const chgQ = q2 - q1;
-    const midQ = (q1 + q2) / 2;
-    const chgP = p2 - p1;
-    const midP = (p1 + p2) / 2;
-
-    const elasticityVal = Math.abs((chgQ / midQ) / (chgP / midP));
-    const elasticity = elasticityVal.toFixed(2);
-
-    // helper classifier
-    function classify(val){
-        if (val > 1) return "Elastic";
-        if (val < 1) return "Inelastic";
-        return "Unit Elastic";
-    }
-
-    const correct = `${elasticity} (${classify(elasticityVal)})`;
-
-    const d1Val = elasticityVal * 0.7;
-    const d2Val = elasticityVal * 1.3;
-    const d3Val = Math.abs((chgQ / q1) / (chgP / p1));
-
-    const d1 = `${d1Val.toFixed(2)} (${classify(d1Val)})`;
-    const d2 = `${d2Val.toFixed(2)} (${classify(d2Val)})`;
-    const d3 = `${d3Val.toFixed(2)} (${classify(d3Val)})`;
-
-    let options = new Set();
-    options.add(correct);
-    options.add(d1);
-    options.add(d2);
-    options.add(d3);
-
-    while (options.size < 4) {
-        const fillerVal = Math.random() * 2 + 0.5;
-        options.add(`${fillerVal.toFixed(2)} (${classify(fillerVal)})`);
-    }
-
-    options = Array.from(options);
-
-return {
-    q: `When the price of a good increases from $${p1} to $${p2}, the quantity demanded decreases from ${q1} to ${q2}. A firm raises price expecting to increase revenue. Based on the midpoint elasticity, what actually happens?`,
-    options: [
-        "Revenue increases because demand is inelastic",
-        "Revenue decreases because demand is elastic",
-        "Revenue stays the same because demand is unit elastic",
-        "Revenue cannot be determined from elasticity"
-    ],
-    a: elasticityVal > 1 ? 1 : (elasticityVal < 1 ? 0 : 2),
-    type: "calculation",
-    hint: "Calculate elasticity, then apply the revenue rule",
-    feedback: `Elasticity ≈ ${elasticity}. Demand is ${classify(elasticityVal)}, so ${elasticityVal > 1 ? "revenue falls when price rises." : elasticityVal < 1 ? "revenue rises when price rises." : "revenue stays the same."}`
-};
+    return {
+        q:`Firms are earning economic ${scenario} in a competitive market.
+What happens next AND in the long run?`,
+        options:[
+            "Short run: nothing → Long run: nothing",
+            scenario === "profit"
+                ? "Short run: profit continues → Long run: entry drives price down"
+                : "Short run: losses continue → Long run: exit drives price up",
+            "Demand shifts permanently",
+            "Firms shut down immediately"
+        ],
+        a:1,
+        tag:"market",
+        type:"multi-step",
+        feedback:"You must separate short run vs long run. Most students collapse them."
+    };
 }
   
-function getConsumerSurplusCalc() {
-    const wtp = Math.floor(Math.random() * 20) + 40; // Higher WTP to ensure positive surplus
-    const initialPrice = Math.floor(Math.random() * 10) + 20; // e.g., $20 - $30
-    const priceDrop = Math.floor(Math.random() * 5) + 5; // e.g., $5 - $10 drop
-    const finalPrice = initialPrice - priceDrop;
+function getEfficiencyProfitCombo(){
+    let price = [8,10,12][Math.floor(Math.random()*3)];
+    let mc = price;
+    let atc = price + [1,2][Math.floor(Math.random()*2)];
 
-    // The increase in surplus is the difference between the price points
-    // New Surplus (wtp - finalPrice) - Old Surplus (wtp - initialPrice) = initialPrice - finalPrice
-    const surplusIncrease = initialPrice - finalPrice;
-
-return {
-    q: `A buyer is willing to pay $${wtp} for a product. The price falls from $${initialPrice} to $${finalPrice}. What happens to consumer surplus and why?`,
-    options: [
-        `It increases by $${surplusIncrease} because the buyer pays less for the same value`,
-        `It increases by $${wtp - finalPrice} because total value increases`,
-        `It does not change because willingness to pay is fixed`,
-        `It decreases because price falls`
-    ],
-    a: 0,
-    type: "calculation",
-    feedback: `Consumer surplus increases by the price drop since WTP stays constant while price falls.`
-};
+    return {
+        q:`A firm produces where P = $${price} and MC = $${mc}, but ATC = $${atc}.
+Which statement is TRUE?`,
+        options:[
+            "The firm is inefficient because it is earning a loss",
+            "The firm is allocatively efficient but earning a loss",
+            "The firm should shut down immediately",
+            "The firm is earning profit because P = MC"
+        ],
+        a:1,
+        tag:"efficiency",
+        type:"trap",
+        feedback:"P = MC → allocative efficiency. Profit depends on P vs ATC. These are NOT the same."
+    };
 }
-
+    
 const calculationGenerators = [
-    getMUPerDollar,
-    getEquilibriumCheck,
-    getElasticityCalc,
-    getConsumerSurplusCalc
+   getProfitShutdownCombo,
+   getCostOutputCombo,
+   getMarketChainCombo,
+   getEfficiencyProfitCombo
 ];
     
 // =============================================
@@ -1987,10 +1953,10 @@ const calculationGenerators = [
 function randomQuestion(poolName) {
     // --- SPECIAL CALCULATED ROOMS (26-29) ---
     // These ensure the student practices specific math skills before the boss
-    if (room === 26) return getMUPerDollar();
-    if (room === 27) return getEquilibriumCheck();
-    if (room === 28) return getConsumerSurplusCalc();
-    if (room === 29) return getElasticityCalc();
+if (room === 26) return getProfitShutdownCombo();
+if (room === 27) return getCostOutputCombo();
+if (room === 28) return getMarketChainCombo();
+if (room === 29) return getEfficiencyProfitCombo();
 
     let pool = questionBanks[poolName]
 
@@ -2003,7 +1969,8 @@ function randomQuestion(poolName) {
         ...usedQuestions.hard,
         ...usedQuestions.easyBoss,
         ...usedQuestions.mediumBoss,
-        ...usedQuestions.finalBoss
+        ...usedQuestions.finalBoss,
+        ...usedQuestions.finalBossPlus
     ];
 
     let available = pool.filter(q => !used.includes(q.id));
@@ -2539,6 +2506,19 @@ function answer(choice) {
         localStorage.setItem("vaultCrown", "true");
         showArtifact(artifacts.crown.img, artifacts.crown.title, artifacts.crown.text);
         }
+
+        if(room === 30){
+       // --- MASTERY GATE ---
+       currentQuestion = shuffleOptions(randomQuestion("finalBossPlus"));
+
+       document.getElementById("question").innerText = "<span class='boss'>👑 The Market Tyrant: Final Judgment</span><br>" + currentQuestion.q;
+
+       document.getElementById("formulaHint").innerText = "";
+       msgElement.innerHTML = `<span class='fade-out-text'>You have proven strength… now prove mastery.</span>`;
+
+       displayQuestion();
+       return;
+      }
 
     showKnowledgeRoom(room);
     bossHealth = 3;
