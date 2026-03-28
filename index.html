@@ -57,7 +57,7 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
-    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.jpeg');
+    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.png');
     background-size: cover;
     background-position: center;
     background-attachment: scroll;
@@ -130,12 +130,12 @@ You can restyle it completely—just keep structure intact.
     margin: 0;
     padding: 18px 20px;
     text-align: center;
-    background: rgba(15,23,42,0.98);
-    backdrop-filter: blur(6px);
+    background: radial-gradient(circle at center, rgba(120,40,10,0.85) 0%, rgba(40,15,5,0.95) 60%, rgba(10,5,2,0.98) 100%);
+    backdrop-filter: blur(4px);
     border-radius: 14px;
     box-sizing: border-box;
-    box-shadow: 0 0 10px rgba(212,175,55,0.6), 0 0 20px rgba(212,175,55,0.5), 0 0 40px rgba(212,175,55,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 0 12px rgba(251,191,36,0.6), 0 0 25px rgba(249,115,22,0.5), 0 0 60px rgba(220,38,38,0.35);
+    border: 1px solid rgba(251,191,36,0.25);
     animation: torchFlicker 6s infinite;
     transition: box-shadow .3s ease;
     position: relative;
@@ -237,11 +237,11 @@ Visual feedback = better engagement.
 /* Base button styling — applies to all buttons */
 button {
     padding: 12px 22px; margin: 6px; font-size: 16px; cursor: pointer;
-    background: #374151; color: white; border: none; border-radius: 8px; transition: all 0.2s ease;
+    background: #fef3c7; color: white; border: 1px solid rgba(251,191,36,0.3);; border-radius: 8px; transition: all 0.2s ease;
 }
 
 /* Hover feedback — improves interactivity */
-button:hover { background: #4b5563; transform: translateY(-2px); }
+button:hover { background: linear-gradient(180deg,#ea580c,#7c2d12); transform: translateY(-2px); }
 
 /* Click feedback — simulates button press */
 button:active {transform: scale(0.96);}
@@ -253,7 +253,7 @@ button:active {transform: scale(0.96);}
 .answers button { flex: 1 1 100%; min-height: 60px; max-width: 100%; padding: 15px; font-size: 18px; margin: 0; }
 
 /* Utility button (fullscreen toggle) — safe to restyle or move */
-.fullscreenBtn { position: absolute; top: 12px; left: 12px; background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.fullscreenBtn { position: absolute; top: 12px; left: 12px; background: #fef3c7; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
 
 /* =========================================
    5. PROGRESS & MAZE TRACK — SAFE TO CUSTOMIZE (WITH RULES)
@@ -292,7 +292,7 @@ If it's unclear, motivation drops.
 #progressBar { width: 100%; height: 22px; background: #2d3748; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
     
 /* Progress fill — width controlled by JS */
-#progressFill { height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #ef4444); transition: width 0.4s ease; }
+#progressFill { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f97316, #dc2626); transition: width 0.4s ease; }
 
 /* Maze grid layout — 10 columns = 30 total rooms */
 #mazeTrack { display: grid; grid-template-columns: repeat(10, 36px); justify-content: center; gap: 10px; margin: 25px auto; }
@@ -454,7 +454,7 @@ Good transitions = smoother experience.
 ========================================= */
 
 /* Fullscreen start screen — shown before game begins */    
-#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('start_screen_image.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('start screen image.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
 /* Transition overlay — appears between rooms (controlled by JS) */
 #hallwayTransition { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)), url('hallway1.png'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; text-align: center; color: white; font-size: 26px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 1.2s ease; animation: hallwayZoom 3.2s ease-out forwards; }
@@ -619,14 +619,14 @@ This controls layout — not game logic.
    
 /* Game Shell Wrapper*/
 /* Core game container — controls overall layout and spacing */
-   #gameShell{
+#gameShell{
     display:flex;
     gap:20px;
-    background:#0f172a;
+    background: linear-gradient(180deg,rgba(30,10,5,0.95), rgba(10,5,2,0.98));
     padding:20px;
     border-radius:16px;
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow:0 0 25px rgba(0,0,0,0.6);
+    border:1px solid rgba(251,191,36,0.15);
+    box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 40px rgba(120,40,10,0.25);
     max-width:900px;
     width:100%;
     margin:0 auto;
@@ -638,19 +638,16 @@ This controls layout — not game logic.
     width:160px;
     min-width:160px;
     min-height:200px;
-    background:#0f172a;
+    background: linear-gradient(180deg,rgba(40,15,5,0.95),rgba(10,5,2,0.98));
     border-radius:12px;
     padding:10px;
     display:flex;
     flex-direction: column;
     justify-content:center;
-    padding-top:14px;
-    align-items:center;          
-    flex:0 0 180px;
-    flex-shrink: 0;
+    align-items:center;
     gap:6px;
-    margin-bottom: 0px;
-    border:1px solid rgba(255,255,255,0.08);
+    border:1px solid rgba(249,115,22,0.2);
+    box-shadow: inset 0 0 25px rgba(120,40,10,0.3);
 }
 
 /* Wizard Name */
@@ -861,36 +858,49 @@ Respect structure strictly.
 </div>
 <!-- Start screen / player entry (safe to redesign completely) -->
 <div id="startScreen">
-    <h1 style="color:rgb(48, 187, 221); text-shadow:0 0 30px rgb(48, 187, 221); font-size:60px; margin-bottom:10px;">THE ARCHIVES OF MICROECONOMICS</h1>
-    <h2 style="color:rgb(51, 140, 178); text-shadow:0 0 20px rgb(51, 140, 178); font-size:40px; margin-bottom:50px;">THE LABYRINTH OF CHOICE</h2>
-    <p style="color:#c4cad3; letter-spacing:2px; margin-bottom:30px; font-style:italic;">Identify yourself, Adventurer</p>
-    <input type="text" id="usernameInput" placeholder="Enter Name..." style="padding:15px; border-radius:8px; border:1px solid #374151; background:#1f2937; color:white; font-size:20px; margin-bottom:20px; text-align:center; outline:none; width:300px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-    <button onclick="startGame()" style="background:#30bbdd; color:#000; font-weight:bold; padding:15px 50px; font-size:20px; cursor:pointer; border-radius:8px; border:none; transition: transform 0.2s;">ENTER THE ARCHIVES</button>
+    <h1 style="color:#fbbf24; text-shadow:0 0 30px #f97316; font-size:60px; margin-bottom:10px;">
+        THE MICROECONOMICS FOUNDRY </h1>
+    <h2 style="color:#f97316; text-shadow:0 0 20px #dc2626; font-size:36px; margin-bottom:40px;">
+        Where Systems Are Forged </h2>
+    <p style="color:#fef3c7; letter-spacing:2px; margin-bottom:30px; font-style:italic;">
+        State your designation </p>
+    <input type="text" id="usernameInput"
+        placeholder="Enter Name..."
+        style="padding:15px; border-radius:8px; border:1px solid rgba(251,191,36,0.3);
+        background:#1a0f0a; color:#fef3c7; font-size:20px; margin-bottom:20px;
+        text-align:center; outline:none; width:300px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.7);">
+    <button onclick="startGame()"
+        style="background:#f97316; color:#000; font-weight:bold; padding:15px 50px;
+        font-size:20px; cursor:pointer; border-radius:8px; border:none;
+        box-shadow:0 0 20px rgba(251,191,36,0.5);">
+        ENTER THE FOUNDRY
+    </button>
 </div>
 <div class="dungeon-container">
     <button class="fullscreenBtn" onclick="goFullscreen()">Fullscreen</button>
     <!-- TOP PANEL -CHANGE NAME IN TITLE -->
     <!-- Top panel: progress track + artifact vault -->
     <div class="top-panel">
-       <div class="top-title">The Labyrinth of Choice</div>
+       <div class="top-title">The Foundry</div>
         <div id="mazeTrackContainer">
             <div id="mazeTrack"></div>
         </div>
         <!-- Artifact slots (IDs must match unlock system in JS - CHANGE NAMES) -->
         <div id="artifactVault">
-            <h3>Relics Recovered</h3>
+            <h3>Forged Artifacts</h3>
             <div class="vaultRow">
-                <div id="vaultSeal" class="artifactSlot">
-                    <img src="seal_of_preferences.png">
-                    <span>Seal of Preferences</span>
+                <div id="vaultHeart" class="artifactSlot">
+                    <img src="heart.png">
+                    <span>Core of Margins</span>
                 </div>
-                <div id="vaultPrism" class="artifactSlot">
-                    <img src="prism_of_tradeoffs.png">
-                    <span>Prism of Tradeoffs</span>
+                <div id="vaultCore" class="artifactSlot">
+                    <img src="core.png">
+                    <span>Engine of Output</span>
                 </div>
-                <div id="vaultScepter" class="artifactSlot">
-                    <img src="scepter_of_elasticity.png">
-                    <span>Scepter of Elasticity</span>
+                <div id="vaultCrown" class="artifactSlot">
+                    <img src="crown.png">
+                    <span>Crown of Control</span>
                 </div>
             </div>
         </div>
@@ -901,13 +911,13 @@ Respect structure strictly.
         <!-- WIZARD - CAN CHANGE WIZARD NAME-->
       <div id="gameShell">
        <div id="wizardBox">
-            <div id="wizardName">The Archivist</div>
+            <div id="wizardName">The Forgemaster</div>
             <img src="wizard.png" id="wizardImage">
         </div>
         <!-- GAME -->
         <!-- Dynamic question + answer rendering (DO NOT rename IDs) -->
         <div id="gameBox">
-            <div id="autosave">💾 Progress Autosaved</div>
+            <div id="autosave">💾 System Stabilized</div>
 
             <p id="areaDisplay" class="area-title"></p>
 
@@ -1152,21 +1162,21 @@ const TIMING = {
      
 const artifacts = {
 seal:{
-    img:"seal_of_preferences.png",
-    title:"Seal of Preferences",
-    text:"An ancient seal revealing the curves of desire. Where preferences meet the budget constraint, utility is maximized."
+    img:"heart.png",
+    title:"The Core of Margins",
+    text:"The structure holds when marginal cost meets its limit. Push beyond it, and the system fractures."
     },
 
 prism:{
-    img:"prism_of_tradeoffs.png",
-    title:"Prism of Tradeoffs",
-    text:"A crystal that fractures a price change into its hidden forces: substitution toward cheaper goods and the pull of income on purchasing power."
+    img:"core.png",
+    title:"The Engine of Output",
+    text:"Production responds to pressure. When conditions shift, output follows—whether you anticipate it or not."
     },
 
 scepter:{
-    img:"scepter_of_elasticity.png",
-    title:"Scepter of Elasticity",
-    text:"The royal instrument of the Sovereign. It reveals how strongly quantity demanded responds when price changes."
+    img:"crown.png",
+    title:"The Crown of Control",
+    text:"Power lies in control over response. Price moves first. Quantity answers."
     }
 };
   
@@ -1242,9 +1252,9 @@ function startGame() {
     bossPool = [];
     calcBag = [];
     localStorage.removeItem("gauntletRoom");
-    localStorage.removeItem("vaultSeal");
-    localStorage.removeItem("vaultPrism");
-    localStorage.removeItem("vaultScepter");
+    localStorage.removeItem("vaultHeart");
+    localStorage.removeItem("vaultCore");
+    localStorage.removeItem("vaultCrown");
 
     questionHistory = {
     easy: [], medium: [], hard: [], calculation: [],
@@ -1272,16 +1282,16 @@ function startGame() {
    //
    // Mismatches = artifacts won't display
    // =============================================    
-        if(localStorage.getItem("vaultSeal")){
-        document.getElementById("vaultSeal").classList.add("unlocked");
+        if(localStorage.getItem("vaultHeart")){
+        document.getElementById("vaultHeart").classList.add("unlocked");
         }
 
-        if(localStorage.getItem("vaultPrism")){
-        document.getElementById("vaultPrism").classList.add("unlocked");
+        if(localStorage.getItem("vaultCore")){
+        document.getElementById("vaultCore").classList.add("unlocked");
         }    
 
-        if(localStorage.getItem("vaultScepter")){
-        document.getElementById("vaultScepter").classList.add("unlocked");
+        if(localStorage.getItem("vaultCrown")){
+        document.getElementById("vaultCrown").classList.add("unlocked");
         }
   
 // Start game loop: music + timer + first question
@@ -1321,13 +1331,13 @@ document.getElementById("usernameInput").addEventListener("keypress", function(e
 // This affects UI only, not game logic.
 // =============================================
 function getAreaName(r) {
-    if (r <= 9) return "The Dimly Lit Archives";
-    if (r === 10) return "The Warden's Gate";
-    if (r <= 19) return "The Hall of Substitutions";
-    if (r === 20) return "The Decomposer's Lair";
-    if (r <= 25) return "The Vault of Elasticity";
-    if (r <= 29) return "The Calculations Corridor";
-    return "The Sovereign's Throne";
+    if (r <= 9) return "The Smelting Passage";
+    if (r === 10) return "The Crucible of Cost";
+    if (r <= 19) return "The Furnace of Output";
+    if (r === 20) return "The Engine Core";
+    if (r <= 25) return "The Pressure Chamber";
+    if (r <= 29) return "The Final Tempering";
+    return "The Throne of Control";
 };
 
 // =============================================
@@ -1352,53 +1362,53 @@ function getAreaName(r) {
 // =============================================
 const wizardFeedback = {
     correct: [
-        "The path reveals itself to those who think clearly.",
-        "You see it now… the logic unfolds.",
-        "Good. You’re beginning to understand.",
-        "The labyrinth yields to disciplined thought.",
-        "Yes… that was no accident. Press on."
+        "The structure holds.",
+        "Pressure contained.",
+        "You stabilized it.",
+        "That will endure.",
+        "Acceptable. Continue."
     ],
     wrong: [
-        "No. That is not the way.",
-        "You moved too quickly.",
-        "The logic slipped from your grasp.",
-        "Careless. Try again.",
-        "The labyrinth punishes haste."
+        "It fractures.",
+        "You lost control.",
+        "Pressure misjudged.",
+        "The system rejects that.",
+        "Weak reasoning. Again."
     ]
 };
-    
+
 const wizardLines = {
     definition: [
-        "Define it. No guessing.",
-        "State the concept clearly.",
-        "What does this mean?",
-        "Precision matters here."
+        "Define the structure.",
+        "What holds this together?",
+        "State it precisely.",
+        "No ambiguity."
     ],
     interpretation: [
-        "What is this telling you?",
-        "Look deeper.",
-        "Interpret the situation.",
-        "What insight do you see?"
+        "What is the system doing?",
+        "Read the pressure.",
+        "What changes here?",
+        "Follow the response."
     ],
     trap: [
-        "Careful. Many fall here.",
-        "This is where mistakes are made.",
-        "Do not answer too quickly.",
-        "Look closely before you choose.",
-        "This will test your attention.",
-        "One detail changes everything."
+        "This is where it breaks.",
+        "Pressure is deceptive here.",
+        "Most fail at this point.",
+        "Look again.",
+        "Do not assume.",
+        "One error collapses it."
     ],
     calculation: [
-        "Work it out.",
-        "Numbers don’t lie.",
-        "Solve it carefully.",
-        "Precision wins here."
+        "Quantify it.",
+        "Show the numbers.",
+        "No guessing. Resolve it.",
+        "Precision determines outcome."
     ],
     default: [
-        "Choose wisely.",
-        "Focus.",
-        "Do not rush.",
-        "Your answer matters."
+        "Decide.",
+        "Commit.",
+        "Proceed.",
+        "Answer."
     ]
 };
      
@@ -2212,8 +2222,8 @@ function loadQuestion() {
 
         currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
         
-        let bTitle = room === 10 ? "WARDEN OF INDIFFERENCE" : room === 20 ? "THE DECOMPOSER OF CHOICE" : "SOVEREIGN OF ELASTICITY";
-        let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#a855f7" : "#ef4444";
+        let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
+        let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#06b6d4" : "#eab308";
         document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
         bossMsg.style.color = bColor;
@@ -2232,15 +2242,15 @@ function loadQuestion() {
 // =============================================
         
     if(room === 10){
-    bossImage = "warden.png";
-    bossClass = "wardenGlow";
+    bossImage = "cost_forger.png";
+    bossClass = "forgerGlow";
     }
     else if(room === 20){
-    bossImage = "decomposer.png";
-    bossClass = "decomposerGlow";
+    bossImage = "supply_engine.png";
+    bossClass = "enginerGlow";
     }
     else{
-    bossImage = "sovereign.png";
+    bossImage = "market_tyrant.png";
     bossClass = "finalBoss";
     }
 
@@ -2452,21 +2462,21 @@ function answer(choice) {
 
         // Boss defeated (CHANGE ARTIFACT NAMES)
         if(room === 10){
-        document.getElementById("vaultSeal").classList.add("unlocked");
-        localStorage.setItem("vaultSeal", "true");
-        showArtifact(artifacts.seal.img, artifacts.seal.title, artifacts.seal.text);
+        document.getElementById("vaultHeart").classList.add("unlocked");
+        localStorage.setItem("vaultHeart", "true");
+        showArtifact(artifacts.heart.img, artifacts.heart.title, artifacts.heart.text);
         }
 
         if(room === 20){
-        document.getElementById("vaultPrism").classList.add("unlocked");
-        localStorage.setItem("vaultPrism", "true");
-        showArtifact(artifacts.prism.img, artifacts.prism.title, artifacts.prism.text);
+        document.getElementById("vaultCore").classList.add("unlocked");
+        localStorage.setItem("vaultCore", "true");
+        showArtifact(artifacts.core.img, artifacts.core.title, artifacts.core.text);
         }
 
         if(room === 30){
-        document.getElementById("vaultScepter").classList.add("unlocked");
-        localStorage.setItem("vaultScepter", "true");
-        showArtifact(artifacts.scepter.img, artifacts.scepter.title, artifacts.scepter.text);
+        document.getElementById("vaultCrown").classList.add("unlocked");
+        localStorage.setItem("vaultCrownr", "true");
+        showArtifact(artifacts.crown.img, artifacts.crown.title, artifacts.crown.text);
         }
 
     showKnowledgeRoom(room);
@@ -2631,9 +2641,9 @@ function handleStreakVisuals() {
     let streakMsg = "";
     let streakColor = "#60a5fa";
 
-    if (streak === 5) { streakMsg = "🔥 STREAK: Economic Insight!"; streakColor = "#fbbf24"; }
-    else if (streak === 10) { streakMsg = "⚡ STREAK: Market Shock!"; streakColor = "#f87171"; }
-    else if (streak === 20) { streakMsg = "🌌 STREAK: Policy Reform!"; streakColor = "#a855f7"; }
+    if (streak === 5) { streakMsg = "🔥 STREAK: Heat Rising!"; streakColor = "#fbbf24"; }
+    else if (streak === 10) { streakMsg = "⚒️ STREAK: Hammer Falling"; streakColor = "#f97316"; }
+    else if (streak === 20) { streakMsg = "👑 STREAK: System Controlled"; streakColor = "#eab308"; }
 
     if (streakMsg) {
         sfxMilestone.currentTime = 0;
@@ -2798,16 +2808,18 @@ function showKnowledgeRoom(bossRoom) {
 // Keep room numbers aligned with:
 // - actual boss encounters
 // =============================================    
-    if (bossRoom === 10) {
-        title = "WARDEN OF INDIFFERENCE DEFEATED (Archive 10.1)";
-        summary = "As the Warden fades you find the Seal of Preferences. Consumers have consistent preferences represented by indifference curves. They face trade-offs determined by their budget constraint. Optimal consumption occurs where the marginal rate of substitution equals the price ratio. The Labyrinth grows deeper...";
-    } else if (bossRoom === 20) {
-        title = "DECOMPOSER OF CHOICE DEFEATED (Archive 20.1)";
-        summary = "With the Decomposer's defeat you claim the Artifact of Price Effects. You have conquered the dual nature of price changes. You now distinguish between how price changes affect purchasing power (Income Effect) and relative attractiveness (Substitution Effect).";
-    } else if (bossRoom === 30) {
-        title = "SOVEREIGN OF ELASTICITY DEFEATED (Final Archive)";
-        summary = "With the Sovereign finally beaten, you claim the Scepter of Elasticity. You have proven your mastery over Market Responsiveness and the mathematical laws that govern Demand, Elasticity, and Total Revenue.";
-    }
+   if (bossRoom === 10) {
+    title = "THE COST FORGER FALLS";
+    summary = "The structure stabilizes. You have endured the strain of rising costs and learned where systems fail. Marginal pressure reveals the limits of production. The forge burns hotter...";
+   } 
+   else if (bossRoom === 20) {
+    title = "THE SUPPLY ENGINE SILENCED";
+    summary = "The system yields. You now understand how output responds under pressure. When conditions shift, production moves—whether controlled or not. The machinery deepens...";
+   } 
+   else if (bossRoom === 30) {
+    title = "THE MARKET TYRANT DEFEATED";
+    summary = "Control is yours. You have mastered response, pricing, and dominance within the system. Markets no longer move against you—they move because of you.";
+   }
 
     // Update the UI
     qContainer.innerHTML = `
@@ -2954,13 +2966,13 @@ function handleVictory() {
 // =============================================
     let archivistLine = "";
     if(accuracy >= 90){
-        archivistLine = "You have mastered the Labyrinth. Few reach this level of clarity.";
+        archivistLine = "You have mastered the Foundry. Few reach this level of clarity.";
     }
     else if(accuracy >= 75){
-        archivistLine = "You see much… but not all. The Labyrinth still holds power over you.";
+        archivistLine = "You see much… but not all. The Foundry still holds power over you.";
     }
     else{
-        archivistLine = "You survived. Barely. The Labyrinth is not finished with you.";
+        archivistLine = "You survived. Barely. The Foundry is not finished with you.";
     }
 
     let lineColor = "#93c5fd";
