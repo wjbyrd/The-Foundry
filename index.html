@@ -54,29 +54,23 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-   /* Use dvh to stay within Safari's changing UI */
     min-height: 100vh;
-    max-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.png');
+    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.jpeg');
     background-size: cover;
     background-position: center;
-    /* Use 'fixed' to prevent the background from jumping when the URL bar hides */
-    background-attachment: fixed; 
-    overflow: hidden; /* Prevents the body from scrolling */;
+    background-attachment: scroll;
 }
    
 #gameShell{
-    display: flex;
-    flex-direction: column; /* Changed to column to allow better vertical stacking */
-    gap: 10px; /* Reduced gap to save vertical space */
-    max-width: 900px;
-    width: 95%; /* Use 95% to leave a tiny bit of breathing room on the edges */
-    height: auto; 
-    margin: 0 auto;
+    display:flex;
+    gap:20px;
+    max-width:900px;
+    width:100%;
+    margin:0 auto;
 }
    
 .dungeon-container {
@@ -85,10 +79,10 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
     max-width: 1100px;
-}
+    margin-top: 20px;
 
 /* =========================================
    2. CORE GAME CONTAINER (#gameBox) — SAFE TO STYLE
@@ -840,70 +834,12 @@ This controls responsiveness, not game logic.
 #wizardImage {width: 100px; max-width: 100%;}
 }
    
-/* Landscape (side-by-side, forced layout) */    
-@media (max-width: 900px) and (orientation: landscape) {
-  /* 1. Shell adjustments - Allow scrolling if the phone is very short */
-  #gameShell {
-    height: auto; 
-    min-height: 100dvh;
-    display: flex; 
-    flex-direction: column;
-    justify-content: flex-start; 
-    padding: 5px;
-    gap: 5px;
-  }
-
-  /* 2. Shrink header and grid to save vertical space */
-  h1, .header-text { font-size: 0.9rem; margin: 2px 0; }
-  .grid-container { 
-    transform: scale(0.7); 
-    margin: -20px 0; /* Pulls the middle section up more aggressively */
-  }
-
-  /* 3. THE CRITICAL FIX: Side-by-side layout using your actual HTML IDs */
-  #gameBox {
-    display: flex !important;
-    flex-direction: row !important; /* Forces Wizard and Question to be neighbors */
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    gap: 15px;
-    flex: 1;
-  }
-
-  #wizardBox {
-    flex: 0 0 20%; /* Keeps the side panel narrow */
-    display: flex;
-    justify-content: center;
-  }
-
-  #wizardImage {
-    width: 100%; 
-    max-width: 130px; /* Big enough for the Forgemaster to look 'boss' */
-    height: auto;
-    max-height: 45vh; /* Limits height so buttons stay on screen */
-  }
-
-  /* Targets your actual HTML container ID */
-  #questionContainer { 
-    flex: 1; 
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  /* 4. Inventory/Artifacts section - flatten to one row */
-  #artifactsBox {
-    padding: 4px;
-    margin-top: 0;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-  }
-  .artifactSlot img { width: 25px; }
+/* Landscape (side-by-side, compact wizard) */   
+@media (max-width: 900px) and (orientation: landscape){
+.main-panel{flex-direction: row;}
+#wizardBox{max-width: 180px;}
+#wizardImage{width: 80px;}
 }
-
   /* Fullscreen button positioning */
   .fullscreenBtn {top: 5px;left: 5px;padding: 4px 8px;font-size: 10px;}}
    
