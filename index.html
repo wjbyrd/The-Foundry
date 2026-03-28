@@ -840,30 +840,69 @@ This controls responsiveness, not game logic.
 #wizardImage {width: 100px; max-width: 100%;}
 }
    
+/* Landscape (side-by-side, forced layout) */    
 @media (max-width: 900px) and (orientation: landscape) {
-  /* 1. Shell adjustments - removed 'overflow: hidden' so you can scroll if needed */
-  #gameShell {height: auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-start; padding: 5px; gap: 5px;  }
+  /* 1. Shell adjustments - Allow scrolling if the phone is very short */
+  #gameShell {
+    height: auto; 
+    min-height: 100dvh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: flex-start; 
+    padding: 5px;
+    gap: 5px;
+  }
 
   /* 2. Shrink header and grid to save vertical space */
   h1, .header-text { font-size: 0.9rem; margin: 2px 0; }
-  .grid-container {transform: scale(0.75); margin: -15px 0; /* Pulls the middle section up */ }
+  .grid-container { 
+    transform: scale(0.7); 
+    margin: -20px 0; /* Pulls the middle section up more aggressively */
+  }
 
-  /* 3. The CRITICAL FIX: Force side-by-side layout */
-  .main-panel {display: flex !important; /* Forces row layout */
-    flex-direction: row !important; align-items: center; justify-content: center; flex: 1; width: 100%; gap: 15px;}
+  /* 3. THE CRITICAL FIX: Side-by-side layout using your actual HTML IDs */
+  #gameBox {
+    display: flex !important;
+    flex-direction: row !important; /* Forces Wizard and Question to be neighbors */
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 15px;
+    flex: 1;
+  }
 
-  #wizardBox {width: 20%; /* Takes up less horizontal room */
-    display: flex;justify-content: center;}
+  #wizardBox {
+    flex: 0 0 20%; /* Keeps the side panel narrow */
+    display: flex;
+    justify-content: center;
+  }
 
-  #wizardImage {width: 120px; /* Big enough to see, small enough to fit */
-    height: auto; max-height: 40vh; /* Limits height so it doesn't push the screen down */  }
+  #wizardImage {
+    width: 100%; 
+    max-width: 130px; /* Big enough for the Forgemaster to look 'boss' */
+    height: auto;
+    max-height: 45vh; /* Limits height so buttons stay on screen */
+  }
 
-  /* Ensure the question box takes the remaining width */
-  #questionBox {flex: 1; padding: 5px;}
+  /* Targets your actual HTML container ID */
+  #questionContainer { 
+    flex: 1; 
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-  /* 4. Inventory/Artifacts section */
-  #artifactsBox {padding: 4px;margin-top: 0;}
-  .artifactSlot img { width: 28px; }
+  /* 4. Inventory/Artifacts section - flatten to one row */
+  #artifactsBox {
+    padding: 4px;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .artifactSlot img { width: 25px; }
+}
 
   /* Fullscreen button positioning */
   .fullscreenBtn {top: 5px;left: 5px;padding: 4px 8px;font-size: 10px;}}
