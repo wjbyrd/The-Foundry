@@ -31,8 +31,6 @@ If something breaks, check:
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
 <!-- Title can be changed to whatever the game needs -->
 <title>The Microeconomics Foundry</title>
@@ -3217,34 +3215,7 @@ function copyResults() {
         }, 2000);
     });
 }
-
-// Target the button by its class name
-const fsButtons = document.querySelectorAll('.fullscreenBtn');
-
-fsButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        // We target the root element to ensure the background and game stay together
-        const elem = document.documentElement; 
-
-        // Check if we are already in fullscreen to allow "toggling"
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) {
-                /* The critical fix for iOS Safari */
-                elem.webkitRequestFullscreen();
-            }
-        } else {
-            // Exit fullscreen if already active
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
-        }
-    });
-});
-    
+   
 // =====================================================
 // IF SOMETHING BREAKS:
 //
