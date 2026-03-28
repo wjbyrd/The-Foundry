@@ -698,7 +698,7 @@ This controls layout — not game logic.
     font-size: 12px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #93c5fd; /* soft arcane blue */
+    color: #f97316; 
     margin-top: 4px;
     margin-bottom: 6px;
     opacity: 0.85;
@@ -2066,7 +2066,7 @@ function updateMazeTrack() {
         
         // Determine the icon and state
         if (i < room) {
-            box.innerText = "🟩";
+            box.innerText = "🟧";
             box.style.opacity = "0.6";
         } else if (i === room) {
             box.classList.add("active"); // Trigger the gold pulse
@@ -2074,7 +2074,7 @@ function updateMazeTrack() {
             box.innerText = "🟥";
         } else {
             // Boss icons for future rooms
-            if (i === 10){box.innerText = "🛡️";box.classList.add("boss10");}
+            if (i === 10){box.innerText = "🔨";box.classList.add("boss10");}
             else if (i === 20){box.innerText = "💀";box.classList.add("boss20");}
             else if (i === 30){box.innerText = "👑";box.classList.add("boss30");}
             else box.innerText = "⬛";
