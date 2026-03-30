@@ -719,7 +719,8 @@ This controls layout — not game logic.
 /* Wizard Image */
 /* Wizard visual + floating animation (safe to replace image or effects) */
 #wizardImage{
-    width:115px;
+    width:100%;
+    max-width:180px;
     filter:
         drop-shadow(0 0 12px rgba(249,115,22,.6))
         drop-shadow(0 0 20px rgba(251,191,36,.5));
@@ -771,10 +772,19 @@ Keep layout clean and centered.
 
 /* Center and slightly constrain game area for boss mode */
 .boss-mode #gameBox{
-    max-width:700px;
+    max-width:900px;
+    width:90%;
     margin:0 auto;
 }
 
+.boss-mode .bossIcon{
+    width:100%;
+    max-width:240px;
+    transform:scale(1.1);
+    display:block;
+    margin:10px auto;
+}
+   
 /* Center layout when wizard is removed */
 .boss-mode #gameShell{
     justify-content:center;
