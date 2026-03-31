@@ -2511,7 +2511,7 @@ function answer(choice) {
         if(detourActive){
         detourActive = false;
         msgElement.innerHTML = `<span class='fade-out-text'>Correct! Concept restored. Moving deeper...</span>`;
-        room = detourReturnRoom + 1;
+        room = Math.min(room + 1, detourReturnRoom);
         localStorage.setItem("gauntletRoom", room);
         setTimeout(loadQuestion, TIMING.normal);
         return;
@@ -2619,7 +2619,7 @@ console.log("UPDATED MEMORY:", conceptMemory[currentQuestion.tag]);
 
 console.log("DETOUR CHECK VALUE:", conceptMemory[currentQuestion.tag]);
        
-   if(!detourActive &&currentQuestion.tag &&(conceptMemory[currentQuestion.tag] || 0) >= 1){
+   if(!detourActive &&currentQuestion.tag &&(conceptMemory[currentQuestion.tag] || 0) >= 2){
 
     let conceptPool = null;
 
