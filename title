@@ -56,11 +56,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
     color: white;
-    background: linear-gradient(rgba(2,6,23,.8), rgba(2,6,23,.8)), url('question_background_image.png');
+    background: url('question_background_image.png');
     background-size: cover;
     background-position: center;
-    background-attachment: scroll;
 }
    
 #gameShell{
@@ -82,6 +82,68 @@ body {
     max-width: 1100px;
     margin-top: 20px;
 }
+
+.start-content{
+  width: 100%;
+  max-width: 420px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;   
+  text-align:center;    
+}
+
+       <h2 style="color:#f97316; text-shadow:0 0 20px #dc2626; font-size:36px; margin-bottom:40px;">
+        Where Systems Are Forged </h2>
+    <p style="color:#fef3c7; letter-spacing:2px; margin-bottom:30px; font-style:italic;">
+        State your designation </p>
+    <input type="text" id="usernameInput"
+
+    <button onclick="startGame()"
+        style="background:#f97316; color:#000; font-weight:bold; padding:15px 50px;
+        font-size:20px; cursor:pointer; border-radius:8px; border:none;
+        box-shadow:0 0 20px rgba(251,191,36,0.5);">
+        ENTER THE FOUNDRY
+    </button>
+
+.title{
+  font-size:64px;
+  letter-spacing:4px;
+  margin-bottom:10px;
+  color:#fbbf24;
+  text-align:center;
+  text-shadow: 0 0 30px rgba(249,115,22,0.8);
+}
+
+.subtitle{
+  font-size:34px;
+  margin-bottom:35px;
+  letter-spacing:2px;
+  text-align:center;
+  text-shadow: 0 0 20px rgba(220, 38, 38,0.7);
+  color:#f97316;
+}
+
+.tagline{
+  margin-bottom:30px;
+  font-style:italic;
+  opacity:0.85;
+  text-align:center;
+}
+
+.name-input{
+  width:100%;
+  max-width:320px;
+  text-align:center;
+  padding:15px; border-radius:8px; border:1px solid rgba(251,191,36,0.3);
+  background:#1a0f0a; color:#fef3c7; font-size:20px; margin-bottom:20px;
+  outline:none; box-shadow: 0 0 15px rgba(0,0,0,0.7);">
+}
+
+.start-btn{
+  width:100%;
+  max-width:320px;
+}
+
    
 /* =========================================
    2. CORE GAME CONTAINER (#gameBox) — SAFE TO STYLE
@@ -126,7 +188,6 @@ You can restyle it completely—just keep structure intact.
     flex:1;
     min-width:0;
     width:100%;
-    min-height: auto;
     margin: 0;
     padding: 18px 20px;
     text-align: center;
@@ -147,6 +208,14 @@ You can restyle it completely—just keep structure intact.
     box-shadow: 0 0 25px rgba(249,115,22,0.6), 0 0 50px rgba(251,191,36,0.4);
 }
 
+/* Boss maze track styling */
+.boss-icon{
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+}
+   
 /* Damage effect when boss/player is hit (visual feedback) */
 .hit { box-shadow: 0 0 60px #ef4444, inset 0 0 40px #7f1d1d !important; animation: hitshake 0.4s ease; }
 
@@ -499,7 +568,25 @@ Good transitions = smoother experience.
 ========================================= */
 
 /* Fullscreen start screen — shown before game begins */    
-#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('start screen image.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+#startScreen{
+  position: fixed;
+  inset: 0;
+  background-image: url('start screen image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 100;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 40px 20px 80px;
+  box-sizing: border-box;
+}
 
 /* Transition overlay — appears between rooms (controlled by JS) */
 #hallwayTransition { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)), url('hallway1.png'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; text-align: center; color: white; font-size: 26px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 1.2s ease; animation: hallwayZoom 3.2s ease-out forwards; }
@@ -662,7 +749,7 @@ This controls layout — not game logic.
     gap:20px;
     justify-content:center;
     width:100%;
-    align-items: flex-start;
+    align-items: stretch;
 }
    
 /* Game Shell Wrapper*/
@@ -726,17 +813,7 @@ This controls layout — not game logic.
         drop-shadow(0 0 20px rgba(251,191,36,.5));
     animation: wizardFloat 4s ease-in-out infinite, torchFlicker 5s infinite;
 }
-
-/* Game Box adjustment */
-/* Main gameplay area — expands to fill available space */
-#gameBox{
-    flex:1;
-    min-width:0;
-    max-width:720px;
-    width:100%;
-    padding:18px 20px;   /* slightly tighter */
-} 
-    
+ 
 /* =========================================
    11. BOSS MODE (UI STATE OVERRIDES) — DO NOT MODIFY STRUCTURE
 =========================================
@@ -829,28 +906,27 @@ Test changes on both:
 
 This controls responsiveness, not game logic.
 ========================================= */
-/* Base mobile rules */
-@media (max-width: 900px){
-#gameShell {padding: 8px;gap: 10px;}
-#question {font-size: 1.2rem; line-height: 1.3;}
-.artifactSlot img {width: 35px;}
-}
-   
-/* Portrait (stacked, bigger wizard) */
-@media (max-width: 600px) and (orientation: portrait){
-.main-panel {flex-direction: column; align-items: center;}
-#wizardBox{width: 100%; max-width: 280px;margin-bottom: 12px;}
-#wizardImage {width: 100px; max-width: 100%;}
-}
-   
-/* Landscape (side-by-side, compact wizard) */   
+@media (max-width: 768px){
+  #gameShell{padding:10px;gap:10px;}
+  .main-panel{flex-direction: column;align-items: center;  }
+  #question{font-size:1.2rem;line-height:1.4;text-align:center;}
+  button{width:100%;padding:14px;font-size:16px;}
+  #wizardBox{width:100%;max-width:260px;margin-bottom:12px;}
+  #wizardImage{width:100%;max-width:120px;}}
+
 @media (max-width: 900px) and (orientation: landscape){
-.main-panel{flex-direction: row;}
-#wizardBox{max-width: 180px;}
-#wizardImage{width: 120px; height: 120px}
-}
-  /* Fullscreen button positioning */
-  .fullscreenBtn {top: 5px;left: 5px;padding: 4px 8px;font-size: 10px;}}
+  .title{font-size: clamp(36px, 5vw, 56px);margin-bottom:6px;}
+  .subtitle{font-size:18px;margin-bottom:12px;}
+  .tagline{font-size:14px;margin-bottom:12px;}
+  .name-input{width:100%;max-width:280px;font-size:16px;padding:12px;margin-bottom:10px;}
+  #startScreen{justify-content: center;overflow: hidden;}
+  .start-content{transform: scale(0.92);}
+  .start-btn{width:100%;max-width:280px;font-size:16px;padding:12px;}}
+
+@media (max-width: 768px) and (orientation: portrait){
+  .main-panel{flex-direction:column;align-items:center;}}
+
+   .fullscreenBtn{top:5px;left:5px;padding:4px 8px;font-size:10px;}
    
 </style>
 </head>
@@ -920,24 +996,11 @@ Respect structure strictly.
 </div>
 <!-- Start screen / player entry (safe to redesign completely) -->
 <div id="startScreen">
-    <h1 style="color:#fbbf24; text-shadow:0 0 30px #f97316; font-size:60px; margin-bottom:10px;">
-        THE MICROECONOMICS FOUNDRY </h1>
-    <h2 style="color:#f97316; text-shadow:0 0 20px #dc2626; font-size:36px; margin-bottom:40px;">
-        Where Systems Are Forged </h2>
-    <p style="color:#fef3c7; letter-spacing:2px; margin-bottom:30px; font-style:italic;">
-        State your designation </p>
-    <input type="text" id="usernameInput"
-        placeholder="Enter Name..."
-        style="padding:15px; border-radius:8px; border:1px solid rgba(251,191,36,0.3);
-        background:#1a0f0a; color:#fef3c7; font-size:20px; margin-bottom:20px;
-        text-align:center; outline:none; width:300px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.7);">
-    <button onclick="startGame()"
-        style="background:#f97316; color:#000; font-weight:bold; padding:15px 50px;
-        font-size:20px; cursor:pointer; border-radius:8px; border:none;
-        box-shadow:0 0 20px rgba(251,191,36,0.5);">
-        ENTER THE FOUNDRY
-    </button>
+   <h1 class="title">THE MICROECONOMICS FOUNDRY</h1>
+   <h2 class="subtitle">Where Systems Are Forged</h2>
+   <p class="tagline">State your designation</p>
+   <input id="usernameInput" class="name-input" ...>
+   <button class="start-btn" onclick="startGame()">ENTER THE FOUNDRY</button>
 </div>
 <div class="dungeon-container">
     <button class="fullscreenBtn" onclick="goFullscreen()">FULLSCREEN</button>
@@ -1582,19 +1645,103 @@ function wizardSpeak(text){
   
 const questionBanks = {
 easyBoss:[
-{ id:2000, q:"The Cost Forger speaks: 'To shape output efficiently, a firm must balance its inputs.' Which condition defines cost minimization for a given level of output?",options:["The firm uses equal amounts of each input","The marginal product per dollar is equal across inputs","Total cost must be zero","Input prices must be identical"],a:1,tag:"production",type:"definition",feedback:"Cost minimization occurs when the marginal product per dollar is equal across inputs (MP_L / w = MP_K / r)."},
-{ id:2001, q:"The Forger strikes the anvil. 'Test your balance.' A firm has MP_L = 24 and MP_K = 12. The wage is $6 and the rental rate of capital is $3. Is the firm minimizing cost?",options:["Yes, marginal product per dollar is equal","No, the firm should use more labor","No, the firm should use more capital","Not enough information"],a:0,tag:"production",type:"calculation",feedback:"MP_L / w = 24/6 = 4 and MP_K / r = 12/3 = 4. The ratios are equal, so cost is minimized."},
-{ id:2002, q:"The forge destabilizes. 'The balance is broken.' Now MP_L / w = 8 and MP_K / r = 4. What must the firm do to restore efficiency?",options:["Use less labor and more capital","Use more labor and less capital","Use equal amounts of both inputs","Reduce output"],a:1,tag:"production",type:"interpretation",feedback:"The firm should use more of the input with the higher marginal product per dollar (labor) until the ratios equalize."}
+
+// ===== PRODUCTION =====
+{ id:2000, q:"The Cost Forger speaks: 'Balance defines efficiency.' What condition defines cost minimization?",options:["Equal quantities of inputs","Equal marginal products","Equal marginal product per dollar across inputs","Equal input prices"],a:2,tag:"production",type:"definition",feedback:"Cost minimization requires MP_L / w = MP_K / r."},
+{ id:2001, q:"The Forger tests your balance. MP_L = 20, wage = 5; MP_K = 15, rental = 5. What should the firm do?",options:["Use more labor","Use more capital","Keep inputs unchanged","Reduce output"],a:0,tag:"production",type:"calculation",feedback:"MP_L/w = 4 and MP_K/r = 3. Labor yields more per dollar, so increase labor."},
+{ id:2002, q:"The forge destabilizes. MP_L / w = 6 while MP_K / r = 2. What restores efficiency?",options:["Use less labor and more capital","Use more labor and less capital","Equalize total product","Reduce all inputs"],a:0,tag:"production",type:"interpretation",feedback:"Shift toward capital since it has lower MP per dollar until ratios equalize."},
+
+// ===== COSTS =====
+{ id:2003, q:"The Forger growls: 'Costs shape destiny.' Which cost is fixed in the short run?",options:["Labor","Raw materials","Rent on a factory","Electricity"],a:2,tag:"costs",type:"definition",feedback:"Fixed costs do not change with output in the short run."},
+{ id:2004, q:"The forge heats. A firm has ATC = $10 and AVC = $6. What is AFC?",options:["$4","$6","$10","$16"],a:0,tag:"costs",type:"calculation",feedback:"ATC = AVC + AFC → 10 = 6 + AFC → AFC = 4."},
+{ id:2005, q:"The Forger watches. If MC is below ATC, what happens to ATC?",options:["ATC increases","ATC decreases","ATC stays constant","ATC becomes zero"],a:1,tag:"costs",type:"interpretation",feedback:"When MC < ATC, it pulls the average down."},
+
+// ===== PROFIT =====
+{ id:2006, q:"The Forger demands: 'Define profit.' What is economic profit?",options:["Revenue minus explicit cost","Revenue minus implicit cost","Revenue minus total opportunity cost","Revenue minus fixed cost"],a:2,tag:"profit",type:"definition",feedback:"Economic profit includes both explicit and implicit costs."},
+{ id:2007, q:"The forge tests your math. TR = 800, TC = 650. What is profit?",options:["150","650","800","-150"],a:0,tag:"profit",type:"calculation",feedback:"Profit = TR - TC = 800 - 650 = 150."},
+{ id:2008, q:"The Forger smirks. If profit is zero, what is true?",options:["The firm should shut down","The firm earns normal profit","The firm is inefficient","The firm loses money"],a:1,tag:"profit",type:"interpretation",feedback:"Zero economic profit means normal profit is earned."},
+
+// ===== COMPETITION =====
+{ id:2009, q:"The Forger declares: 'In perfect competition, power is illusion.' What does this mean?",options:["Firms control price","Firms are price takers","Firms restrict output","Firms face downward demand"],a:1,tag:"competition",type:"definition",feedback:"Competitive firms accept the market price."},
+{ id:2010, q:"The forge sharpens. If price is $12 and MC = $10, what should the firm do?",options:["Decrease output","Increase output","Shut down","Do nothing"],a:1,tag:"competition",type:"calculation",feedback:"Since P > MC, increasing output raises profit."},
+{ id:2011, q:"The Forger presses harder. If many firms enter a competitive market, what happens to price?",options:["Price rises","Price falls","Price stays fixed","Price becomes zero"],a:1,tag:"competition",type:"interpretation",feedback:"Entry increases supply, pushing price down."},
+
+// ===== MARKET =====
+{ id:2012, q:"The Forger whispers: 'Markets guide the forge.' What determines market price?",options:["Firm costs","Government policy","Supply and demand","Worker wages"],a:2,tag:"market",type:"definition",feedback:"Market price is determined by supply and demand."},
+{ id:2013, q:"The forge shifts. Demand increases while supply stays constant. What happens?",options:["Price rises","Price falls","Quantity falls","Nothing changes"],a:0,tag:"market",type:"calculation",feedback:"Higher demand pushes equilibrium price up."},
+{ id:2014, q:"The Forger challenges you. If supply increases significantly, what happens to equilibrium price?",options:["Price rises","Price falls","Price stays constant","Demand increases"],a:1,tag:"market",type:"interpretation",feedback:"Greater supply lowers equilibrium price."},
+
+// ===== EFFICIENCY =====
+{ id:2015, q:"The final trial begins. What defines allocative efficiency?",options:["P = ATC","P = MC","MC = ATC","Profit = 0"],a:1,tag:"efficiency",type:"definition",feedback:"Allocative efficiency occurs where price equals marginal cost."},
+{ id:2016, q:"The Forger tests precision. If P = 15 and MC = 15, what does this imply?",options:["Allocative efficiency","Productive inefficiency","Loss minimization","Shutdown condition"],a:0,tag:"efficiency",type:"calculation",feedback:"P = MC indicates allocative efficiency."},
+{ id:2017, q:"The Forger delivers the final blow. If P > MC, what does this indicate?",options:["Too much output","Too little output","Efficient production","Zero profit"],a:1,tag:"efficiency",type:"interpretation",feedback:"When P > MC, output is too low—more should be produced."}
+
 ],
 mediumBoss:[
-{ id:3000, q:"The Supply Engine hums: 'Output must be chosen precisely.' In a perfectly competitive market, what rule determines the profit-maximizing level of output?",options:["Produce where average total cost is minimized across output","Produce where marginal revenue equals marginal cost across output","Produce where price equals average total cost at equilibrium","Produce where total revenue is maximized across all units"],a:1,tag:"profit",type:"definition",feedback:"Profit maximization occurs where MR = MC. In perfect competition, MR = P."},
-{ id:3001, q:"The Engine flashes data. 'Evaluate the system.' A firm faces a market price of $10. At its current output, MC = $8 and AVC = $6. What should the firm do?",options:["Shut down because price does not exceed total cost","Continue operating and increase output toward equilibrium","Continue operating and reduce output below current level","Exit the market because profit is not guaranteed"],a:1,tag:"profit",type:"calculation",feedback:"MR > MC → increase output. P > AVC → continue operating."},
-{ id:3002, q:"The Engine overloads: 'Multiple conditions detected.' A firm now faces P = $7, MC = $9, AVC = $6, and ATC = $10. What is the best decision?",options:["Shut down because price is below average total cost","Continue operating while reducing output toward equilibrium","Increase output to reach marginal revenue equal to cost","Exit the market because losses are currently observed"],a:1,tag:"profit",type:"multi-step",feedback:"P > AVC → continue. MC > MR → reduce output. Losses do not imply shutdown."}
+
+// ===== PRODUCTION =====
+{ id:3000, q:"The Supply Engine hums: 'Precision defines output.' What condition defines optimal input use in production?",options:["MP_L = MP_K","MP_L / w = MP_K / r","Total product is maximized","Costs are minimized at zero"],a:1,tag:"production",type:"definition",feedback:"Optimal input use requires equal marginal product per dollar across inputs."},
+{ id:3001, q:"The Engine calibrates inputs. MP_L = 30, w = 10; MP_K = 20, r = 5. What should the firm do?",options:["Use more labor","Use more capital","Keep inputs unchanged","Reduce both inputs"],a:1,tag:"production",type:"calculation",feedback:"MP_L/w = 3, MP_K/r = 4 → capital yields more per dollar, so increase capital."},
+{ id:3002, q:"The Engine destabilizes. A firm adjusts inputs but MP_L/w remains greater than MP_K/r. What does this imply?",options:["Efficiency has been reached","The firm is overusing labor","The firm is overusing capital","The firm should reduce output"],a:1,tag:"production",type:"interaction",feedback:"If MP_L/w > MP_K/r, labor is overused relative to capital."},
+
+// ===== COSTS =====
+{ id:3003, q:"The Engine calculates: 'Costs evolve with output.' What happens when marginal cost rises above average total cost?",options:["ATC increases","ATC decreases","ATC remains constant","ATC becomes zero"],a:0,tag:"costs",type:"definition",feedback:"When MC > ATC, it pulls the average up."},
+{ id:3004, q:"The Engine processes data. ATC = $12 and MC = $10. What happens to ATC as output increases?",options:["ATC rises","ATC falls","ATC stays constant","ATC equals zero"],a:1,tag:"costs",type:"calculation",feedback:"MC < ATC → ATC decreases as output expands."},
+{ id:3005, q:"The Engine detects inefficiency. A firm produces where MC is rising and above ATC. What is occurring?",options:["Economies of scale","Diseconomies of scale","Cost minimization","Shutdown condition"],a:1,tag:"costs",type:"interaction",feedback:"Rising MC above ATC signals diseconomies of scale."},
+
+// ===== PROFIT =====
+{ id:3006, q:"The Engine declares: 'Profit requires balance.' What rule determines profit maximization?",options:["P = ATC","MR = MC","TR is maximized","MC = ATC"],a:1,tag:"profit",type:"definition",feedback:"Profit maximization occurs where MR = MC."},
+{ id:3007, q:"The Engine flashes data. P = $12, MC = $9, AVC = $7. What should the firm do?",options:["Shut down","Reduce output","Increase output","Exit immediately"],a:2,tag:"profit",type:"calculation",feedback:"P > MC → increase output; P > AVC → continue operating."},
+{ id:3008, q:"The Engine overloads. P = $6, MC = $8, AVC = $5, ATC = $9. What is the best decision?",options:["Shut down","Continue and reduce output","Increase output","Exit immediately"],a:1,tag:"profit",type:"interaction",feedback:"P > AVC → operate; MC > MR → reduce output."},
+
+// ===== COMPETITION =====
+{ id:3009, q:"The Engine states: 'Firms adapt to markets.' In perfect competition, how is price determined?",options:["By the firm","By supply and demand","By marginal cost","By average cost"],a:1,tag:"competition",type:"definition",feedback:"Firms are price takers in competitive markets."},
+{ id:3010, q:"The Engine observes: A firm's MC rises above price. What should it do?",options:["Increase output","Decrease output","Shut down immediately","Raise price"],a:1,tag:"competition",type:"calculation",feedback:"MC > P → reduce output to restore equilibrium."},
+{ id:3011, q:"The Engine expands the market. New firms enter. What happens to existing firms’ profits?",options:["Increase","Decrease toward zero","Remain constant","Become negative immediately"],a:1,tag:"competition",type:"interaction",feedback:"Entry increases supply, reducing price and driving profits toward zero."},
+
+// ===== MARKET =====
+{ id:3012, q:"The Engine analyzes markets: 'Equilibrium defines stability.' What defines equilibrium price?",options:["Where supply equals demand","Where firms maximize profit","Where costs are lowest","Where output is highest"],a:0,tag:"market",type:"definition",feedback:"Equilibrium occurs where quantity supplied equals quantity demanded."},
+{ id:3013, q:"The Engine detects change. Demand increases and supply decreases. What happens to price?",options:["Price rises","Price falls","Price stays constant","Quantity falls only"],a:0,tag:"market",type:"calculation",feedback:"Both shifts push price upward."},
+{ id:3014, q:"The Engine processes shocks. Supply increases while demand decreases. What is the likely outcome?",options:["Price rises","Price falls","Price stays constant","Output rises only"],a:1,tag:"market",type:"interaction",feedback:"Both shifts push price downward."},
+
+// ===== EFFICIENCY =====
+{ id:3015, q:"The Engine declares: 'Efficiency governs outcomes.' What defines allocative efficiency?",options:["P = MC","P = ATC","MC = ATC","Profit = 0"],a:0,tag:"efficiency",type:"definition",feedback:"Allocative efficiency occurs where P = MC."},
+{ id:3016, q:"The Engine evaluates output. P = $20 and MC = $15. What does this imply?",options:["Too much output","Too little output","Efficient output","Zero profit"],a:1,tag:"efficiency",type:"calculation",feedback:"P > MC → output is too low; more should be produced."},
+{ id:3017, q:"The Engine reaches final analysis. A firm produces where P < MC. What is the implication?",options:["Too much output","Too little output","Efficient outcome","Shutdown condition"],a:0,tag:"efficiency",type:"interaction",feedback:"P < MC → output is too high; production should decrease."}
+
 ],
 finalBoss:[
-{ id:4000, q:"The Market Tyrant rises: 'You think in parts. I demand the whole.' In a perfectly competitive market, what condition defines long-run equilibrium?",options:["Firms produce where marginal revenue equals marginal cost at all output levels","Price equals marginal cost ensuring efficient allocation of resources","Price equals average total cost with firms earning zero economic profit","Demand equals supply across all markets in the short run"],a:2,tag:"market",type:"definition",feedback:"Long-run equilibrium requires P = ATC (zero profit), not just MR = MC."},
-{ id:4001, q:"The Tyrant tightens his grip: 'Now follow the chain.' A market begins in long-run equilibrium. Demand increases. What is the correct sequence of events?",options:["Price rises as firms incur losses and exit reduces supply further","Price rises as firms earn profit and entry expands supply over time","Price falls as firms earn profit and entry reduces market demand","Price remains constant as firms adjust output without entry"],a:1,tag:"market",type:"multi-step",feedback:"Demand ↑ → price ↑ → profit → entry → supply ↑ → price falls."},
-{ id:4002, q:"The Tyrant delivers judgment: 'One final test.' In the new long-run equilibrium after demand increased, which statement is TRUE?",options:["Firms earn positive profit because demand remains elevated","Price equals marginal and average cost with higher total output","Price remains above cost as firms restrict entry into the market","Firms exit because increased competition lowers market price"],a:1,tag:"efficiency",type:"multi-step",feedback:"P = MC and P = ATC, with higher output due to more firms."}
+
+// ===== PRODUCTION =====
+{ id:4000, q:"The Market Tyrant looms: 'Production is not isolated—it shapes cost and survival.' What defines optimal production in the long run?",options:["Equal total product across inputs","Equal marginal products across inputs","Equal marginal product per dollar across inputs","Maximum labor usage"],a:2,tag:"production",type:"definition",feedback:"Optimal production requires MP per dollar to be equal across all inputs."},
+{ id:4001, q:"The Tyrant tightens control. A firm has MP_L/w = 5 and MP_K/r = 3 while producing efficiently otherwise. What must change?",options:["Increase labor usage","Increase capital usage","Reduce both inputs","Shut down production"],a:1,tag:"production",type:"calculation",feedback:"Capital yields less per dollar, so increase capital to restore balance."},
+{ id:4002, q:"The Tyrant tests integration. A firm corrects input imbalance, lowering cost. What is the broader implication?",options:["Profit must fall","Output becomes inefficient","Costs fall and profit potential increases","Market price increases"],a:2,tag:"production",type:"interaction",feedback:"Improved input efficiency lowers cost, increasing profit potential at a given price."},
+
+// ===== COSTS =====
+{ id:4003, q:"The Tyrant declares: 'Costs determine survival.' What defines productive efficiency in the long run?",options:["P = MC","MC = ATC","ATC is minimized","Profit equals zero"],a:2,tag:"costs",type:"definition",feedback:"Productive efficiency occurs at the minimum of ATC."},
+{ id:4004, q:"The Tyrant evaluates. A firm produces where MC = ATC and ATC = $12. What does this imply?",options:["Allocative efficiency","Productive efficiency","Shutdown condition","Economic loss"],a:1,tag:"costs",type:"calculation",feedback:"MC = ATC at its minimum indicates productive efficiency."},
+{ id:4005, q:"The Tyrant escalates. If firms operate above minimum ATC in the long run, what follows?",options:["Costs fall further","Firms earn zero profit","Firms are inefficient and adjust or exit","Market price rises"],a:2,tag:"costs",type:"interaction",feedback:"Operating above minimum ATC implies inefficiency, triggering adjustment or exit."},
+
+// ===== PROFIT =====
+{ id:4006, q:"The Tyrant commands: 'Profit is temporary.' What defines long-run profit in perfect competition?",options:["Positive profit persists","Zero economic profit","Profit equals revenue","Profit equals marginal cost"],a:1,tag:"profit",type:"definition",feedback:"Entry and exit drive economic profit to zero in the long run."},
+{ id:4007, q:"The Tyrant observes. A firm earns profit as P > ATC. What occurs next?",options:["Exit reduces supply","Entry increases supply","Demand decreases","Costs increase immediately"],a:1,tag:"profit",type:"calculation",feedback:"Positive profit attracts entry, increasing supply."},
+{ id:4008, q:"The Tyrant connects the system. Entry continues until which condition is restored?",options:["P = MC only","P = ATC only","P = MC and P = ATC","MC = ATC only"],a:2,tag:"profit",type:"interaction",feedback:"Long-run equilibrium requires both allocative and productive efficiency."},
+
+// ===== COMPETITION =====
+{ id:4009, q:"The Tyrant declares: 'Competition destroys power.' What is the defining feature of perfect competition?",options:["Firms set prices","Firms face downward demand","Firms are price takers","Firms restrict output"],a:2,tag:"competition",type:"definition",feedback:"Firms in perfect competition accept the market price."},
+{ id:4010, q:"The Tyrant tests reaction. If market price rises above MC, what occurs immediately?",options:["Firms reduce output","Firms increase output","Firms exit","Nothing changes"],a:1,tag:"competition",type:"calculation",feedback:"P > MC → firms expand output to maximize profit."},
+{ id:4011, q:"The Tyrant completes the cycle. As firms expand and new firms enter, what happens to price?",options:["Price rises indefinitely","Price falls toward cost","Price stays fixed","Price becomes zero"],a:1,tag:"competition",type:"interaction",feedback:"Increased supply pushes price back down toward cost."},
+
+// ===== MARKET =====
+{ id:4012, q:"The Tyrant proclaims: 'Markets move in sequences, not moments.' What defines long-run equilibrium?",options:["P = MC","P = ATC","P = MC and P = ATC","Demand equals supply only"],a:2,tag:"market",type:"definition",feedback:"Long-run equilibrium requires both allocative and productive efficiency."},
+{ id:4013, q:"The Tyrant initiates shock. Demand increases in a competitive market. What happens first?",options:["Supply increases immediately","Price rises","Firms exit","Costs fall"],a:1,tag:"market",type:"calculation",feedback:"Demand increase shifts equilibrium, raising price initially."},
+{ id:4014, q:"The Tyrant demands the full chain. What sequence follows a demand increase?",options:["Price ↓ → exit → supply ↓","Price ↑ → profit → entry → supply ↑ → price ↓","Price constant → no entry","Price ↑ → loss → exit"],a:1,tag:"market",type:"interaction",feedback:"Demand ↑ → price ↑ → profit → entry → supply ↑ → price falls to equilibrium."},
+
+// ===== EFFICIENCY =====
+{ id:4015, q:"The Tyrant delivers final doctrine: 'Efficiency is absolute.' What defines full efficiency?",options:["P = ATC","MC = ATC","P = MC and ATC minimized","Profit is zero only"],a:2,tag:"efficiency",type:"definition",feedback:"Full efficiency requires allocative (P = MC) and productive (ATC minimized) efficiency."},
+{ id:4016, q:"The Tyrant evaluates. If P = MC but ATC is not minimized, what is true?",options:["Fully efficient","Allocatively efficient only","Productively efficient only","Inefficient in all ways"],a:1,tag:"efficiency",type:"calculation",feedback:"Allocative efficiency is met, but productive efficiency is not."},
+{ id:4017, q:"The Tyrant concludes. In long-run equilibrium, what must be true simultaneously?",options:["P > MC and profit > 0","P = MC and P = ATC","MC > ATC and firms exit","Price equals revenue only"],a:1,tag:"efficiency",type:"interaction",feedback:"Long-run equilibrium ensures both allocative and productive efficiency."}
+
 ],
 easy:[
 { id:1, q:"A production function shows the relationship between...",options:["Costs and profits","Inputs and output","Prices and demand","Revenue and cost"],a:1,tag:"production",type:"definition",feedback:"A production function maps inputs like labor and capital into output."},
@@ -2111,9 +2258,9 @@ function updateMazeTrack() {
             box.innerText = "🟥";
         } else {
             // Boss icons for future rooms
-            if (i === 10){box.innerText = "🔨";box.classList.add("boss10");}
-            else if (i === 20){box.innerText = "💀";box.classList.add("boss20");}
-            else if (i === 30){box.innerText = "👑";box.classList.add("boss30");}
+            if (i === 10){box.innerText = '<img src="cost_forger.png" class="boss-icon">';box.classList.add("boss10");}
+            else if (i === 20){box.innerText = '<img src="supply_engine.png" class="boss-icon">';box.classList.add("boss20");}
+            else if (i === 30){box.innerText = '<img src="market_tyrant.png" class="boss-icon">';box.classList.add("boss30");}
             else box.innerText = "⬛";
         }
         
@@ -2297,14 +2444,40 @@ function loadQuestion() {
     document.getElementById("srAnnouncements").innerText = `Entering ${getAreaName(room)}. Room ${room} of 30.`;
 
     // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
+   if (isBoss) {
 
-       // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
-    if (isBoss) {
-        if (bossHealth === 3) {
-        bossPool = [...questionBanks[diff]]; // ← NO SHUFFLE
+    if (bossHealth === 3) {
+
+        let pool = [...questionBanks[diff]];
+
+        let entries = Object.entries(conceptMemory || {});
+        let chosenTag = null;
+
+        if (entries.length > 0) {
+
+            let maxWeakness = Math.max(...entries.map(e => e[1]));
+
+            if (maxWeakness < 1) {
+                // no weakness → target strongest
+                chosenTag = entries.sort((a,b)=> a[1]-b[1])[0][0];
+            } else {
+                // normal → target weakest
+                chosenTag = entries.sort((a,b)=> b[1]-a[1])[0][0];
+            }
         }
 
-        currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
+        // --- BUILD BOSS SEQUENCE ---
+        bossPool = chosenTag
+            ? pool.filter(q => q.tag === chosenTag)
+            : [];
+
+        // --- SAFETY FALLBACK ---
+        if (bossPool.length !== 3) {
+            bossPool = pool.slice(0,3);
+        }
+    }
+
+    currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
         
         let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
         let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#f97316" : "#ef4444";
