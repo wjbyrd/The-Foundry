@@ -92,19 +92,6 @@ body {
   text-align:center;    
 }
 
-       <h2 style="color:#f97316; text-shadow:0 0 20px #dc2626; font-size:36px; margin-bottom:40px;">
-        Where Systems Are Forged </h2>
-    <p style="color:#fef3c7; letter-spacing:2px; margin-bottom:30px; font-style:italic;">
-        State your designation </p>
-    <input type="text" id="usernameInput"
-
-    <button onclick="startGame()"
-        style="background:#f97316; color:#000; font-weight:bold; padding:15px 50px;
-        font-size:20px; cursor:pointer; border-radius:8px; border:none;
-        box-shadow:0 0 20px rgba(251,191,36,0.5);">
-        ENTER THE FOUNDRY
-    </button>
-
 .title{
   font-size:64px;
   letter-spacing:4px;
@@ -579,7 +566,7 @@ Good transitions = smoother experience.
 
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 
   overflow-y: auto;
@@ -2258,9 +2245,9 @@ function updateMazeTrack() {
             box.innerText = "🟥";
         } else {
             // Boss icons for future rooms
-            if (i === 10){box.innerText = '<img src="cost_forger.png" class="boss-icon">';box.classList.add("boss10");}
-            else if (i === 20){box.innerText = '<img src="supply_engine.png" class="boss-icon">';box.classList.add("boss20");}
-            else if (i === 30){box.innerText = '<img src="market_tyrant.png" class="boss-icon">';box.classList.add("boss30");}
+            if (i === 10){box.innerHTML = '<img src="cost_forger.png" class="boss-icon">';box.classList.add("boss10");}
+            else if (i === 20){box.innerHTML = '<img src="supply_engine.png" class="boss-icon">';box.classList.add("boss20");}
+            else if (i === 30){box.innerHTML = '<img src="market_tyrant.png" class="boss-icon">';box.classList.add("boss30");}
             else box.innerText = "⬛";
         }
         
