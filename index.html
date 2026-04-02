@@ -409,6 +409,10 @@ If it's unclear, motivation drops.
 .maze-box:nth-child(10) { text-shadow: 0 0 8px #fbbf24, 0 0 18px #f97316; }
 .maze-box:nth-child(20) { text-shadow: 0 0 8px #f97316, 0 0 18px #ea580c; }
 .maze-box:nth-child(30) { text-shadow: 0 0 10px #eab308, 0 0 25px #fbbf24; }
+
+/*Streak styling*/
+.streak{display:inline-flex;align-items:center;gap:8px;font-weight:bold;}
+.streak-icon{width:20px;height:20px;object-fit:contain;filter: drop-shadow(0 0 6px rgba(255,140,0,0.7));}
    
 /* =========================================
    6. ARTIFACT SYSTEM (REWARDS) — SAFE TO CUSTOMIZE
@@ -2893,14 +2897,23 @@ function handleStreakVisuals() {
     let streakMsg = "";
     let streakColor = "#fbbf24";
 
-    if (streak === 5) { streakMsg = "🔥 STREAK: Heat Rising!"; streakColor = "#fbbf24"; }
-    else if (streak === 10) { streakMsg = "⚒️ STREAK: Hammer Falling"; streakColor = "#f97316"; }
-    else if (streak === 20) { streakMsg = "👑 STREAK: System Controlled"; streakColor = "#eab308"; }
+if (streak === 5) {
+    streakMsg = `<span class="streak"><img src="streakheat.png" class="streak-icon"> STREAK: Heat Rising</span>`;
+    streakColor = "#fbbf24";
+}
+else if (streak === 10) {
+    streakMsg = `<span class="streak"><img src="streakhammer.png" class="streak-icon"> STREAK: Hammer Falling</span>`;
+    streakColor = "#f97316";
+}
+else if (streak === 20) {
+    streakMsg = `<span class="streak"><img src="streakcrown.png" class="streak-icon"> STREAK: System Controlled</span>`;
+    streakColor = "#eab308";
+}
 
     if (streakMsg) {
         sfxMilestone.currentTime = 0;
         sfxMilestone.play();
-        document.getElementById("streakDisplay").innerText = streakMsg;
+        document.getElementById("streakDisplay").innerHTML = streakMsg;
         document.getElementById("streakDisplay").style.color = streakColor;
     } else if (streak > 0) {
         document.getElementById("streakDisplay").innerText = `Streak: ${streak}`;
