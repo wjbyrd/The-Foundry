@@ -131,6 +131,10 @@ body {
   max-width:320px;
 }
 
+#username::placeholder{
+    color: rgba(255,180,80,0.6);
+    font-style: italic;
+}
    
 /* =========================================
    2. CORE GAME CONTAINER (#gameBox) — SAFE TO STYLE
@@ -197,11 +201,16 @@ You can restyle it completely—just keep structure intact.
 
 /* Boss maze track styling */
 .boss-icon{
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
     pointer-events: none;
 }
+
+/* 🔥 Boss-specific glow */
+.boss10 .boss-icon{ filter: drop-shadow(0 0 8px rgba(255,120,0,0.9)); }
+.boss20 .boss-icon{ filter: drop-shadow(0 0 8px rgba(255,60,0,0.9)); }
+.boss30 .boss-icon{ filter: drop-shadow(0 0 10px rgba(255,0,0,1)); }
    
 /* Damage effect when boss/player is hit (visual feedback) */
 .hit { box-shadow: 0 0 60px #ef4444, inset 0 0 40px #7f1d1d !important; animation: hitshake 0.4s ease; }
@@ -986,7 +995,7 @@ Respect structure strictly.
    <h1 class="title">THE MICROECONOMICS FOUNDRY</h1>
    <h2 class="subtitle">Where Systems Are Forged</h2>
    <p class="tagline">State your designation</p>
-   <input id="usernameInput" class="name-input" ...>
+   <input id="usernameInput" type="text" placeholder="Enter your designation" class="name-input" ...>
    <button class="start-btn" onclick="startGame()">ENTER THE FOUNDRY</button>
 </div>
 <div class="dungeon-container">
