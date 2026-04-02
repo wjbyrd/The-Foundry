@@ -1440,7 +1440,7 @@ if(savedUser){
 function startGame() {
     let inputName = document.getElementById("usernameInput").value.trim();
     if (!inputName) {
-        alert("A name is required to bind your soul to the archives.");
+        alert("A name is required to bind your soul to the Foundry.");
         return;
     }
     
@@ -2439,7 +2439,20 @@ function loadQuestion() {
     document.getElementById("artifactDrop").style.display = "none";
 
     // 1. Determine Difficulty and Boss Status
-    let diff = (room <= 9) ? "easy" : (room === 10) ? "easyBoss" : (room <= 19) ? "medium" : (room === 20) ? "mediumBoss" : (room <= 25) ? "hard" : (room <= 29) ? "calculation" : "finalBoss";
+    let diff = (room <= 9) ? "easy"
+             : (room === 10) ? "easyBoss"
+             : (room <= 19) ? "medium"
+             : (room === 20) ? "mediumBoss"
+             : (room <= 25) ? "hard"
+             : (room <= 29) ? "calculation"
+             : "finalBoss";
+
+   const isBoss = diff.includes("Boss");
+
+   // Only reset health if the bossPool is currently empty (meaning a new encounter)
+     if (isBoss && (!bossPool || bossPool.length === 0)) {
+    bossHealth = 3;
+   }
     
     // --- MUSIC CONTROL ---
     if(diff === "finalBoss"){
@@ -2452,7 +2465,6 @@ function loadQuestion() {
         playExplorationMusic();
         }
 
-    const isBoss = diff.includes("Boss");
     const shell = document.getElementById("gameShell");
 
     // SINGLE SOURCE OF TRUTH
@@ -2466,43 +2478,34 @@ function loadQuestion() {
     document.getElementById("srAnnouncements").innerText = `Entering ${getAreaName(room)}. Room ${room} of 30.`;
 
     // 3. Select the Question (CHANGE BOSS NAMES AND PNG)
-   if (isBoss) {
+    if (isBoss) {
+        // 1. If it's a new fight (Health 3), decide the "Theme" of the boss
+        if (bossHealth === 3 || !bossPool || bossPool.length === 0) {
+            const bank = [...questionBanks[diff]];
+            let entries = Object.entries(conceptMemory || {});
+            let chosenTag = null;
 
-    if (bossHealth === 3) {
+            if (entries.length > 0) {
+                entries.sort((a, b) => b[1] - a[1]);
+                chosenTag = entries[0][0];
+            }
 
-        let pool = [...questionBanks[diff]];
+            bossPool = chosenTag 
+                ? bank.filter(q => q.tag === chosenTag) 
+                : [];
 
-        let entries = Object.entries(conceptMemory || {});
-        let chosenTag = null;
-
-        if (entries.length > 0) {
-
-            let maxWeakness = Math.max(...entries.map(e => e[1]));
-
-            if (maxWeakness < 1) {
-                // no weakness → target strongest
-                chosenTag = entries.sort((a,b)=> a[1]-b[1])[0][0];
-            } else {
-                // normal → target weakest
-                chosenTag = entries.sort((a,b)=> b[1]-a[1])[0][0];
+            if (bossPool.length < 3) {
+                bossPool = bank.slice(0, 3);
             }
         }
 
-        // --- BUILD BOSS SEQUENCE ---
-        bossPool = chosenTag
-            ? pool.filter(q => q.tag === chosenTag)
-            : [];
+        // 2. Select the specific question based on boss health
+        currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
 
-        // --- SAFETY FALLBACK ---
-        if (bossPool.length !== 3) {
-            bossPool = pool.slice(0,3);
-        }
-    }
-
-    currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
-        
+       // 3. Boss Identity UI (Logic moved ABOVE the return)
         let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
         let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#f97316" : "#ef4444";
+       
         document.getElementById("srAnnouncements").innerText =`Boss encounter. ${bTitle}. Prepare yourself`;
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
         bossMsg.style.color = bColor;
@@ -2533,13 +2536,19 @@ function loadQuestion() {
     bossClass = "finalBoss";
     }
 
-    questionElement.innerHTML =
-    `<img src="${bossImage}" class="bossIcon ${bossClass}">
-    <span class="boss-title" style="color:${bColor}">${bTitle}</span>
-    <div class="boss-q" style="--bossColor:${bColor}">
-    ${currentQuestion.q}
-    </div>`;
-   } else {
+        questionElement.innerHTML = `
+            <img src="${bossImage}" class="bossIcon ${bossClass}">
+            <span class="boss-title" style="color:${bColor}">${bTitle}</span>
+            <div class="boss-q" style="--bossColor:${bColor}">
+                ${currentQuestion.q}
+            </div>`;
+
+        // 4. THE CORRECT PLACEMENT OF RETURN
+        // We draw the UI first, THEN we exit the function.
+        displayQuestion(); 
+        return; 
+
+    } else {
 
     // --- STREAK ADAPTIVE LOGIC ---
     let adjustedDiff = diff;
@@ -2721,24 +2730,17 @@ function answer(choice) {
             conceptMemory[currentQuestion.tag] =
             (conceptMemory[currentQuestion.tag] || 0) * 0.7;
         }
-
-      // 🔍 DEBUG: Check tag + memory
-      console.log("TAG:", currentQuestion.tag);
-      console.log("MEMORY:", conceptMemory[currentQuestion.tag]);
        
        // --- BOSS HIT LOGIC ---
         if(isBossRoom){
         bossHealth--;
-
         msgElement.innerHTML = `<span style='color:#f87171;font-weight:bold;'>⚔ HIT! Boss Health: ${bossHealth}/3</span>`;
-
         triggerBossShake();
-
         if (bossHealth > 0) {
         setTimeout(loadQuestion, TIMING.boss);
         return;
         }
-
+        bossPool = [];
         // Boss defeated (CHANGE ARTIFACT NAMES)
         if(room === 10){
         document.getElementById("vaultHeart").classList.add("unlocked");
@@ -2758,16 +2760,21 @@ function answer(choice) {
         showArtifact(artifacts.crown.img, artifacts.crown.title, artifacts.crown.text);
         }
 
-   showKnowledgeRoom(room);
-    bossHealth = 3;
-    return;
-            }
-        
-msgElement.innerHTML = "";
-room++;
-localStorage.setItem("gauntletRoom", room);
-showHallwayTransition(currentQuestion.feedback);
-return;
+// ... (Inside the Boss Victory check)
+        showKnowledgeRoom(room);
+        bossHealth = 3;
+        bossPool = []; // Clear the pool so the next boss is fresh
+        return; 
+    } // <--- THIS ends the "if(isBossRoom)" block
+
+    // --- NORMAL ROOM PROGRESSION ---
+    // This code ONLY runs if choice === currentQuestion.a 
+    // AND it wasn't a Boss Room (or a Detour).
+   msgElement.innerHTML = "";
+   room++;
+   localStorage.setItem("gauntletRoom", room);
+   showHallwayTransition(currentQuestion.feedback);
+   return;
        
 // =============================================
 // ❌ WRONG ANSWER BLOCK — ALL FAILURE LOGIC
@@ -2848,9 +2855,17 @@ console.log("DETOUR CHECK VALUE:", conceptMemory[currentQuestion.tag]);
     document.getElementById("streakDisplay").innerText = "";
     bossHealth = 3;
 
-    // =============================================
+// =============================================
     // SAFE FALLBACK LOGIC (NO BOSS REGRESSION)
     // =============================================
+   // 1. Reset health and CLEAR the pool 
+    // Doing this BEFORE loadQuestion() is the secret sauce.
+    bossHealth = 3;
+    bossPool = []; 
+
+    // 2. Normal failure handling
+    document.getElementById("streakDisplay").innerText = "";
+
     const bossRooms = [10, 20, 30];
 
     // Original fallback amount
@@ -2859,13 +2874,17 @@ console.log("DETOUR CHECK VALUE:", conceptMemory[currentQuestion.tag]);
 
     // Prevent falling into boss rooms
     while (bossRooms.includes(newRoom)) {
-    newRoom++;
+        newRoom++;
     }
 
-    // Clamp to minimum
+    // 3. Update the room and save
     room = Math.max(1, newRoom);
     localStorage.setItem("gauntletRoom", room);
+
+    // 4. Alert the player
     alert(`Incorrect! You trip in the darkness and tumble back to Room ${room}.`);
+
+    // 5. Final Step: Load the new room state
     loadQuestion();
     }
 }
