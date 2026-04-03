@@ -1175,6 +1175,7 @@ let bossPool = [];
 let correctAnswers = 0; 
 let maxStreak = 0; 
 let username = "";
+let questionStartTime = 0;
 let streak = 0; 
 let startTime; // Will be set in startGame()
 let room = localStorage.getItem("gauntletRoom") ? parseInt(localStorage.getItem("gauntletRoom")) : 1;
@@ -2044,7 +2045,8 @@ efficiency:[
 // =============================================   
 function shuffleOptions(question){
     let q = {
-        q: question.q,
+        id: question.id
+		q: question.q,
         options: [...question.options],
         a: question.a,
         feedback: question.feedback,
