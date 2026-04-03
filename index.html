@@ -3279,7 +3279,18 @@ function handleVictory() {
     const totalTimeMs = Date.now() - startTime;
     const timeString = formatTime(totalTimeMs);
     const accuracy = Math.round((correctAnswers / totalAttempts) * 100);
-    const verificationCode = generateCode(username, accuracy, maxStreak, totalAttempts);
+    const verificationCode = generateCode(username, accuracy, maxStreak, totalTimeMS);
+
+sendGameData({
+    game: "The Strategic Vault",
+    event: "complete",
+    user: username,
+    totalTime: totalTimeMs,
+    accuracy: accuracy,
+    maxStreak: maxStreak,
+    attempts: totalAttempts,
+    code: verificationCode
+});
     
 // =============================================
 // PERFORMANCE FEEDBACK TEXT — SAFE TO EDIT
