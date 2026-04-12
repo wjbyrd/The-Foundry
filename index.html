@@ -218,6 +218,21 @@ You can restyle it completely—just keep structure intact.
 /* Autosave indicator — positioned relative to gameBox */
 #autosave { position: absolute; top: 15px; right: 15px; font-size: 11px; opacity: 0.5; font-style: italic; }
 
+/* Adds a graph box for questions with graphs */
+#questionImageBox{
+  margin: 0 auto 12px auto;
+  text-align: center;
+  display: none;
+}
+
+#questionImageBox img{
+  max-width: 100%;
+  width: 420px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255,255,255,0.08);
+}
+
 /* =========================================
    3. TEXT & TYPOGRAPHY SYSTEM — SAFE TO CUSTOMIZE
 =========================================
@@ -1072,6 +1087,7 @@ Respect structure strictly.
             <div id="streakDisplay"></div>
             <p id="bossMessage"></p>
             <div id="questionContainer">
+			<div id="questionImageBox"></div>
              <p id="question"></p>
              <p id="message"></p>
           <div id="formulaHint" class="hint-box"></div>
@@ -1172,6 +1188,7 @@ document.querySelectorAll(".torch").forEach(t => t.style.display = "none");
 let totalAttempts = 0;
 let bossHealth = 3; 
 let bossPool = [];
+let bossCheckpoint = 1;
 let correctAnswers = 0; 
 let maxStreak = 0; 
 let username = "";
@@ -1444,7 +1461,8 @@ function startGame() {
         alert("A name is required to bind your soul to the Foundry.");
         return;
     }
-    
+
+	bossCheckpoint = 1;
     username = inputName;
     localStorage.setItem("gauntletUser", username);
 
@@ -2052,9 +2070,11 @@ function shuffleOptions(question){
         feedback: question.feedback,
         hint: question.hint,
         tag: question.tag,
-        type: question.type
+        type: question.type,
+		image: question.image
     };
 
+	// Store correct answer BEFORE shuffle
     let correct = q.options[q.a];
 
     for(let i = q.options.length - 1; i > 0; i--){
@@ -2444,8 +2464,12 @@ function loadQuestion() {
     const msgElement = document.getElementById("message");
     const gameBox = document.getElementById("gameBox");
     const bossMsg = document.getElementById("bossMessage");
+	const imageBox = document.getElementById("questionImageBox");
 
     document.getElementById("artifactDrop").style.display = "none";
+
+	imageBox.innerHTML = "";
+	imageBox.style.display = "none";
 
     // 1. Determine Difficulty and Boss Status
     let diff = (room <= 9) ? "easy"
@@ -2481,7 +2505,6 @@ function loadQuestion() {
     gameBox.classList.toggle("boss-mode", isBoss);
    
     // 2. UI & Progress Updates
-    gameBox.classList.toggle("boss-mode", isBoss);
     document.getElementById("progressFill").style.width = (room / 30 * 100) + "%";
     document.getElementById("areaDisplay").innerText = `${getAreaName(room)} (${room}/30)`;
     document.getElementById("srAnnouncements").innerText = `Entering ${getAreaName(room)}. Room ${room} of 30.`;
@@ -2511,6 +2534,11 @@ function loadQuestion() {
         // 2. Select the specific question based on boss health
         currentQuestion = shuffleOptions(bossPool[3 - bossHealth]);
 
+		if(currentQuestion.image){
+   		imageBox.innerHTML = `<img src="${currentQuestion.image}" alt="Question graph">`;
+   		imageBox.style.display = "block";
+		}
+
        // 3. Boss Identity UI (Logic moved ABOVE the return)
         let bTitle = room === 10 ? "THE COST FORGER" : room === 20 ? "THE SUPPLY ENGINE" : "THE MARKET TYRANT";
         let bColor = room === 10 ? "#fbbf24" : room === 20 ? "#f97316" : "#ef4444";
@@ -2519,6 +2547,7 @@ function loadQuestion() {
         bossMsg.innerText = "⚠ BOSS ENCOUNTER ⚠";
         bossMsg.style.color = bColor;
         gameBox.style.setProperty('--bossColor', bColor);
+		
         let bossImage = "";
         let bossClass = "";
 
@@ -3182,6 +3211,10 @@ document.getElementById("continueBtn").onclick = () => {
     document.getElementById("gameBox").classList.remove("boss-mode");
     bossHealth = 3;
 
+	if(bossRoom === 10) bossCheckpoint = 11;
+    if(bossRoom === 20) bossCheckpoint = 21;
+    if(bossRoom === 30) bossCheckpoint = 31;
+
     if(bossRoom === 30){
         handleVictory();
     } else {
@@ -3227,7 +3260,7 @@ document.getElementById("continueBtn").onclick = () => {
 // It is a lightweight integrity check.
 // =============================================
 function generateCode(name, acc, streak, total){
-    let str = `${name}|${acc}|${streak}|${total}|ARCHIVE42`;
+    let str = `${name}|${acc}|${streak}|${total}|FOUNDRY98`;
     let hash = 0;
 
     for(let i = 0; i < str.length; i++){
@@ -3235,7 +3268,7 @@ function generateCode(name, acc, streak, total){
         hash |= 0;
     }
 
-    return "ARCH-" + Math.abs(hash).toString(36).toUpperCase();
+    return "FOUND-" + Math.abs(hash).toString(36).toUpperCase();
 } 
 
 // =============================================
