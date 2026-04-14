@@ -231,7 +231,7 @@ You can restyle it completely—just keep structure intact.
     pointer-events: none;
 }
 
-/* 🔥 Boss-specific glow */
+/* Boss-specific glow */
 .boss10 .boss-icon{ filter: drop-shadow(0 0 8px rgba(255,120,0,0.9)); }
 .boss20 .boss-icon{ filter: drop-shadow(0 0 8px rgba(255,60,0,0.9)); }
 .boss30 .boss-icon{ filter: drop-shadow(0 0 10px rgba(255,0,0,1)); }
@@ -349,7 +349,7 @@ Visual feedback = better engagement.
 
 /* Base button styling — applies to all buttons */
 button {padding: 12px 22px; margin: 6px; font-size: 16px; cursor: pointer;
-    /* 🔥 ALWAYS HOT */
+    /* ALWAYS HOT */
     background: linear-gradient(180deg, #ea580c, #7c2d12);     color: #fef3c7;
     border: 1px solid rgba(251,191,36,0.4);
     border-radius: 8px;
@@ -383,7 +383,7 @@ button:active {transform: scale(0.96);}
     letter-spacing: 1px;
     text-transform: uppercase;
     color: #fef3c7;
-    /* 🔥 forged metal look */
+    /* forged metal look */
     background: linear-gradient(180deg,#7c2d12,#3f1a0d);
     border: 1px solid rgba(251,191,36,0.4); border-radius: 6px; cursor: pointer; box-shadow: 0 0 10px rgba(249,115,22,0.4), inset 0 0 6px rgba(0,0,0,0.6); transition: all 0.15s ease;}
    .fullscreenBtn:active {transform: scale(0.95); box-shadow: 0 0 8px rgba(249,115,22,0.3),inset 0 0 10px rgba(0,0,0,0.8);}
@@ -457,12 +457,12 @@ If it's unclear, motivation drops.
     object-fit:contain;
     border-radius:50%;
 
-    /* 🔥 layered glow */
+    /* layered glow */
     filter:
         drop-shadow(0 0 8px rgba(255,140,0,0.9))
         drop-shadow(0 0 14px rgba(255,80,0,0.6));
 
-    /* 🔥 subtle inner heat illusion */
+    /* subtle inner heat illusion */
     background: radial-gradient(circle,
         rgba(255,220,150,0.6) 0%,
         rgba(255,140,0,0.4) 40%,
@@ -516,7 +516,7 @@ circle at center, rgba(120,40,10,0.6), rgba(20,8,4,0.95)); border-radius: 10px; 
 
 /* Persistent artifact collection display (top panel) */
 #artifactVault{margin-top: -6px; width: 220px; padding: 18px; border-radius: 12px;
-    /* 🔥 molten vault look */
+    /* molten vault look */
     background: radial-gradient(circle at top, rgba(180,60,20,0.6), rgba(40,15,5,0.95));
     border: 1px solid rgba(251,191,36,0.25);
     box-shadow: 0 0 15px rgba(249,115,22,0.25), inset 0 10px 30px rgba(251,191,36,0.15),inset 0 -10px 20px rgba(0,0,0,0.6);
@@ -2263,7 +2263,19 @@ hard:[
 { id:180, q:"A market is allocatively efficient, but a firm is not at minimum ATC. Which statement is best?",options:["Allocative and productive efficiency can occur separately","This situation cannot occur in competitive markets","The firm must be earning positive economic profit","The market demand curve must be perfectly elastic"],a:0,tag:"efficiency",type:"trap",feedback:"P = MC differs from minimum ATC."},
 { id:181, q:"Firms face identical costs in long-run equilibrium. Input prices rise temporarily. What happens in the short run?",options:["Price rises and output falls as supply shifts left","Nothing changes because firms are price takers","All firms exit immediately due to higher costs","Demand increases because production is more expensive"],a:0,tag:"market",type:"interpretation",feedback:"Higher costs shift supply left, raising price."},
 { id:182, q:"A student says zero economic profit means a firm is indifferent between producing and shutting down. What is wrong?",options:["Zero profit still means price covers total cost in equilibrium","Shutdown decisions depend only on total revenue conditions","Exit and shutdown are identical decisions","Firms earn positive losses in long-run equilibrium"],a:0,tag:"profit",type:"trap",feedback:"Shutdown depends on AVC, not total profit."},
-{ id:183, q:"A firm observes that output increases more from the second worker than the first. What is the best conclusion?",options:["Marginal product increased and marginal cost likely decreased","Marginal product decreased and marginal cost increased","Returns to scale must be decreasing at that level","Average fixed cost increased with additional labor"],a:0,tag:"production",type:"interpretation",feedback:"Higher marginal product lowers marginal cost."}
+{ id:183, q:"A firm observes that output increases more from the second worker than the first. What is the best conclusion?",options:["Marginal product increased and marginal cost likely decreased","Marginal product decreased and marginal cost increased","Returns to scale must be decreasing at that level","Average fixed cost increased with additional labor"],a:0,tag:"production",type:"interpretation",feedback:"Higher marginal product lowers marginal cost."},
+{ id:184, q:"Refer to the graph of MC, ATC, and AVC for a price-taking firm. If market price is P3, what is the firm's best short-run decision?", options:["Shut down immediately because price is below ATC","Continue operating and produce Q3 because price covers AVC but not ATC","Produce Q2 because that is where ATC is minimized","Exit the market because the firm is earning an economic loss"], a:1, tag:"profit", type:"interpretation", image:"shutdown.png", feedback:"At price P3, the firm produces where P = MC, which is Q3. Because P3 is above AVC but below ATC, the firm operates in the short run and earns a loss."},
+{ id:185, q:"Refer to the graph of MC, ATC, and AVC for a price-taking firm. Which statement correctly identifies the shutdown point?", options:["The shutdown point is P2 at Q2 because ATC is minimized there","The shutdown point is P4 at Q4 because AVC is minimized there","The shutdown point is P3 at Q3 because price equals marginal cost there","The shutdown point is P1 at Q1 because the firm earns positive profit there"], a:1, tag:"costs", type:"trap", image:"shutdown.png", feedback:"The shutdown point occurs where price equals minimum AVC. On the graph, AVC reaches its minimum at P4 and the corresponding output is Q4."},
+{ id:186, q:"Refer to the graph of MC, ATC, and AVC for a price-taking firm. Suppose the market price is P1. What output level will the firm choose?", options:["Q4","Q3","Q2","Q1"], a:3, tag:"competition", type:"calculation", image:"shutdown.png", feedback:"A competitive firm chooses output where price equals marginal cost, as long as price is at least AVC. At price P1, the horizontal price line intersects MC at Q1, so the firm produces Q1."},
+{ id:187, q:"Refer to the left graph of a price-taking firm. If the market price is P2, which statement is correct?", options:["The firm produces q1 and earns zero economic profit","The firm produces q2 and earns positive economic profit","The firm produces q2 and earns an economic loss","The firm shuts down because price is below ATC"], a:1, tag:"profit", type:"interpretation", image:"longrun.png", feedback:"At price P2, the firm produces where price equals marginal cost, which is point b at q2. Because P2 is above ATC at q2, the firm earns positive economic profit."},
+{ id:188, q:"Refer to the right graph. Suppose the market begins at point A and then shifts to point C. What change best explains this movement?", options:["Demand decreases while supply stays constant","Demand increases while supply stays constant","Supply decreases while demand stays constant","Supply increases while demand stays constant"], a:1, tag:"market", type:"trap", image:"longrun.png", feedback:"Point A is where D1 intersects S1. Point C is where D2 intersects S1. Supply stays at S1 while demand shifts right from D1 to D2, raising both equilibrium price and quantity."},
+{ id:189, q:"Refer to the left graph of a price-taking firm. Which output level corresponds to the firm's break-even point?", options:["q3","q1","q2","The firm never breaks even on this graph"], a:1, tag:"costs", type:"calculation", image:"longrun.png", feedback:"The break-even point occurs where price equals ATC at the profit-maximizing output. On the graph, that happens at point a, where P1 intersects both MC and ATC, so the firm produces q1."},
+{ id:190, q:"Refer to the left graph of a price-taking firm. If market price falls to P3, what is the firm's best short-run decision?", options:["Shut down immediately because price is below AVC","Produce q3 and continue operating at a loss","Produce q1 because that is where ATC is minimized","Exit the market because price is below ATC"], a:1, tag:"profit", type:"trap", image:"longrun.png", feedback:"At price P3, the firm still produces where price equals marginal cost, which is q3. Because the graph does not show price below AVC, the firm continues operating in the short run even though it earns a loss."},
+{ id:191, q:"Refer to the right graph. If the market is initially at point A and then moves to point B, which change occurred?", options:["Demand increased while supply stayed constant","Demand decreased while supply stayed constant","Supply increased while demand stayed constant","Supply decreased while demand stayed constant"], a:2, tag:"market", type:"interpretation", image:"longrun.png", feedback:"Point A is the intersection of D1 and S1, while point B is the intersection of D1 and S2. Demand stays fixed at D1 and supply shifts right from S1 to S2, increasing equilibrium quantity and lowering equilibrium price."},
+{ id:192, q:"Refer to the right graph. Which point represents a market outcome with both a higher equilibrium price and a lower equilibrium quantity than point B?", options:["A","C","D","No labeled point satisfies both conditions"], a:1, tag:"competition", type:"calculation", image:"longrun.png", feedback:"Relative to point B, point C has a higher price level and a lower quantity. That makes C the outcome with higher equilibrium price and lower equilibrium quantity than B."},
+{ id:193, q:"Refer to the isoquant graph. Which point shows a combination of labor and capital that produces output level Q1?", options:["A","B","C","D"], a:3, tag:"production", type:"interpretation", image:"isoquant.png", feedback:"Point D lies on the lower isoquant labeled Q1, so it represents an input bundle that produces output level Q1."},
+{ id:194, q:"Refer to the isoquant graph. Moving from point B to point C on isoquant Q1, what happens to the firm's use of labor and capital?", options:["Labor decreases while capital increases","Both labor and capital increase","Labor increases while capital decreases","Both labor and capital decrease"], a:2, tag:"production", type:"interpretation", image:"isoquant.png", feedback:"Point B uses 4 units of labor and 26 units of capital, while point C uses 8 units of labor and 20 units of capital. Labor rises and capital falls along the same isoquant."},
+{ id:195, q:"Refer to the isoquant graph. Which statement is best supported by points A, B, C, and D on isoquant Q1?", options:["The firm must use more of both inputs to keep output constant","Labor and capital can be substituted for one another while holding output constant","Capital is the only input that matters for production","The isoquant shows combinations that minimize cost"], a:1, tag:"production", type:"trap", image:"isoquant.png", feedback:"Points A, B, C, and D all lie on isoquant Q1, meaning they produce the same output with different combinations of labor and capital. That shows input substitution, not cost minimization by itself."}
 ]
 };
 
