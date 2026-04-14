@@ -155,9 +155,14 @@ body {
   max-width:320px;
 }
 
+.name-input{
+  text-align: center;
+}
+	
 #username::placeholder{
     color: rgba(255,180,80,0.6);
     font-style: italic;
+	text-align: center;
 }
    
 /* =========================================
@@ -1359,8 +1364,7 @@ Respect structure strictly.
 <div id="startScreen">
    <h1 class="title">THE MICROECONOMICS FOUNDRY</h1>
    <h2 class="subtitle">Where Systems Are Forged</h2>
-   <p class="tagline">State your designation</p>
-   <input id="usernameInput" type="text" placeholder="Enter your designation" class="name-input" ...>
+   <input id="usernameInput" type="text" placeholder="State your designation" class="name-input" ...>
    <button class="start-btn" onclick="startGame()">ENTER THE FOUNDRY</button>
 </div>
 <div class="dungeon-container">
