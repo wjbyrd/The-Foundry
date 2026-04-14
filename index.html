@@ -2982,11 +2982,17 @@ else if(adjustedDiff === "hard" && strongestTag){
         getAdaptiveQuestion(adjustedDiff, strongestTag)
     );
 }
+	
 else{
     // normal behavior
     currentQuestion = shuffleOptions(
         getAdaptiveQuestion(adjustedDiff)
     );
+}
+		
+if(currentQuestion.image){
+    imageBox.innerHTML = `<img src="${currentQuestion.image}" alt="Question graph">`;
+    imageBox.style.display = "block";
 }
 
 // =============================
@@ -3283,16 +3289,12 @@ function answer(choice) {
     bossHealth = 3;
     bossPool = [];
 
-    const bossRooms = [10, 20, 30];
+	let fallback = (room % 10 === 0 ? 3 : (room >= 21 ? 2 : 1));
+	let newRoom = room - fallback;
 
-    let fallback = (room % 10 === 0 ? 3 : (room >= 21 ? 2 : 1));
-    let newRoom = room - fallback;
+// Never fall back behind the most recently cleared boss gate
+	room = Math.max(bossCheckpoint, newRoom);
 
-    while (bossRooms.includes(newRoom)) {
-        newRoom++;
-    }
-
-    room = Math.max(1, newRoom);
     localStorage.setItem("gauntletRoom", room);
 
     alert(`Incorrect! You trip in the darkness and tumble back to Room ${room}.`);
@@ -3546,12 +3548,12 @@ function showKnowledgeRoom(bossRoom) {
     
     // logic to ensure Room 30 triggers the end game, while 10 and 20 trigger the next level
     let nextAction = bossRoom === 30 ? "handleVictory()" : "room++; loadQuestion();";
-    let buttonLabel = bossRoom === 30 ? "FINALIZE THE ARCHIVE CONQUEST →" : `CONTINUE TO ROOM ${bossRoom + 1} →`;
+    let buttonLabel = bossRoom === 30 ? "FINALIZE THE FOUNDRY CONQUEST →" : `CONTINUE TO ROOM ${bossRoom + 1} →`;
 
 aContainer.innerHTML = `
-<button id="continueBtn" class="continue-btn">
+	<button id="continueBtn" class="continue-btn">
     ${buttonLabel}
-</button>`;
+	</button>`;
 
 // =============================================
 // PROGRESSION HANDLER — DO NOT MODIFY
