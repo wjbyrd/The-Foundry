@@ -1544,6 +1544,16 @@ let room = localStorage.getItem("gauntletRoom") ? parseInt(localStorage.getItem(
 let currentQuestion = null;
 let detourActive = false;
 let detourReturnRoom = null;
+let remediationState = {
+    active: false,
+    stage: null,
+    tag: null,
+    objective: null,
+    sourceType: null,
+    returnRoom: null,
+    originQuestionId: null,
+    careless: false
+};
 let conceptMemory = {};
 let masteryState = { byTag: {}, byObjective: {}, recent: [] };
 let adaptiveMode = "support";
@@ -1872,6 +1882,127 @@ function shouldTriggerDetour(question){
         || (objectiveAccuracy !== null && objectiveAccuracy < 0.5 && getObjectiveBucket(question).attempts >= 2);
 }
 
+function resetRemediationState(){
+    remediationState = {
+        active: false,
+        stage: null,
+        tag: null,
+        objective: null,
+        sourceType: null,
+        returnRoom: null,
+        originQuestionId: null,
+        careless: false
+    };
+    detourActive = false;
+    detourReturnRoom = null;
+}
+
+function planRemediation(question, responseTime){
+    if(!question || !question.tag) return null;
+
+    const expected = getTypeTargetMs(question.type);
+    const objectiveBucket = getObjectiveBucket(question);
+    const objectiveAccuracy = getAccuracy(objectiveBucket);
+    const objectiveAttempts = objectiveBucket?.attempts || 0;
+    const carelessMiss = responseTime < expected * 0.55 && (objectiveAccuracy === null || objectiveAccuracy >= 0.45);
+    const repeatedObjectiveMiss = objectiveAttempts >= 2 && objectiveAccuracy !== null && objectiveAccuracy < 0.6;
+    const slowStruggle = responseTime > expected * 1.2;
+
+    return {
+        active: true,
+        stage: carelessMiss ? "bridge" : "repair",
+        tag: question.tag,
+        objective: inferObjective(question),
+        sourceType: question.type || "default",
+        returnRoom: room,
+        originQuestionId: question.id || null,
+        careless: carelessMiss,
+        repeatedObjectiveMiss,
+        slowStruggle
+    };
+}
+
+function getRemediationStageLabel(stage){
+    if(stage === "repair") return "Concept Repair";
+    if(stage === "bridge") return "Bridge Repair";
+    return "Recovery Retest";
+}
+
+function getQuestionsMatchingNeed(pool, objectiveKey, tag, excludeIds = []){
+    if(!Array.isArray(pool) || pool.length === 0) return [];
+
+    let candidates = pool.filter(q => !excludeIds.includes(q.id));
+    let objectiveMatches = candidates.filter(q => inferObjective(q) === objectiveKey);
+    if(objectiveMatches.length > 0) return objectiveMatches;
+
+    let tagMatches = candidates.filter(q => q.tag === tag);
+    if(tagMatches.length > 0) return tagMatches;
+
+    return candidates;
+}
+
+function getRetestPoolName(){
+    if(room <= 9) return "easy";
+    if(room <= 19) return "medium";
+    if(room <= 25) return "hard";
+    if(room <= 29) return "hard";
+    return "elite";
+}
+
+function pickRemediationFromBank(poolName, objectiveKey, tag, purpose = "confirm"){
+    const pool = questionBanks[poolName] || [];
+    const recentIds = (questionHistory[poolName] || []).slice(-10);
+    let candidates = getQuestionsMatchingNeed(pool, objectiveKey, tag, recentIds);
+
+    if(candidates.length === 0){
+        candidates = getQuestionsMatchingNeed(pool, objectiveKey, tag, []);
+    }
+
+    if(candidates.length === 0) return null;
+
+    const picked = weightedPick(candidates, {
+        mode: purpose === "challenge" ? "challenge" : "support",
+        preferredTypes: purpose === "challenge" ? ELITE_PREFERRED_TYPES : [],
+        purpose
+    });
+
+    if(!questionHistory[poolName]) questionHistory[poolName] = [];
+    questionHistory[poolName].push(picked.id);
+    if(questionHistory[poolName].length > 15) questionHistory[poolName].shift();
+
+    if(picked.tag){
+        tagHistory.push(picked.tag);
+        if(tagHistory.length > 10) tagHistory.shift();
+    }
+
+    return picked;
+}
+
+function getRemediationQuestion(state){
+    if(!state || !state.active) return null;
+
+    const excludeIds = [state.originQuestionId].filter(Boolean);
+
+    if(state.stage === "repair"){
+        const repairPool = easyConceptPools[state.tag] || [];
+        const repairCandidates = getQuestionsMatchingNeed(repairPool, state.objective, state.tag, excludeIds);
+        if(repairCandidates.length > 0){
+            return weightedPick(repairCandidates, { mode: "support", purpose: "repair" });
+        }
+    }
+
+    if(state.stage === "bridge"){
+        const bridgePool = mediumConceptPools[state.tag] || [];
+        const bridgeCandidates = getQuestionsMatchingNeed(bridgePool, state.objective, state.tag, excludeIds);
+        if(bridgeCandidates.length > 0){
+            return weightedPick(bridgeCandidates, { mode: "support", purpose: "confirm" });
+        }
+    }
+
+    const retestPoolName = getRetestPoolName();
+    return pickRemediationFromBank(retestPoolName, state.objective, state.tag, state.stage === "retest" ? "challenge" : "confirm");
+}
+
 function weightedPick(pool, options = {}){
     const {
         mode = "support",
@@ -2141,6 +2272,7 @@ function startGame() {
     tagHistory = [];
     lastTypes = [];
     adaptiveMode = "support";
+    resetRemediationState();
     localStorage.removeItem("gauntletRoom");
     localStorage.removeItem("vaultHeart");
     localStorage.removeItem("vaultCore");
@@ -3482,11 +3614,42 @@ function answer(choice) {
         wizard.style.transform = "";
         },200);
        
-        // If this was a concept detour question, return player to main path
-        if(detourActive){
-           detourActive = false;
-           msgElement.innerHTML = `<span class='fade-out-text'>Correct! Concept restored. Moving deeper...</span>`;
-           room = Math.min(room + 1, detourReturnRoom);
+        // --- STAGED REMEDIATION SUCCESS PATH ---
+        if(remediationState.active){
+           if(remediationState.stage === "repair"){
+               remediationState.stage = "bridge";
+               adaptiveMode = "bridge";
+               const bridgeQuestion = getRemediationQuestion(remediationState);
+               if(bridgeQuestion){
+                   currentQuestion = shuffleOptions(bridgeQuestion);
+                   document.getElementById("question").innerText = `${getRemediationStageLabel("bridge")}: ` + currentQuestion.q;
+                   document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+                   msgElement.innerHTML = `<span class='fade-out-text'>Stability returns. Now prove it under pressure.</span>`;
+                   displayQuestion();
+                   return;
+               }
+               remediationState.stage = "retest";
+           }
+
+           if(remediationState.stage === "bridge"){
+               remediationState.stage = "retest";
+               adaptiveMode = "retest";
+               const retestQuestion = getRemediationQuestion(remediationState);
+               if(retestQuestion){
+                   currentQuestion = shuffleOptions(retestQuestion);
+                   document.getElementById("question").innerText = `${getRemediationStageLabel("retest")}: ` + currentQuestion.q;
+                   document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+                   msgElement.innerHTML = `<span class='fade-out-text'>Concept recovered. One final proof.</span>`;
+                   displayQuestion();
+                   return;
+               }
+           }
+
+           const returnRoom = remediationState.returnRoom ?? room;
+           resetRemediationState();
+           adaptiveMode = "support";
+           msgElement.innerHTML = `<span class='fade-out-text'>Recovery confirmed. Return to the forge.</span>`;
+           room = returnRoom;
            localStorage.setItem("gauntletRoom", room);
            setTimeout(loadQuestion, TIMING.normal);
            return;
@@ -3589,35 +3752,29 @@ function answer(choice) {
             (conceptMemory[currentQuestion.tag] || 0) + rushPenalty;
     }
 
-    // --- DETOUR TRIGGER ---
-    if (!detourActive && currentQuestion.tag && shouldTriggerDetour(currentQuestion)) {
+    // --- STAGED REMEDIATION TRIGGER ---
+    if (!remediationState.active && currentQuestion.tag && shouldTriggerDetour(currentQuestion)) {
+        remediationState = planRemediation(currentQuestion, responseTime) || remediationState;
+        detourActive = true;
+        detourReturnRoom = room;
 
-        let conceptPool = null;
+        const remediationPrompt = getRemediationQuestion(remediationState);
 
-        if (room <= 9 && easyConceptPools[currentQuestion.tag]) {
-            conceptPool = easyConceptPools[currentQuestion.tag];
-        }
+        if (remediationPrompt) {
+            currentQuestion = shuffleOptions(remediationPrompt);
+            adaptiveMode = remediationState.stage;
 
-        if (room >= 11 && room <= 19 && mediumConceptPools[currentQuestion.tag]) {
-            conceptPool = mediumConceptPools[currentQuestion.tag];
-        }
-
-        if (conceptPool) {
-            detourActive = true;
-            detourReturnRoom = room;
-
-            const detourPrompt = pickConceptQuestion(conceptPool);
-            currentQuestion = shuffleOptions(detourPrompt);
-
-            const detourLabel = currentQuestion.type === "definition" ? "Concept Repair"
-                : currentQuestion.type === "interpretation" ? "Bridge Repair"
-                : "Recovery Drill";
-
-            document.getElementById("question").innerText = `${detourLabel}: ` + currentQuestion.q;
+            document.getElementById("question").innerText = `${getRemediationStageLabel(remediationState.stage)}: ` + currentQuestion.q;
             document.getElementById("formulaHint").innerText =
                 currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
 
-            msgElement.innerHTML = `<span class='fade-out-text'>You falter… The forgery demands a concept check.</span>`;
+            const remediationMessage = remediationState.careless
+                ? "You rushed the metal. Slow down and prove command."
+                : remediationState.slowStruggle
+                    ? "The forge resists. Rebuild the concept before advancing."
+                    : "The structure cracked. Repair it before moving on.";
+
+            msgElement.innerHTML = `<span class='fade-out-text'>${remediationMessage}</span>`;
 
             displayQuestion();
             return;
@@ -4255,5 +4412,6 @@ function sendGameData(payload){
 </script>
 </body>
 </html>
+
 
 
