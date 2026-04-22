@@ -1545,7 +1545,7 @@ let currentQuestion = null;
 let detourActive = false;
 let detourReturnRoom = null;
 let conceptMemory = {};
-let masteryState = { byTag: {}, recent: [] };
+let masteryState = { byTag: {}, byObjective: {}, recent: [] };
 let adaptiveMode = "support";
 let tagHistory = [];
 let lastTypes = [];
@@ -1644,6 +1644,74 @@ function getTypeBucket(tag, type){
     return tagBucket.byType[key];
 }
 
+function inferObjective(question){
+    if(!question) return "general";
+    if(question.objective) return question.objective;
+    const q = (question.q || "").toLowerCase();
+    const tag = question.tag || "general";
+    const type = question.type || "default";
+
+    if(tag === "production"){
+        if(q.includes("isoquant")) return "isoquant_reading";
+        if(q.includes("technical substitution") || q.includes("mrts")) return "mrts";
+        if(q.includes("marginal product")) return "marginal_product";
+        if(q.includes("substitut")) return "input_substitution";
+        if(q.includes("returns to scale")) return "returns_to_scale";
+        if(q.includes("technology")) return "technology_productivity";
+    }
+    if(tag === "costs"){
+        if(q.includes("fixed cost")) return "fixed_vs_variable";
+        if(q.includes("average total cost") || q.includes("atc")) return "atc_relationships";
+        if(q.includes("average variable cost") || q.includes("avc")) return "shutdown_components";
+        if(q.includes("marginal cost") || q.includes("mc")) return "mc_relationships";
+        if(q.includes("wage") || q.includes("input prices")) return "cost_curve_shifts";
+    }
+    if(tag === "profit"){
+        if(q.includes("shut down")) return "shutdown_rule";
+        if(q.includes("profit maxim")) return "mr_mc_rule";
+        if(q.includes("zero economic profit")) return "normal_profit";
+        if(q.includes("loss")) return "profit_vs_loss";
+    }
+    if(tag === "competition"){
+        if(q.includes("price taker") || q.includes("perfectly elastic")) return "price_taking";
+        if(q.includes("supply curve")) return "firm_supply";
+        if(q.includes("market price")) return "firm_vs_market_price";
+    }
+    if(tag === "market"){
+        if(q.includes("entry")) return "entry_adjustment";
+        if(q.includes("exit")) return "exit_adjustment";
+        if(q.includes("long run equilibrium")) return "long_run_equilibrium";
+        if(q.includes("demand")) return "market_shift_sequences";
+    }
+    if(tag === "efficiency"){
+        if(q.includes("allocative")) return "allocative_efficiency";
+        if(q.includes("productive")) return "productive_efficiency";
+        if(q.includes("full efficiency")) return "combined_efficiency";
+    }
+
+    return `${tag}_${type}`;
+}
+
+function getObjectiveBucket(question){
+    const objectiveKey = inferObjective(question);
+    if(!masteryState.byObjective[objectiveKey]){
+        masteryState.byObjective[objectiveKey] = {
+            attempts: 0,
+            correct: 0,
+            avgTime: 0
+        };
+    }
+    return masteryState.byObjective[objectiveKey];
+}
+
+function getObjectiveAccuracy(question){
+    return getAccuracy(getObjectiveBucket(question));
+}
+
+function getObjectiveFluency(question){
+    return getFluency(getObjectiveBucket(question), question?.type || "default");
+}
+
 function updateBucket(bucket, isCorrect, responseTime){
     if(!bucket) return;
     bucket.attempts++;
@@ -1691,15 +1759,18 @@ function recordAdaptiveAttempt(question, isCorrect, responseTime){
 
     const tagBucket = getTagBucket(question.tag);
     const typeBucket = getTypeBucket(question.tag, question.type);
+    const objectiveBucket = getObjectiveBucket(question);
 
     updateBucket(tagBucket, isCorrect, responseTime);
     updateBucket(typeBucket, isCorrect, responseTime);
+    updateBucket(objectiveBucket, isCorrect, responseTime);
 
     masteryState.recent.push({
         correct: !!isCorrect,
         responseTime,
         tag: question.tag,
-        type: question.type || "default"
+        type: question.type || "default",
+        objective: inferObjective(question)
     });
 
     if(masteryState.recent.length > 20){
@@ -1781,19 +1852,31 @@ function getSelectionProfile(){
     };
 }
 
+function determineSelectionPurpose(profile){
+    if(profile.eliteReady) return "stretch";
+    if(profile.recentAccuracy < 0.65) return "repair";
+    if(profile.recentAccuracy < 0.8) return "confirm";
+    if(profile.hardReady) return "challenge";
+    return "diversify";
+}
+
 function shouldTriggerDetour(question){
     if(!question || !question.tag) return false;
     const tagWeakness = conceptMemory[question.tag] || 0;
     const typeBucket = getTypeBucket(question.tag, question.type);
     const typeAccuracy = getAccuracy(typeBucket);
+    const objectiveAccuracy = getObjectiveAccuracy(question);
 
-    return tagWeakness >= 2.2 || (typeBucket && typeBucket.attempts >= 2 && typeAccuracy !== null && typeAccuracy < 0.6);
+    return tagWeakness >= 2.2
+        || (typeBucket && typeBucket.attempts >= 2 && typeAccuracy !== null && typeAccuracy < 0.6)
+        || (objectiveAccuracy !== null && objectiveAccuracy < 0.5 && getObjectiveBucket(question).attempts >= 2);
 }
 
 function weightedPick(pool, options = {}){
     const {
         mode = "support",
-        preferredTypes = []
+        preferredTypes = [],
+        purpose = "diversify"
     } = options;
 
     let totalWeight = 0;
@@ -1802,30 +1885,40 @@ function weightedPick(pool, options = {}){
         let w = 1;
         const tagAccuracy = q.tag ? getTagAccuracy(q.tag) : null;
         const typeAccuracy = (q.tag && q.type) ? getTagTypeAccuracy(q.tag, q.type) : null;
+        const objectiveAccuracy = getObjectiveAccuracy(q);
         const tagFluency = q.tag ? getTagFluency(q.tag) : 0;
         const typeFluency = (q.tag && q.type) ? getTagTypeFluency(q.tag, q.type) : 0;
+        const objectiveFluency = getObjectiveFluency(q);
         const conceptWeakness = q.tag ? (conceptMemory[q.tag] || 0) : 0;
+
+        let recentCount = tagHistory.filter(t => t === q.tag).length;
 
         if(mode === "challenge"){
             w += clamp(tagFluency || 0, 0, 1.2) * 0.9;
             w += clamp(typeFluency || 0, 0, 1.0) * 0.6;
+            w += clamp(objectiveFluency || 0, 0, 1.0) * 0.5;
             w += getTypePressure(q.type || "default");
             if(preferredTypes.includes(q.type)) w += 1.1;
+            if(purpose === "stretch") w += 0.8;
         } else {
             const tagNeed = tagAccuracy === null ? 0.45 : (1 - tagAccuracy);
             const typeNeed = typeAccuracy === null ? 0.35 : (1 - typeAccuracy);
+            const objectiveNeed = objectiveAccuracy === null ? 0.35 : (1 - objectiveAccuracy);
             const slowPenalty = clamp((getTimeRatio(getTypeBucket(q.tag, q.type), q.type) - 1), 0, 1.2);
 
             w += Math.min(conceptWeakness, 2.2);
-            w += tagNeed * 0.9;
-            w += typeNeed * 0.7;
+            w += tagNeed * 0.7;
+            w += typeNeed * 0.55;
+            w += objectiveNeed * 0.85;
             w += slowPenalty * 0.35;
+
+            if(purpose === "repair" && objectiveNeed > 0.35) w += 0.9;
+            if(purpose === "confirm" && typeNeed > 0.25) w += 0.5;
         }
 
         // Coverage boost
-        let recentCount = tagHistory.filter(t => t === q.tag).length;
         if(recentCount === 0){
-            w += 0.4;
+            w += purpose === "diversify" ? 0.7 : 0.4;
         }
 
         w = Math.min(w, mode === "challenge" ? 5.5 : 4.5);
@@ -1847,7 +1940,7 @@ function weightedPick(pool, options = {}){
 
 function getAdaptiveQuestion(poolName, targetTag = null, options = {}){
     let pool = questionBanks[poolName];
-    const { mode = "support", preferredTypes = [] } = options;
+    const { mode = "support", preferredTypes = [], purpose = "diversify" } = options;
 
     // --- 🎯 TARGET SPECIFIC TAG IF PROVIDED ---
     if(targetTag){
@@ -1886,7 +1979,7 @@ function getAdaptiveQuestion(poolName, targetTag = null, options = {}){
 
     console.log("AVAILABLE:", available.map(q => q.id));
 
-    let picked = weightedPick(available, { mode, preferredTypes });
+    let picked = weightedPick(available, { mode, preferredTypes, purpose });
 
     console.log("PICKED:", picked.id);
     console.log("RECENT:", questionHistory[poolName]);
@@ -2044,7 +2137,7 @@ function startGame() {
     bossPool = [];
     calcBag = [];
     conceptMemory = {};
-    masteryState = { byTag: {}, recent: [] };
+    masteryState = { byTag: {}, byObjective: {}, recent: [] };
     tagHistory = [];
     lastTypes = [];
     adaptiveMode = "support";
@@ -2656,6 +2749,7 @@ function shuffleOptions(question){
         hint: question.hint,
         tag: question.tag,
         type: question.type,
+        objective: question.objective,
 		image: question.image
     };
 
@@ -3170,9 +3264,10 @@ function loadQuestion() {
     // --- STREAK + MASTERY ADAPTIVE LOGIC ---
     let adjustedDiff = diff;
     const profile = getSelectionProfile();
+    const purpose = determineSelectionPurpose(profile);
     const strongestTag = profile.strongestTag;
     const weakestTag = getWeakestTag();
-    adaptiveMode = "support";
+    adaptiveMode = purpose;
 
     if(diff === "easy" && profile.mediumReady){
         adjustedDiff = "medium";
@@ -3199,7 +3294,8 @@ else if(adjustedDiff === "elite"){
     currentQuestion = shuffleOptions(
         getAdaptiveQuestion("elite", strongestTag || weakestTag, {
             mode: "challenge",
-            preferredTypes: ELITE_PREFERRED_TYPES
+            preferredTypes: ELITE_PREFERRED_TYPES,
+            purpose
         })
     );
 }
@@ -3207,14 +3303,16 @@ else if(adjustedDiff === "hard"){
     currentQuestion = shuffleOptions(
         getAdaptiveQuestion("hard", strongestTag || weakestTag, {
             mode: strongestTag ? "challenge" : "support",
-            preferredTypes: ELITE_PREFERRED_TYPES
+            preferredTypes: ELITE_PREFERRED_TYPES,
+            purpose
         })
     );
 }
 else{
     currentQuestion = shuffleOptions(
         getAdaptiveQuestion(adjustedDiff, weakestTag, {
-            mode: "support"
+            mode: "support",
+            purpose
         })
     );
 }
@@ -3350,6 +3448,7 @@ function answer(choice) {
         correct: isCorrect ? 1 : 0,
         tag: currentQuestion.tag || "none",
         type: currentQuestion.type || "none",
+        objective: inferObjective(currentQuestion),
         responseTime: responseTime,
 	     attempt: totalAttempts ?? 0,
 		  streak: streak ?? 0,
@@ -3507,9 +3606,14 @@ function answer(choice) {
             detourActive = true;
             detourReturnRoom = room;
 
-            currentQuestion = shuffleOptions(pickConceptQuestion(conceptPool));
+            const detourPrompt = pickConceptQuestion(conceptPool);
+            currentQuestion = shuffleOptions(detourPrompt);
 
-            document.getElementById("question").innerText = "Concept Check: " + currentQuestion.q;
+            const detourLabel = currentQuestion.type === "definition" ? "Concept Repair"
+                : currentQuestion.type === "interpretation" ? "Bridge Repair"
+                : "Recovery Drill";
+
+            document.getElementById("question").innerText = `${detourLabel}: ` + currentQuestion.q;
             document.getElementById("formulaHint").innerText =
                 currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
 
@@ -4151,4 +4255,5 @@ function sendGameData(payload){
 </script>
 </body>
 </html>
+
 
