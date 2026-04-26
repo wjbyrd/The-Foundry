@@ -3633,7 +3633,7 @@ function answer(choice) {
         event: "question",
         user: username || "anonymous",
         room: room,
-        question: currentQuestion.id || "unknown",
+        question: currentQuestion.id || 0,
         correct: isCorrect ? 1 : 0,
         tag: currentQuestion.tag || "none",
         type: currentQuestion.type || "none",
@@ -4230,14 +4230,23 @@ function handleVictory() {
     const verificationCode = generateCode(username, accuracy, maxStreak, totalTimeMs);
 
 sendGameData({
-    game: "The Foundry",
-    event: "complete",
-    user: username,
+user: username,
+    room: room,
+    questionId: 0,
+    correct: 1,
+    tag: "",
+    type: "",
+    objective: "",
+    responseTime: 0,
+    attempt: totalAttempts,
+    streak: streak,
+    elapsedTime: startTime ? (Date.now() - startTime) : 0,
+    adaptiveMode: "complete",
     totalTime: totalTimeMs,
-    accuracy: accuracy,
+    accuracy: accuracy / 100,
     maxStreak: maxStreak,
-    attempts: totalAttempts,
-    code: verificationCode
+    totalAttempts: totalAttempts,
+    verificationCode: verificationCode
 });
     
 // =============================================
@@ -4445,12 +4454,41 @@ function copyResults() {
     });
 }
 
-function sendGameData(payload){
-    fetch("https://script.google.com/macros/s/AKfycbzEaOLUKs1snA7lN7ELjnoqKlUQhGhaHLyjjfiD5LqTP16xnJ8NmR2Q7PXydlEb3fLpUA/exec", {
-        method: "POST",
-        body: JSON.stringify(payload),
-		mode: "no-cors"
-    }).catch(err => console.log("Tracking failed", err));
+function sendGameData(data) {
+  const payload = {
+    timestamp: new Date().toISOString(),
+    runID: data.runID || localStorage.getItem("gauntletRunID") || "",
+    token: data.token || "",
+    version: "LOC-foundry-engine-ms-telemetry-v1",
+    userAgent: navigator.userAgent || "",
+    game: data.game || "The Labyrinth of Choice",
+    event: data.event || "",
+    user: data.user || username || "anonymous",
+    room: Number(data.room ?? 0),
+    questionId: Number(data.questionId ?? data.question ?? 0),
+    correct: Number(data.correct ?? 0),
+    tag: data.tag || "",
+    type: data.type || "",
+    objective: data.objective || "",
+    responseTime: Number(data.responseTime ?? data.responseTimeMs ?? 0),
+    attempt: Number(data.attempt ?? 0),
+    streak: Number(data.streak ?? 0),
+    elapsedTime: Number(data.elapsedTime ?? data.elapsedTimeMs ?? 0),
+    adaptiveMode: data.adaptiveMode || adaptiveMode || "",
+    totalTime: Number(data.totalTime ?? data.totalTimeMs ?? 0),
+    accuracy: Number(data.accuracy ?? 0),
+    maxStreak: Number(data.maxStreak ?? 0),
+    totalAttempts: Number(data.totalAttempts ?? data.attempts ?? 0),
+    verificationCode: data.verificationCode || data.code || ""
+  };
+
+  fetch("https://default8de80de86d8a47cbb5bc7fb9b5bf1c.64.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/239b526e4b9f4c1997a009d53a32267a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qQhDuP6P3K8mxdCKyBaMw6S0IPd8rBn8BUAEi_CtlxQ", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  }).catch(err => console.log("Telemetry failed:", err));
 }
    
 // =====================================================
