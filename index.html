@@ -4230,7 +4230,8 @@ function handleVictory() {
     const verificationCode = generateCode(username, accuracy, maxStreak, totalTimeMs);
 
 sendGameData({
-user: username,
+	event: "complete",
+	user: username,
     room: room,
     questionId: 0,
     correct: 1,
