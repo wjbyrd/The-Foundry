@@ -1808,17 +1808,20 @@ function getRecentPerformance(windowSize = 8){
 
 function getWeakestTag(){
     const entries = Object.keys(masteryState.byTag);
+
     if(entries.length === 0){
         const fallback = Object.entries(conceptMemory || {}).sort((a,b) => b[1]-a[1])[0];
         return fallback ? fallback[0] : null;
     }
 
     let weakestTag = null;
-    let weakestScore = Infinity;
+    let weakestScore = -Infinity;
 
     entries.forEach(tag => {
-        const weakness = (conceptMemory[tag] || 0) + (1 - (getTagFluency(tag) || 0));
-        if(weakness < weakestScore){
+        const fluency = getTagFluency(tag);
+        const weakness = (conceptMemory[tag] || 0) + (1 - (fluency ?? 0));
+
+        if(weakness > weakestScore){
             weakestScore = weakness;
             weakestTag = tag;
         }
@@ -1863,6 +1866,7 @@ function getSelectionProfile(){
 }
 
 function determineSelectionPurpose(profile){
+    if(profile.recentAccuracy === 0 && getRecentPerformance(8).count === 0) return "support";
     if(profile.eliteReady) return "stretch";
     if(profile.recentAccuracy < 0.65) return "repair";
     if(profile.recentAccuracy < 0.8) return "confirm";
@@ -3671,49 +3675,75 @@ function answer(choice) {
         setTimeout(()=>{
         wizard.style.transform = "";
         },200);
-       
-        // --- STAGED REMEDIATION SUCCESS PATH ---
-        if(remediationState.active){
-           if(remediationState.stage === "repair"){
-               remediationState.stage = "bridge";
-               adaptiveMode = "bridge";
-               const bridgeQuestion = getRemediationQuestion(remediationState);
-               if(bridgeQuestion){
-                   currentQuestion = shuffleOptions(bridgeQuestion);
-                   document.getElementById("question").innerText = `${getRemediationStageLabel("bridge")}: ` + currentQuestion.q;
-                   document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
-                   msgElement.innerHTML = `<span class='fade-out-text'>Stability returns. Now prove it under pressure.</span>`;
-                   displayQuestion();
-                   return;
-               }
-               remediationState.stage = "retest";
-           }
 
-           if(remediationState.stage === "bridge"){
-               remediationState.stage = "retest";
-               adaptiveMode = "retest";
-               const retestQuestion = getRemediationQuestion(remediationState);
-               if(retestQuestion){
-                   currentQuestion = shuffleOptions(retestQuestion);
-                   document.getElementById("question").innerText = `${getRemediationStageLabel("retest")}: ` + currentQuestion.q;
-                   document.getElementById("formulaHint").innerText = currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
-                   msgElement.innerHTML = `<span class='fade-out-text'>Concept recovered. One final proof.</span>`;
-                   displayQuestion();
-                   return;
-               }
-           }
-
-           const returnRoom = remediationState.returnRoom ?? room;
-           resetRemediationState();
-           adaptiveMode = "support";
-           msgElement.innerHTML = `<span class='fade-out-text'>Recovery confirmed. Return to the forge.</span>`;
-           room = returnRoom;
-           localStorage.setItem("gauntletRoom", room);
-           setTimeout(loadQuestion, TIMING.normal);
-           return;
-    }
-        correctAnswers++;
+		correctAnswers++;
         handleStreakVisuals();
+       
+       // --- STAGED REMEDIATION SUCCESS PATH ---
+if(remediationState.active){
+    if(remediationState.stage === "repair"){
+        remediationState.stage = "bridge";
+        adaptiveMode = "bridge";
+
+        const bridgeQuestion = getRemediationQuestion(remediationState);
+
+        if(bridgeQuestion){
+            currentQuestion = shuffleOptions(bridgeQuestion);
+
+            document.getElementById("question").innerText =
+                `${getRemediationStageLabel("bridge")}: ` + currentQuestion.q;
+
+            document.getElementById("formulaHint").innerText =
+                currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+
+            msgElement.innerHTML =
+                `<span class='fade-out-text'>Stability returns. Now prove it under pressure.</span>`;
+
+            displayQuestion();
+            return;
+        }
+
+        remediationState.stage = "retest";
+    }
+
+    if(remediationState.stage === "bridge"){
+        remediationState.stage = "retest";
+        adaptiveMode = "retest";
+
+        const retestQuestion = getRemediationQuestion(remediationState);
+
+        if(retestQuestion){
+            currentQuestion = shuffleOptions(retestQuestion);
+
+            document.getElementById("question").innerText =
+                `${getRemediationStageLabel("retest")}: ` + currentQuestion.q;
+
+            document.getElementById("formulaHint").innerText =
+                currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+
+            msgElement.innerHTML =
+                `<span class='fade-out-text'>Concept recovered. One final proof.</span>`;
+
+            displayQuestion();
+            return;
+        }
+    }
+
+    const returnRoom = remediationState.returnRoom ?? room;
+
+    resetRemediationState();
+    adaptiveMode = "support";
+
+    msgElement.innerHTML =
+        `<span class='fade-out-text'>Recovery confirmed. Return to the forge.</span>`;
+
+    room = returnRoom;
+    localStorage.setItem("gauntletRoom", room);
+
+    setTimeout(loadQuestion, TIMING.normal);
+    return;
+}
+
     
         // --- LEARNING: reduce weakness ---
         if(currentQuestion.tag){
@@ -3810,34 +3840,29 @@ function answer(choice) {
             (conceptMemory[currentQuestion.tag] || 0) + rushPenalty;
     }
 
-    // --- STAGED REMEDIATION TRIGGER ---
-    if (!remediationState.active && currentQuestion.tag && shouldTriggerDetour(currentQuestion)) {
-        remediationState = planRemediation(currentQuestion, responseTime) || remediationState;
-        detourActive = true;
-        detourReturnRoom = room;
+    // --- IF STUDENT MISSES DURING ACTIVE REMEDIATION ---
+if(remediationState.active){
+    const remediationPrompt = getRemediationQuestion(remediationState);
 
-        const remediationPrompt = getRemediationQuestion(remediationState);
+    if(remediationPrompt){
+        currentQuestion = shuffleOptions(remediationPrompt);
+        adaptiveMode = remediationState.stage;
 
-        if (remediationPrompt) {
-            currentQuestion = shuffleOptions(remediationPrompt);
-            adaptiveMode = remediationState.stage;
+        document.getElementById("question").innerText =
+            `${getRemediationStageLabel(remediationState.stage)}: ` + currentQuestion.q;
 
-            document.getElementById("question").innerText = `${getRemediationStageLabel(remediationState.stage)}: ` + currentQuestion.q;
-            document.getElementById("formulaHint").innerText =
-                currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+        document.getElementById("formulaHint").innerText =
+            currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
 
-            const remediationMessage = remediationState.careless
-                ? "You rushed the metal. Slow down and prove command."
-                : remediationState.slowStruggle
-                    ? "The forge resists. Rebuild the concept before advancing."
-                    : "The structure cracked. Repair it before moving on.";
+        msgElement.innerHTML =
+            `<span class='fade-out-text'>Still cracked. Stay in repair until the concept holds.</span>`;
 
-            msgElement.innerHTML = `<span class='fade-out-text'>${remediationMessage}</span>`;
-
-            displayQuestion();
-            return;
-        }
+        displayQuestion();
+        return;
     }
+
+    resetRemediationState();
+}
 
     // --- FALLBACK LOGIC ---
     document.getElementById("streakDisplay").innerText = "";
