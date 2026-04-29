@@ -3638,7 +3638,7 @@ function answer(choice) {
         event: "question",
         user: username || "anonymous",
         room: room,
-        question: currentQuestion.id || 0,
+        questionId: currentQuestion.id || 0,
         correct: isCorrect ? 1 : 0,
         tag: currentQuestion.tag || "none",
         type: currentQuestion.type || "none",
@@ -3862,6 +3862,37 @@ if(remediationState.active){
     }
 
     resetRemediationState();
+}
+// --- STAGED REMEDIATION TRIGGER ---
+if (!remediationState.active && currentQuestion.tag && shouldTriggerDetour(currentQuestion)) {
+    remediationState = planRemediation(currentQuestion, responseTime) || remediationState;
+    detourActive = true;
+    detourReturnRoom = room;
+
+    const remediationPrompt = getRemediationQuestion(remediationState);
+
+    if (remediationPrompt) {
+        currentQuestion = shuffleOptions(remediationPrompt);
+        adaptiveMode = remediationState.stage;
+
+        document.getElementById("question").innerText =
+            `${getRemediationStageLabel(remediationState.stage)}: ` + currentQuestion.q;
+
+        document.getElementById("formulaHint").innerText =
+            currentQuestion.hint ? "💡 Hint: " + currentQuestion.hint : "";
+
+        const remediationMessage = remediationState.careless
+            ? "You rushed the forge. Slow down and prove control."
+            : remediationState.slowStruggle
+                ? "The forge resists. Rebuild the concept before advancing."
+                : "The structure cracked. Repair the weakness before moving on.";
+
+        msgElement.innerHTML =
+            `<span class='fade-out-text'>${remediationMessage}</span>`;
+
+        displayQuestion();
+        return;
+    }
 }
 
     // --- FALLBACK LOGIC ---
