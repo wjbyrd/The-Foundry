@@ -1360,7 +1360,7 @@ Respect structure strictly.
 <div id="startScreen">
    <h1 class="title">THE FOUNDRY</h1>
    <h2 class="subtitle">Where Systems Are Forged</h2>
-   <input id="usernameInput" type="text" placeholder="State your designation" class="name-input" ...>
+   <input id="emailInput" type="email" placeholder="Enter your school email" class="name-input">
    <button class="start-btn" onclick="startGame()">ENTER THE FOUNDRY</button>
 </div>
 <div class="dungeon-container">
@@ -1537,6 +1537,7 @@ let bossCheckpoint = 1;
 let correctAnswers = 0; 
 let maxStreak = 0; 
 let username = "";
+let studentEmail = "";
 let questionStartTime = 0;
 let streak = 0; 
 let startTime; // Will be set in startGame()
@@ -1580,6 +1581,25 @@ let questionHistory = {
     mediumBoss: [],
     finalBoss: [],
 };
+
+function generatePseudonym(){
+    const adjectives = [
+        "Iron", "Crimson", "Silent", "Golden", "Shadow", "Blazing",
+        "Stone", "Storm", "Obsidian", "Frost", "Ember", "Steel"
+    ];
+
+    const nouns = [
+        "Anvil", "Hammer", "Falcon", "Forge", "Sentinel", "Warden",
+        "Cipher", "Titan", "Raven", "Vanguard", "Crown", "Engine"
+    ];
+
+    const number = Math.floor(1000 + Math.random() * 9000);
+
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+    return `${adj}${noun}${number}`;
+}
 
 // =============================================
 // ADAPTIVE ENGINE — DO NOT TOUCH
@@ -2242,27 +2262,44 @@ if(savedUser){
 // - incorrect scoring
 // - progression bugs
 // =============================================
+
 function startGame() {
-    let inputName = document.getElementById("usernameInput").value.trim();
-    if (!inputName) {
-        alert("A name is required to bind your soul to the Foundry.");
+    let inputEmail = document.getElementById("emailInput").value.trim().toLowerCase();
+
+    if (!inputEmail) {
+        alert("An email is required to enter the Foundry.");
         return;
     }
 
-	bossCheckpoint = 1;
-    username = inputName;
-    localStorage.setItem("gauntletUser", username);
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(inputEmail)) {
+        alert("Enter a valid email address.");
+        return;
+    }
+
+    studentEmail = inputEmail;
+
+    let savedPseudo = localStorage.getItem("gauntletPseudonym");
+    let savedEmail = localStorage.getItem("gauntletEmail");
+
+    if (savedPseudo && savedEmail === studentEmail) {
+        username = savedPseudo;
+    } else {
+        username = generatePseudonym();
+        localStorage.setItem("gauntletPseudonym", username);
+        localStorage.setItem("gauntletEmail", studentEmail);
+    }
 
     sendGameData({
-    game: "The Foundry",
-    event: "start",
-    user: username
-});
+        game: "The Foundry",
+        event: "start",
+        user: username,
+        email: studentEmail
+    });
 
-// =============================================
-// RESET CORE GAME STATE — DO NOT MODIFY STRUCTURE
-// =============================================
-// Resets all progression, scoring, and adaptive tracking
+    bossCheckpoint = 1;
+
     room = 1;
     bossHealth = 3;
     streak = 0;
@@ -2277,54 +2314,39 @@ function startGame() {
     lastTypes = [];
     adaptiveMode = "support";
     resetRemediationState();
+
     localStorage.removeItem("gauntletRoom");
     localStorage.removeItem("vaultHeart");
     localStorage.removeItem("vaultCore");
     localStorage.removeItem("vaultCrown");
 
     questionHistory = {
-    easy: [], medium: [], hard: [], elite: [], calculation: [],
-    easyBoss: [], mediumBoss: [], finalBoss: []
+        easy: [], medium: [], hard: [], elite: [], calculation: [],
+        easyBoss: [], mediumBoss: [], finalBoss: []
     };
+
     usedQuestions = {
-    easy: [], medium: [], hard: [], elite: [],
-    easyBoss: [], mediumBoss: [], finalBoss: []
+        easy: [], medium: [], hard: [], elite: [],
+        easyBoss: [], mediumBoss: [], finalBoss: []
     };
-    
-// =============================================
-// UI INITIALIZATION — SAFE TO CUSTOMIZE
-// =============================================
-// Shows main game elements and restores vault visuals
+
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameBox").style.display = "block";
     document.getElementById("artifactVault").style.display = "block";
     document.querySelectorAll(".torch").forEach(t => t.style.display = "block");
 
-   // =============================================
-   // VAULT RESTORE SYSTEM — SAFE WITH MATCHING IDS
-   // =============================================
-   // Restores previously unlocked artifacts from storage.
-   //
-   // IMPORTANT:
-   // IDs must match exactly:
-   // - localStorage key ("vaultCore")
-   // - HTML element id ("vaultCore")
-   //
-   // Mismatches = artifacts won't display
-   // =============================================    
-        if(localStorage.getItem("vaultHeart")){
+    if(localStorage.getItem("vaultHeart")){
         document.getElementById("vaultHeart").classList.add("unlocked");
-        }
+    }
 
-        if(localStorage.getItem("vaultCore")){
+    if(localStorage.getItem("vaultCore")){
         document.getElementById("vaultCore").classList.add("unlocked");
-        }    
+    }
 
-        if(localStorage.getItem("vaultCrown")){
+    if(localStorage.getItem("vaultCrown")){
         document.getElementById("vaultCrown").classList.add("unlocked");
-        }
-  
-// Start game loop: music + timer + first question
+    }
+
     bgMusic.play().catch(e => console.log("Audio started"));
     startTime = Date.now(); 
     loadQuestion();
@@ -2336,7 +2358,7 @@ function startGame() {
 // Allows pressing Enter to start the game
 // Improves usability, does not affect logic
 // =============================================
-document.getElementById("usernameInput").addEventListener("keypress", function(event) {
+document.getElementById("emailInput").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
         startGame();
@@ -3637,6 +3659,7 @@ function answer(choice) {
         game: "The Foundry",
         event: "question",
         user: username || "anonymous",
+		email: studentEmail,
         room: room,
         questionId: currentQuestion.id || 0,
         correct: isCorrect ? 1 : 0,
@@ -3769,6 +3792,7 @@ if(remediationState.active){
             game: "The Foundry",
             event: "boss_defeated",
             user: username,
+			email: studentEmail,
             room: room
          });
            
@@ -4289,6 +4313,7 @@ function handleVictory() {
 sendGameData({
 	event: "complete",
 	user: username,
+	email: studentEmail,
     room: room,
     questionId: 0,
     correct: 1,
@@ -4522,6 +4547,7 @@ function sendGameData(data) {
     game: data.game || "The Labyrinth of Choice",
     event: data.event || "",
     user: data.user || username || "anonymous",
+	email: studentEmail,
     room: Number(data.room ?? 0),
     questionId: Number(data.questionId ?? data.question ?? 0),
     correct: Number(data.correct ?? 0),
