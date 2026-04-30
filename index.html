@@ -2296,7 +2296,8 @@ function startGame() {
 	localStorage.setItem("gauntletPseudonym", username);
 
     sendGameData({
-        game: "The Foundry",
+        runID: runID,
+		game: "The Foundry",
         event: "start",
         user: username,
         email: studentEmail
@@ -3794,7 +3795,8 @@ if(remediationState.active){
         }
          // Boss defeated
          sendGameData({
-            game: "The Foundry",
+            runID: runID,
+			game: "The Foundry",
             event: "boss_defeated",
             user: username,
 			email: studentEmail,
@@ -4316,6 +4318,7 @@ function handleVictory() {
     const verificationCode = generateCode(username, accuracy, maxStreak, totalTimeMs);
 
 sendGameData({
+	runID: runID,
 	event: "complete",
 	user: username,
 	email: studentEmail,
