@@ -1582,7 +1582,7 @@ let questionHistory = {
     finalBoss: [],
 };
 
-function generatePseudonym(){
+function generatePseudonymFromEmail(email) {
     const adjectives = [
         "Iron", "Crimson", "Silent", "Golden", "Shadow", "Blazing",
         "Stone", "Storm", "Obsidian", "Frost", "Ember", "Steel"
@@ -1593,10 +1593,19 @@ function generatePseudonym(){
         "Cipher", "Titan", "Raven", "Vanguard", "Crown", "Engine"
     ];
 
-    const number = Math.floor(1000 + Math.random() * 9000);
+    let hash = 0;
+    const cleanEmail = email.trim().toLowerCase();
 
-    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    for (let i = 0; i < cleanEmail.length; i++) {
+        hash = ((hash << 5) - hash) + cleanEmail.charCodeAt(i);
+        hash |= 0;
+    }
+
+    const positiveHash = Math.abs(hash);
+
+    const adj = adjectives[positiveHash % adjectives.length];
+    const noun = nouns[Math.floor(positiveHash / adjectives.length) % nouns.length];
+    const number = 1000 + (positiveHash % 9000);
 
     return `${adj}${noun}${number}`;
 }
@@ -2280,16 +2289,10 @@ function startGame() {
 
     studentEmail = inputEmail;
 
-    let savedPseudo = localStorage.getItem("gauntletPseudonym");
-    let savedEmail = localStorage.getItem("gauntletEmail");
+	username = generatePseudonymFromEmail(studentEmail);
 
-    if (savedPseudo && savedEmail === studentEmail) {
-        username = savedPseudo;
-    } else {
-        username = generatePseudonym();
-        localStorage.setItem("gauntletPseudonym", username);
-        localStorage.setItem("gauntletEmail", studentEmail);
-    }
+	localStorage.setItem("gauntletEmail", studentEmail);
+	localStorage.setItem("gauntletPseudonym", username);
 
     sendGameData({
         game: "The Foundry",
