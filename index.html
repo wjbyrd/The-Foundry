@@ -2229,9 +2229,9 @@ crown:{
 // Removing this will NOT break the game,
 // but will remove convenience for returning users.
 // =============================================
-const savedUser = localStorage.getItem("gauntletUser");
-if(savedUser){
-    document.getElementById("usernameInput").value = savedUser;
+const savedEmail = localStorage.getItem("gauntletEmail");
+if (savedEmail && document.getElementById("emailInput")) {
+    document.getElementById("emailInput").value = savedEmail;
 }
 
 // =============================================
