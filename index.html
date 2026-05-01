@@ -3005,10 +3005,11 @@ function getProfitShutdownCombo(){
     let atc = avc + 2;
 
     return {
+        id:10000,
         q:`A firm has P = $${price}, MC = $${mc}, AVC = $${avc}, and ATC = $${atc}.
 What is the BEST decision?`,
         options:[
-            "Shut down because it is making a loss",
+            "Shut down because price is below average variable cost",
             "Continue operating and increase output",
             "Continue operating but decrease output",
             "Exit immediately because ATC exceeds price"
@@ -3016,8 +3017,8 @@ What is the BEST decision?`,
         a: (price < avc) ? 0 : (mc < price ? 1 : 2),
         tag:"profit",
         type:"multi-step",
-		objective:"9.4",
-        feedback:"Step 1: Shutdown depends on AVC. Step 2: Output depends on MR vs MC. Most people miss one of these."
+        objective:"LO9.4",
+        feedback:"Step 1: Shutdown depends on whether price covers AVC. Step 2: If the firm operates, output depends on MR versus MC. Do not confuse losses with shutdown."
     };
 }
 
@@ -3025,8 +3026,9 @@ function getCostOutputCombo(){
     let direction = Math.random() < 0.5 ? "increase" : "decrease";
 
     return {
-        q:`A firm experiences a ${direction} in marginal product of labor.
-What happens to cost and output?`,
+        id:10001,
+        q:`A firm experiences a ${direction} in marginal product of labor, with market price unchanged.
+What happens to marginal cost and the firm's profit-maximizing output?`,
         options:[
             "MC rises and output rises",
             "MC falls and output falls",
@@ -3038,8 +3040,8 @@ What happens to cost and output?`,
         a:2,
         tag:"production",
         type:"multi-step",
-		objective:"7.2",
-        feedback:"Productivity affects MC → MC determines output via MR = MC."
+        objective:"LO7.2",
+        feedback:"Productivity moves marginal cost. With price unchanged, the firm adjusts output using MR = MC."
     };
 }
     
@@ -3047,21 +3049,22 @@ function getMarketChainCombo(){
     let scenario = Math.random() < 0.5 ? "profit" : "loss";
 
     return {
+        id:10002,
         q:`Firms are earning economic ${scenario} in a competitive market.
-What happens next AND in the long run?`,
+What happens in the short run, and what happens in the long run?`,
         options:[
-            "Short run: nothing → Long run: nothing",
+            "Short run: nothing changes → Long run: nothing changes",
             scenario === "profit"
-                ? "Short run: profit continues → Long run: entry drives price down"
-                : "Short run: losses continue → Long run: exit drives price up",
+                ? "Short run: firms earn profit → Long run: entry increases supply and drives price down"
+                : "Short run: firms earn losses → Long run: exit decreases supply and drives price up",
             "Demand shifts permanently",
             "Firms shut down immediately"
         ],
         a:1,
         tag:"market",
         type:"multi-step",
-		objective:"10.2",
-        feedback:"You must separate short run vs long run. Most students collapse them."
+        objective:"LO10.2",
+        feedback:"Do not collapse the time frames. In the short run, firms experience profit or loss. In the long run, entry or exit adjusts supply and pushes profit back toward zero."
     };
 }
   
@@ -3071,10 +3074,11 @@ function getEfficiencyProfitCombo(){
     let atc = price + [1,2][Math.floor(Math.random()*2)];
 
     return {
+        id:10003,
         q:`A firm produces where P = $${price} and MC = $${mc}, but ATC = $${atc}.
 Which statement is TRUE?`,
         options:[
-            "The firm is inefficient because it is earning a loss",
+            "The firm is not allocatively efficient because it is earning a loss",
             "The firm is allocatively efficient but earning a loss",
             "The firm should shut down immediately",
             "The firm is earning profit because P = MC"
@@ -3082,8 +3086,8 @@ Which statement is TRUE?`,
         a:1,
         tag:"efficiency",
         type:"trap",
-		objective:"10.3",
-        feedback:"P = MC → allocative efficiency. Profit depends on P vs ATC. These are NOT the same."
+        objective:"LO10.3",
+        feedback:"P = MC means allocative efficiency. Since P is below ATC, the firm is earning a loss. Efficiency and profit are not the same thing."
     };
 }
     
