@@ -2288,12 +2288,14 @@ function startGame() {
         return;
     }
 
-    studentEmail = inputEmail;
+studentEmail = inputEmail;
+username = generatePseudonymFromEmail(studentEmail);
 
-	username = generatePseudonymFromEmail(studentEmail);
+runID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-	localStorage.setItem("gauntletEmail", studentEmail);
-	localStorage.setItem("gauntletPseudonym", username);
+localStorage.setItem("gauntletEmail", studentEmail);
+localStorage.setItem("gauntletPseudonym", username);
+localStorage.setItem("gauntletRunID", runID);
 
     sendGameData({
         runID: runID,
